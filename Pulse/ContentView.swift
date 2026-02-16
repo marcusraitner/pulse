@@ -52,11 +52,11 @@ struct ContentView: View {
                             ToolbarItem (placement: .topBarLeading) {
                                 if #available(iOS 26, *) {
                                     Button(role: .confirm) {
-                                        isPresentingAbout.toggle()
+                                        isPresentingAbout = false
                                     }
                                 } else {
                                     Button("Close") {
-                                        isPresentingAbout.toggle()
+                                        isPresentingAbout = false
                                     }
                                 }
                             }
@@ -70,11 +70,11 @@ struct ContentView: View {
                             ToolbarItem (placement: .confirmationAction) {
                                 if #available(iOS 26, *) {
                                     Button(role: .confirm) {
-                                        isPresentingSettings.toggle()
+                                        isPresentingSettings = false
                                     }
                                 } else {
                                     Button("Close") {
-                                        isPresentingSettings.toggle()
+                                        isPresentingSettings = false
                                     }
                                 }
                             }
@@ -83,18 +83,14 @@ struct ContentView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Image(systemName: "gearshape.fill")
-                        .foregroundColor(.white)
-                        .onTapGesture {
-                            isPresentingSettings.toggle()
-                        }
+                    Button("Settings", systemImage: "gearshape.fill") {
+                        isPresentingSettings = true
+                    }
                 }
                 ToolbarItem(placement: .navigation) {
-                    Image(systemName: "line.3.horizontal")
-                        .foregroundStyle(.white)
-                        .onTapGesture {
-                            isPresentingAbout.toggle()
-                        }
+                    Button("About", systemImage: "line.3.horizontal") {
+                        isPresentingAbout = true
+                    }
                 }
             }
             .task {
@@ -105,7 +101,8 @@ struct ContentView: View {
                     print(error.localizedDescription)
                 }
             }
-            .task {
+            .onChange(of: allEntries, initial: true) {
+                // allEntries changes when a new day is added; let's scroll to it
                 selectedEntry = today
             }
             .onChange(of: scenePhase) {
@@ -149,7 +146,7 @@ struct ContentView: View {
         }
         
         // entry for today missing: create and save it
-        let today = DailyEntry(date: Date())
+        let today = DailyEntry(date: .now)
         context.insert(today)
         try? context.save()
     }
