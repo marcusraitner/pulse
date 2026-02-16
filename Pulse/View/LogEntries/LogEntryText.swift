@@ -12,16 +12,8 @@ struct LogEntryText: View {
     
     var body: some View {
         HStack(alignment: .top) {
-            Text(
-                    """
-                    \(Text(logEntry.timestamp.formatted(.dateTime
-                            .hour()
-                            .minute()))
-                        .bold()): \
-                    \(Text("\(logEntry.log)"))
-                    """)
+            Text("\(Text(logEntry.formatedTimestamp).bold()): \(Text("\(logEntry.log)"))")
             Spacer()
-
             ScoreLabelView(score: logEntry.score)
         }
     }

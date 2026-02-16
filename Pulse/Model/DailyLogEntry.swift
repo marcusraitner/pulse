@@ -15,6 +15,10 @@ class DailyLogEntry: Identifiable {
     var log: String
     var score: Int
     
+    var formatedTimestamp: String {
+        self.timestamp.formatted(.dateTime.hour().minute())
+    }
+    
     init(timestamp: Date, log: String, score: Int) {
         self.timestamp = timestamp
         self.log = log
