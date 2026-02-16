@@ -2,6 +2,8 @@
 
 A quick check-in for your mind. Capture your moments, understand your patterns.
 
+<img width="590" height="1278" alt="IMG_5089" src="https://github.com/user-attachments/assets/7db24158-0507-42c2-b24c-9ba81b54a5d6" />
+
 ## Description
 
 How are you really feeling right now? In the rush of daily life, we often forget to pause. Pulse is your minimalist micro-journaling companion designed to make reflection as effortless as possible.
