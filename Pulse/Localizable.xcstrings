@@ -1,0 +1,338 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        }
+      }
+    },
+    "%@: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@:%2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
+    "%lld" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        }
+      }
+    },
+    "© 2026 Marcus Raitner" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "© 2026 Marcus Raitner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "© 2026 Marcus Raitner"
+          }
+        }
+      }
+    },
+    "A quick check-in for your mind. Capture your moments, understand your patterns." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein kurzer Check-in für dich. Erfasse deine Momente, verstehe deine Muster."
+          }
+        }
+      }
+    },
+    "Add reminder" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neue Erinnerung"
+          }
+        }
+      }
+    },
+    "Adjust general settings here." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passe allgemeine Einstellungen hier an."
+          }
+        }
+      }
+    },
+    "Background image by %@ published on [Unsplash](https://unsplash.com/de/fotos/wanderer-uberqueren-bei-sonnenuntergang-schneebedeckte-bergkamme-lJL53PfBYmM)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hintergrundbild von %@ veröffentlicht auf [Unsplash](https://unsplash.com/de/fotos/wanderer-uberqueren-bei-sonnenuntergang-schneebedeckte-bergkamme-lJL53PfBYmM)"
+          }
+        }
+      }
+    },
+    "Close" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        }
+      }
+    },
+    "Contact: [pulse@raitner.de](mailto:pulse@raitner.de)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontakt: [pulse@raitner.de](mailto:pulse@raitner.de)"
+          }
+        }
+      }
+    },
+    "Credits" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quellenangaben"
+          }
+        }
+      }
+    },
+    "Enable reminders" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerungen senden"
+          }
+        }
+      }
+    },
+    "Every day at" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeden Tag um"
+          }
+        }
+      }
+    },
+    "Feedback" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback"
+          }
+        }
+      }
+    },
+    "Freeze History" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Historie sperren"
+          }
+        }
+      }
+    },
+    "General" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allgemein"
+          }
+        }
+      }
+    },
+    "If enabled, entries in the past cannot be modified" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einträge in der Vergangenheit können nicht verändert werden"
+          }
+        }
+      }
+    },
+    "It's time to log your activities and feelings!" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nimm dir kurz Zeit deine Aktivitäten und Gefühle zu notieren."
+          }
+        }
+      }
+    },
+    "Kseniia Lobko" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kseniia Lobko"
+          }
+        }
+      }
+    },
+    "No sample data available" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Beispieldaten vorhanden"
+          }
+        }
+      }
+    },
+    "Note what is on your mind or what is happening and rate how you are feeling about this from -2 (bad) to 2 (good)." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notiere was dich in diesem Moment beschäftigt und wie du dich dabei fühlst auf einer Skala von -2 (schlecht) bis 2 (gut)"
+          }
+        }
+      }
+    },
+    "Notifications are currently disabled. Please open settings to enable them." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Moment sind Mitteilungen deaktiviert. Bitte öffne die Systemeinstellungen, um sie zu erlauben."
+          }
+        }
+      }
+    },
+    "Open Settings" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systemeinstellungen öffnen"
+          }
+        }
+      }
+    },
+    "Pulse" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulse"
+          }
+        }
+      }
+    },
+    "Pulse is being improved contiously. Looking forward to your feedback and suggestions. Thanks!" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulse wird ständig weiterentwickelt. Wir freuen uns über dein Feedback. Danke!"
+          }
+        }
+      }
+    },
+    "Reminders" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerungen"
+          }
+        }
+      }
+    },
+    "Set multiple daily reminders to log what's happening and how you feel about it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lass dich täglich mehrfach erinnern, um zu notieren, was gerade passiert und wie es dir geht."
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen"
+          }
+        }
+      }
+    },
+    "Submit Issues on [GitHub](https://github.com/marcusraitner/pulse/issues)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feature Requests und Bugs über [GitHub](https://github.com/marcusraitner/pulse/issues)"
+          }
+        }
+      }
+    },
+    "Version: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: %@"
+          }
+        }
+      }
+    },
+    "What's going on?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was passiert gerade?"
+          }
+        }
+      }
+    },
+    "Your Reminders" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Erinnerungen"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

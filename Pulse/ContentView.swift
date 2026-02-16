@@ -16,6 +16,7 @@ struct ContentView: View {
     
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
     @State private var isPresentingSettings: Bool = false
+    @State private var isPresentingAbout: Bool = false
     
     private var today: DailyEntry {
         // create today's entry if missing
@@ -44,6 +45,24 @@ struct ContentView: View {
                     LogEntriesView(day: selectedEntry)
                 }
             }
+            .sheet(isPresented: $isPresentingAbout) {
+                NavigationStack {
+                    AboutView()
+                        .toolbar {
+                            ToolbarItem (placement: .topBarLeading) {
+                                if #available(iOS 26, *) {
+                                    Button(role: .confirm) {
+                                        isPresentingAbout.toggle()
+                                    }
+                                } else {
+                                    Button("Close") {
+                                        isPresentingAbout.toggle()
+                                    }
+                                }
+                            }
+                        }
+                }
+            }
             .sheet(isPresented: $isPresentingSettings, onDismiss: setNotifications) {
                 NavigationStack {
                     SettingsView()
@@ -68,6 +87,13 @@ struct ContentView: View {
                         .foregroundColor(.white)
                         .onTapGesture {
                             isPresentingSettings.toggle()
+                        }
+                }
+                ToolbarItem(placement: .navigation) {
+                    Image(systemName: "line.3.horizontal")
+                        .foregroundStyle(.white)
+                        .onTapGesture {
+                            isPresentingAbout.toggle()
                         }
                 }
             }
