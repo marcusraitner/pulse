@@ -2,7 +2,7 @@
 
 A quick check-in for your mind. Capture your moments, understand your patterns.
 
-<img width="590" height="1278" alt="IMG_5089" src="https://github.com/user-attachments/assets/7db24158-0507-42c2-b24c-9ba81b54a5d6" />
+<img width="640"  src="https://github.com/user-attachments/assets/8486c800-9525-4536-868e-7050da8f3305" />
 
 ## Description
 
