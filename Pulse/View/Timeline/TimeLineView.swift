@@ -26,12 +26,10 @@ struct TimeLineView: View {
         ZStack {
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 3) {
-                    ForEach(allEntries) { entry in
+                    
+                    ForEach(Array(allEntries.enumerated()), id: \.offset) { i, entry in
                         let avg: CGFloat = entry.averageScore
-                        let barHeight: CGFloat = max(
-                            1,
-                            heightScale * abs(avg)
-                        )
+                        let barHeight: CGFloat = max(1, heightScale * abs(avg))
                         let yOffset: CGFloat = -0.5 * heightScale * avg
 
                         Group {
@@ -59,8 +57,9 @@ struct TimeLineView: View {
                                 }
                         }
                         .id(entry.date)
+                        .accessibilityIdentifier("entry\(i)")
                         .onTapGesture {
-                            withAnimation(.smooth) {
+                            withAnimation(.default) {
                                 selectedEntry = entry
                                 position.scrollTo(
                                     id: entry.date,
@@ -73,6 +72,7 @@ struct TimeLineView: View {
                 .scrollTargetLayout()
                 .coordinateSpace(Self.geometry)
             }
+            .accessibilityIdentifier("timelineView")
             .scrollTargetBehavior(
                 TimeLineViewScrollTargetBehavior(
                     frames: frames

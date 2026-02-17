@@ -53,6 +53,26 @@
         }
       }
     },
+    "👉 Submit issues directly on [GitHub](https://github.com/marcusraitner/pulse/issues)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "👉 Bugs und Ideen gerne direkt auf [GitHub](https://github.com/marcusraitner/pulse/issues)"
+          }
+        }
+      }
+    },
+    "📧 Or drop me a line: [pulse@raitner.de](mailto:pulse@raitner.de)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "📧 Schick uns eine Nachricht: [pulse@raitner.de](mailto:pulse@raitner.de)"
+          }
+        }
+      }
+    },
     "A quick check-in for your mind. Capture your moments, understand your patterns." : {
       "localizations" : {
         "de" : {
@@ -93,12 +113,22 @@
         }
       }
     },
-    "Background image by %@ published on [Unsplash](https://unsplash.com/de/fotos/wanderer-uberqueren-bei-sonnenuntergang-schneebedeckte-bergkamme-lJL53PfBYmM)" : {
+    "And do not forget to leave a positive review in the App Store! That means a lot to us." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hintergrundbild von %@ veröffentlicht auf [Unsplash](https://unsplash.com/de/fotos/wanderer-uberqueren-bei-sonnenuntergang-schneebedeckte-bergkamme-lJL53PfBYmM)"
+            "value" : "Und vergiss nicht: Eine positive Bewertung im App Store bedeutet uns sehr viel!"
+          }
+        }
+      }
+    },
+    "Background images by %@ published on [Unsplash](https://unsplash.com/de/@hello_kseniia)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hintergrundbilder von %@ veröffentlicht auf [Unsplash](https://unsplash.com/de/@hello_kseniia)"
           }
         }
       }
@@ -109,16 +139,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Schließen"
-          }
-        }
-      }
-    },
-    "Contact: [pulse@raitner.de](mailto:pulse@raitner.de)" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kontakt: [pulse@raitner.de](mailto:pulse@raitner.de)"
           }
         }
       }
@@ -263,22 +283,22 @@
         }
       }
     },
-    "Pulse is being improved contiously. Looking forward to your feedback and suggestions. Thanks!" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pulse wird ständig weiterentwickelt. Wir freuen uns über dein Feedback. Danke!"
-          }
-        }
-      }
-    },
     "Reminders" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erinnerungen"
+          }
+        }
+      }
+    },
+    "selectedEntry:%@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "selectedEntry:%@"
           }
         }
       }
@@ -303,22 +323,22 @@
         }
       }
     },
-    "Submit Issues on [GitHub](https://github.com/marcusraitner/pulse/issues)" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bugs und Ideen direkt auf [GitHub](https://github.com/marcusraitner/pulse/issues)"
-          }
-        }
-      }
-    },
     "Version: %@" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version: %@"
+          }
+        }
+      }
+    },
+    "We are working hard to improve Pulse continuously. Looking forward to your feedback and suggestions. Thanks!" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wir arbeiten hart daran, Pulse ständig weiterzuentwickeln und freuen uns auf dein Feedback. Vielen Dank!"
           }
         }
       }

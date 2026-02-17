@@ -27,14 +27,18 @@ struct AboutView: View {
             Text("Feedback")
                 .font(Font.title)
                 .padding(.top, 20)
-            Text("Pulse is being improved contiously. Looking forward to your feedback and suggestions. Thanks!")
-            Text("Submit Issues on [GitHub](https://github.com/marcusraitner/pulse/issues)")
-            Text("Contact: [pulse@raitner.de](mailto:pulse@raitner.de)")
+            Text("We are working hard to improve Pulse continuously. Looking forward to your feedback and suggestions. Thanks!")
+            Text("👉 Submit issues directly on [GitHub](https://github.com/marcusraitner/pulse/issues)")
+                .padding(.top, 5)
+            Text("📧 Or drop me a line: [pulse@raitner.de](mailto:pulse@raitner.de)")
+            Text("And do not forget to leave a positive review in the App Store! That means a lot to us.")
+                .bold()
+                .padding(.top, 5)
             Text("Credits")
                 .font(Font.title)
                 .padding(.top, 20)
-            Text("Background image by \(Text("Kseniia Lobko").bold()) published on [Unsplash](https://unsplash.com/de/fotos/wanderer-uberqueren-bei-sonnenuntergang-schneebedeckte-bergkamme-lJL53PfBYmM)")
-            
+            Text("Background images by \(Text("Kseniia Lobko").bold()) published on [Unsplash](https://unsplash.com/de/@hello_kseniia)")
+
             Spacer()
             Text("© 2026 Marcus Raitner")
         }

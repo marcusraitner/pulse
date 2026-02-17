@@ -41,7 +41,7 @@ struct NewLogEntryView: View {
                 "Note what is on your mind or what is happening and rate how you are feeling about this from -2 (bad) to 2 (good)."
             )
             .font(.footnote)
-            .padding(.top)
+            .padding(.top, 5)
         }
         .padding()
     }
@@ -50,10 +50,7 @@ struct NewLogEntryView: View {
 
 
 #Preview {
-    @Previewable @State var logEntries: [DailyLogEntry] = [
-        //        DailyLogEntry(timestamp: Date.now, log: "AWESOME!", score: 2),
-        //      DailyLogEntry(timestamp: Date.now.addingTimeInterval(-20000), log: "NOT SO GREAT...", score: -1)
-    ]
+    @Previewable @State var logEntries: [DailyLogEntry] = []
 
     NewLogEntryView(logEntries: $logEntries)
 }

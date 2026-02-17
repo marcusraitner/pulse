@@ -17,14 +17,16 @@ struct SettingsView: View {
     @State private var notificationsAuthorized: Bool = true
     @Environment(\.dismiss) private var dismiss
 
+    private let imageFrame: CGFloat = 55
+    private let imageSize: CGFloat = 32
     
     var body: some View {
         Form {
             Section {
                 VStack(alignment: .leading) {
                     Image(systemName: "gear")
-                        .font(.system(size: 32))
-                        .frame(width: 55, height: 55)
+                        .font(.system(size: imageSize))
+                        .frame(width: imageFrame, height: imageFrame)
                         .foregroundStyle(.white)
                         .background(.secondary, in: RoundedRectangle(cornerRadius: 16))
                     Text("General")
@@ -42,8 +44,8 @@ struct SettingsView: View {
             Section {
                 VStack(alignment: .leading) {
                     Image(systemName: "bell.fill")
-                        .font(.system(size: 32))
-                        .frame(width: 55, height: 55)
+                        .font(.system(size: imageSize))
+                        .frame(width: imageFrame, height: imageFrame)
                         .foregroundStyle(.white)
                         .background(.red, in: RoundedRectangle(cornerRadius: 16))
                     Text("Reminders")
