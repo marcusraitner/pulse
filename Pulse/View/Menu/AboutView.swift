@@ -48,7 +48,10 @@ struct AboutView: View {
 
 extension UIApplication {
     static var appVersion: String? {
-        return Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
+        guard let version, let build else { return nil }
+        return "\(version) (\(build))"
     }
 }
 
