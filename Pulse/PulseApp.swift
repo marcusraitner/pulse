@@ -13,6 +13,7 @@ struct PulseApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(\.featureFlags, FeatureFlags(editHistory: false))
         }
         .modelContainer(for: DailyEntry.self)
     }

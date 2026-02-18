@@ -13,9 +13,11 @@ struct ContentView: View {
     
     @Environment(\.modelContext) private var context
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.featureFlags) private var featureFlags
     
     @AppStorage("notificationsEnabled") private var notificationsEnabled: Bool = true
+    @AppStorage("freezeHistory") private var freezeHistory: Bool = true
     
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
     @State private var isPresentingSettings: Bool = false
@@ -105,20 +107,7 @@ struct ContentView: View {
                 }
             }
             .task {
-#if DEBUG
-                let args = ProcessInfo.processInfo.arguments
-
-                if args.contains("--disable-animations") {
-                    UIView.setAnimationsEnabled(false)
-                }
-#endif // DEBUG only for testing
-
-                // Request authorization for notifications
-                do {
-                    try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
-                } catch {
-                    print(error.localizedDescription)
-                }
+                await initApplication()
             }
             .onChange(of: allEntries, initial: true) {
                 // allEntries changes when a new day is added; let's scroll to it
@@ -146,6 +135,29 @@ struct ContentView: View {
         // and a values containing the selectedEntry for UI Tests
         .accessibilityValue(Text("selectedEntry:\(formatDate(selectedEntry.date))"))
 #endif // DEBUG only for UI Tests
+    }
+    
+    private func initApplication() async {
+        
+#if DEBUG
+        let args = ProcessInfo.processInfo.arguments
+
+        if args.contains("--disable-animations") {
+            UIView.setAnimationsEnabled(false)
+        }
+#endif // DEBUG only for testing
+
+        if !featureFlags.editHistory {
+            // make sure, that history is frozen if feature is disabled
+            freezeHistory = true
+        }
+        
+        // Request authorization for notifications
+        do {
+            try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
+        } catch {
+            print(error.localizedDescription)
+        }
     }
     
     private func setNotifications() {

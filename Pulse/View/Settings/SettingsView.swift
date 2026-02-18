@@ -16,29 +16,32 @@ struct SettingsView: View {
     @State private var notificationTimes: [Date] = []
     @State private var notificationsAuthorized: Bool = true
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.featureFlags) private var featureFlags
 
     private let imageFrame: CGFloat = 55
     private let imageSize: CGFloat = 32
     
     var body: some View {
         Form {
-            Section {
-                VStack(alignment: .leading) {
-                    Image(systemName: "gear")
-                        .font(.system(size: imageSize))
-                        .frame(width: imageFrame, height: imageFrame)
-                        .foregroundStyle(.white)
-                        .background(.secondary, in: RoundedRectangle(cornerRadius: 16))
-                    Text("General")
-                        .font(.title2.bold())
-                        .padding(.top, 4)
-                    Text("Adjust general settings here.")
-                        .foregroundStyle(.secondary)
+            if featureFlags.editHistory {
+                Section {
+                    VStack(alignment: .leading) {
+                        Image(systemName: "gear")
+                            .font(.system(size: imageSize))
+                            .frame(width: imageFrame, height: imageFrame)
+                            .foregroundStyle(.white)
+                            .background(.secondary, in: RoundedRectangle(cornerRadius: 16))
+                        Text("General")
+                            .font(.title2.bold())
+                            .padding(.top, 4)
+                        Text("Adjust general settings here.")
+                            .foregroundStyle(.secondary)
 
-                }
-                Toggle(isOn: $freezeHistory) {
-                    Text("Freeze History")
-                    Text("If enabled, entries in the past cannot be modified")
+                    }
+                    Toggle(isOn: $freezeHistory) {
+                        Text("Freeze History")
+                        Text("If enabled, entries in the past cannot be modified")
+                    }
                 }
             }
             Section {
