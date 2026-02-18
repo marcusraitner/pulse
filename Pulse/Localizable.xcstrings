@@ -153,6 +153,9 @@
         }
       }
     },
+    "Delete" : {
+
+    },
     "Enable reminders" : {
       "localizations" : {
         "de" : {

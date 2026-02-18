@@ -15,25 +15,30 @@ struct LogEntriesView: View {
     private var isToday: Bool {
         Calendar.current.isDateInToday(day.date)
     }
-
+    
     var body: some View {
         VStack {
+            let logs = Binding(
+                get: { day.logEntries ?? [] },
+                set: { newValue in day.logEntries = newValue }
+            )
+            
             if isToday || !freezeHistory {
                 if #available(iOS 26.0, *) {
-                    NewLogEntryView(logEntries: $day.logEntries)
+                    NewLogEntryView(logEntries: logs)
                         .glassEffect(.regular, in: Rectangle())
                 } else {
-                    NewLogEntryView(logEntries: $day.logEntries)
+                    NewLogEntryView(logEntries: logs)
                         .background(.regularMaterial, in: Rectangle())
                 }
             }
 
             List {
-                ForEach(
-                    day.logEntries.sorted(by: {
-                        $0.timestamp > $1.timestamp
-                    })
-                ) { entry in
+                let logEntries = day.logEntries?.sorted(by: {
+                    $0.timestamp > $1.timestamp
+                }) ?? []
+                
+                ForEach(logEntries) { entry in
                     LogEntryText(logEntry: entry)
                         .listRowBackground(
                             ScoreStyleHelper.color(for: entry.score)
@@ -42,7 +47,7 @@ struct LogEntriesView: View {
                         .swipeActions(edge: .trailing) {
                             if isToday || !freezeHistory {
                                 Button(role: .destructive) {
-                                    day.logEntries.removeAll(where: {
+                                    day.logEntries?.removeAll(where: {
                                         $0 == entry
                                     })
                                 } label: {
@@ -78,3 +83,4 @@ struct LogEntriesViewPreview: View {
     LogEntriesViewPreview()
         .modelContainer(SampleData.shared.modelContainer)
 }
+

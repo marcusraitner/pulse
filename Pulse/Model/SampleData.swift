@@ -21,8 +21,7 @@ class SampleData {
                 DailyLogEntry(
                     timestamp: Date(timeIntervalSinceNow: -5000),
                     log: "Good start; got distracted after an hour",
-                    score: 2
-                )
+                    score: 2)
             ],
         ),
         .init(

@@ -105,6 +105,14 @@ struct ContentView: View {
                         isPresentingAbout = true
                     }
                 }
+                if featureFlags.enableRemovingEntries {
+                    ToolbarItem(placement: .bottomBar) {
+                        Button("Delete", systemImage: "trash") {
+                            context.delete(selectedEntry)
+                            try? context.save()
+                        }
+                    }
+                }
             }
             .task {
                 await initApplication()

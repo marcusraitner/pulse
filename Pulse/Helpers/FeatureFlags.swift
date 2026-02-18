@@ -10,12 +10,14 @@ import SwiftUI
 
 public struct FeatureFlags: Sendable, Decodable {
     public let editHistory: Bool
+    public let enableRemovingEntries: Bool
     
-    init(editHistory: Bool = false) {
+    init(editHistory: Bool = false, enableRemovingEntries: Bool = false) {
         self.editHistory = editHistory
+        self.enableRemovingEntries = enableRemovingEntries
     }
 }
 
 extension EnvironmentValues {
-    @Entry public var featureFlags = FeatureFlags(editHistory: false)
+    @Entry public var featureFlags = FeatureFlags(editHistory: false, enableRemovingEntries: false)
 }
