@@ -29,7 +29,8 @@ struct PulseApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.featureFlags, FeatureFlags(editHistory: false, enableRemovingEntries: false))
+                .environment(\.featureFlags, FeatureFlags(editHistory: false, adminEnabled: false))
+            
         }
         .modelContainer(modelContainer)
     }

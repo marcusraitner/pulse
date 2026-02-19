@@ -14,8 +14,9 @@ struct NewLogEntryView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            HStack {
+            VStack(alignment: .leading) {
                 TextField("What's going on?", text: $newLog)
+                    .submitLabel(.done)
                     .onSubmit {
                         if !newLog.isEmpty {
                             logEntries.append(
@@ -29,19 +30,15 @@ struct NewLogEntryView: View {
                             newScore = 0
                         }
                     }
-                    .submitLabel(.done)
-
-                Stepper(value: $newScore, in: -2...2, step: 1) {
+                HStack {
+                    Stepper(value: $newScore, in: -2...2, step: 1) {
+                        Text("How are you feeling?")
+                    }
                     ScoreLabelView(score: newScore)
+                        .padding(.leading, 2)
                 }
-                .fixedSize()
+                .padding(.top, 4)
             }
-
-            Text(
-                "Note what is on your mind or what is happening and rate how you are feeling about this from -2 (bad) to 2 (good)."
-            )
-            .font(.footnote)
-            .padding(.top, 5)
         }
         .padding()
     }

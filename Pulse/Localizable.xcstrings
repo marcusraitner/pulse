@@ -58,17 +58,17 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "👉 Bugs und Ideen gerne direkt auf [GitHub](https://github.com/marcusraitner/pulse/issues)"
+            "value" : "👉 Bugs und Ideen direkt auf [GitHub](https://github.com/marcusraitner/pulse/issues)"
           }
         }
       }
     },
-    "📧 Or drop me a line: [pulse@raitner.de](mailto:pulse@raitner.de)" : {
+    "📧 Or send us an [email](mailto:pulse@raitner.de)" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "📧 Schick uns eine Nachricht: [pulse@raitner.de](mailto:pulse@raitner.de)"
+            "value" : "📧 Oder schick uns eine [E-Mail](mailto:pulse@raitner.de)"
           }
         }
       }
@@ -113,12 +113,12 @@
         }
       }
     },
-    "And do not forget to leave a positive review in the App Store! That means a lot to us." : {
+    "And please leave a positive review in the App Store! That means a lot to us." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Und vergiss nicht: Eine positive Bewertung im App Store bedeutet uns sehr viel!"
+            "value" : "Wir freuen uns über eine positive Bewertung im App-Store!"
           }
         }
       }
@@ -153,8 +153,25 @@
         }
       }
     },
-    "Delete" : {
-
+    "Danger Zone" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gefahrenzone"
+          }
+        }
+      }
+    },
+    "Delete Entry" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eintrag löschen"
+          }
+        }
+      }
     },
     "Enable reminders" : {
       "localizations" : {
@@ -206,6 +223,16 @@
         }
       }
     },
+    "How are you feeling?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie geht es dir?"
+          }
+        }
+      }
+    },
     "If enabled, entries in the past cannot be modified" : {
       "localizations" : {
         "de" : {
@@ -246,16 +273,6 @@
         }
       }
     },
-    "Note what is on your mind or what is happening and rate how you are feeling about this from -2 (bad) to 2 (good)." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Notiere was dich in diesem Moment beschäftigt und wie du dich dabei fühlst auf einer Skala von -2 (schlecht) bis 2 (gut)"
-          }
-        }
-      }
-    },
     "Notifications are currently disabled. Please open settings to enable them." : {
       "localizations" : {
         "de" : {
@@ -292,6 +309,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erinnerungen"
+          }
+        }
+      }
+    },
+    "Seed Samples" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einträge erzeugen "
           }
         }
       }

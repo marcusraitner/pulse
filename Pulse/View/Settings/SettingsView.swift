@@ -8,6 +8,7 @@
 
 import SwiftUI
 import UserNotifications
+import SwiftData
 
 struct SettingsView: View {
     @AppStorage("freezeHistory") private var freezeHistory: Bool = true
@@ -17,12 +18,25 @@ struct SettingsView: View {
     @State private var notificationsAuthorized: Bool = true
     @Environment(\.dismiss) private var dismiss
     @Environment(\.featureFlags) private var featureFlags
+    @Environment(\.modelContext) private var context
 
     private let imageFrame: CGFloat = 55
     private let imageSize: CGFloat = 32
     
     var body: some View {
         Form {
+            if featureFlags.adminEnabled {
+                Section {
+                    Text("Danger Zone")
+                        .foregroundStyle(Color.red)
+                    Button("Seed Samples") {
+                        for entry in SampleData.shared.previewSampleData {
+                            context.insert(entry)
+                        }
+                        try? context.save()
+                    }
+                }
+            }
             if featureFlags.editHistory {
                 Section {
                     VStack(alignment: .leading) {
