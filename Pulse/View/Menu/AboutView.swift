@@ -35,12 +35,16 @@ struct AboutView: View {
                 .bold()
                 .padding(.top, 5)
             Text("Credits")
-                .font(Font.title)
+                .font(Font.title3)
                 .padding(.top, 20)
             Text("Background images by \(Text("Kseniia Lobko").bold()) published on [Unsplash](https://unsplash.com/de/@hello_kseniia)")
 
             Spacer()
-            Text("© 2026 Marcus Raitner")
+            HStack {
+                Spacer()
+                Text("© 2026 Marcus Raitner")
+                Spacer()
+            }
         }
         .padding()
     }
