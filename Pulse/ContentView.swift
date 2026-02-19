@@ -62,7 +62,7 @@ struct ContentView: View {
                 NavigationStack {
                     AboutView()
                         .toolbar {
-                            ToolbarItem (placement: .topBarLeading) {
+                            ToolbarItem (placement: .confirmationAction) {
                                 if #available(iOS 26, *) {
                                     Button(role: .confirm) {
                                         isPresentingAbout = false
@@ -99,11 +99,13 @@ struct ContentView: View {
                     Button("Settings", systemImage: "gearshape.fill") {
                         isPresentingSettings = true
                     }
+                    .tint(.white)
                 }
                 ToolbarItem(placement: .topBarLeading) {
                     Button("About", systemImage: "line.3.horizontal") {
                         isPresentingAbout = true
                     }
+                    .tint(.white)
                 }
                 if featureFlags.adminEnabled {
                     ToolbarItem(placement: .bottomBar) {
@@ -111,6 +113,7 @@ struct ContentView: View {
                             context.delete(selectedEntry)
                             try? context.save()
                         }
+                        .tint(.white)
                     }
                 }
             }

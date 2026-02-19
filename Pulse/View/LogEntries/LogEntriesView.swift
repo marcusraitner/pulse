@@ -11,6 +11,7 @@ import SwiftUI
 struct LogEntriesView: View {
     @Bindable var day: DailyEntry
     @AppStorage("freezeHistory") private var freezeHistory: Bool = true
+    @Environment(\.featureFlags) private var featureFlags
 
     private var isToday: Bool {
         Calendar.current.isDateInToday(day.date)
@@ -40,6 +41,7 @@ struct LogEntriesView: View {
                 
                 ForEach(logEntries) { entry in
                     LogEntryText(logEntry: entry)
+                        .padding(.vertical, featureFlags.iOS26 ? 0 : 5)
                         .listRowBackground(
                             ScoreStyleHelper.color(for: entry.score)
                                 .opacity(0.85)
