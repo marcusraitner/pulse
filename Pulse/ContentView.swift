@@ -105,6 +105,14 @@ struct ContentView: View {
                         isPresentingAbout = true
                     }
                 }
+                if featureFlags.adminEnabled {
+                    ToolbarItem(placement: .bottomBar) {
+                        Button("Delete Entry", systemImage: "trash") {
+                            context.delete(selectedEntry)
+                            try? context.save()
+                        }
+                    }
+                }
             }
             .task {
                 await initApplication()
@@ -211,9 +219,10 @@ struct ContentView: View {
     private var dateView: some View {
         HStack {
             VStack(alignment: .center) {
+                Text(selectedEntry.date.formatted(.dateTime.weekday(.wide)))
                 Text(
                     selectedEntry.date.formatted(
-                        .dateTime.day().month().year().weekday(.wide)
+                        .dateTime.day().month().year()
                     )
                 )
             }
