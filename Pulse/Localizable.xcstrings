@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Empty String)"
+          }
+        }
+      }
+    },
     "%@" : {
       "localizations" : {
         "de" : {
@@ -153,12 +163,12 @@
         }
       }
     },
-    "Capture your mood from -2 (bad) to 2 (good)" : {
+    "Capture your mood on a scale from -2 (bad) to 2 (good)" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bewerte deine Stimmung von -2 (schlecht) bis 2 (gut)"
+            "value" : "Bewerte deine Stimmung auf einer Skala von -2 (schlecht) bis 2 (gut)"
           }
         }
       }
@@ -343,6 +353,16 @@
         }
       }
     },
+    "Please capture your moment here." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte erfasse deinen Moment hier."
+          }
+        }
+      }
+    },
     "Pulse" : {
       "localizations" : {
         "de" : {
@@ -398,7 +418,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lass dich täglich mehrfach erinnern, um zu notieren, was gerade passiert und wie es dir geht."
+            "value" : "Lass dich täglich mehrfach erinnern, um zu notieren, was du erlebst und wie es dir geht."
           }
         }
       }
@@ -428,7 +448,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wir arbeiten hart daran, Pulse ständig weiterzuentwickeln und freuen uns auf dein Feedback. Vielen Dank!"
+            "value" : "Wir entwickeln Pulse ständig weiter und freuen uns auf dein Feedback. Vielen Dank!"
           }
         }
       }
@@ -438,7 +458,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Was erlebst du gerade?"
+            "value" : "Was hast du erlebt?"
           }
         }
       }

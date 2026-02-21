@@ -9,12 +9,14 @@ import SwiftUI
 
 struct ScoreLabelView: View {
     var score: Int
+    var size: CGFloat = 35
+    var radius: CGFloat = 4
     
     var body: some View {
         Text("\(score)")
-            .frame(width: 35, height: 35)
+            .frame(width: size, height: size)
             .background(ScoreStyleHelper.color(for: score).gradient,
-                        in: RoundedRectangle(cornerRadius: 4))
+                        in: RoundedRectangle(cornerRadius: radius))
             .foregroundStyle(.primary)
     }
 }

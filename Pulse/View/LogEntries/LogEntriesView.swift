@@ -96,6 +96,7 @@ struct LogEntriesView: View {
                                     Button("Save") {
                                         isPresenting = false
                                     }
+                                    .disabled(newLogEntry.log.isEmpty)
                                 }
                             }
                             ToolbarItem (placement: .cancellationAction) {
