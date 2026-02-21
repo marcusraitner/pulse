@@ -93,6 +93,16 @@
         }
       }
     },
+    "Add" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinzufügen"
+          }
+        }
+      }
+    },
     "Add reminder" : {
       "localizations" : {
         "de" : {
@@ -129,6 +139,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hintergrundbilder von %@ veröffentlicht auf [Unsplash](https://unsplash.com/de/@hello_kseniia)"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        }
+      }
+    },
+    "Capture your mood from -2 (bad) to 2 (good)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewerte deine Stimmung von -2 (schlecht) bis 2 (gut)"
           }
         }
       }
@@ -183,6 +213,16 @@
         }
       }
     },
+    "Enter something" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etwas eingeben"
+          }
+        }
+      }
+    },
     "Every day at" : {
       "localizations" : {
         "de" : {
@@ -228,7 +268,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wie geht es dir?"
+            "value" : "Wie fühlst du dich dabei?"
           }
         }
       }
@@ -259,6 +299,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kseniia Lobko"
+          }
+        }
+      }
+    },
+    "New Moment" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer Moment"
           }
         }
       }
@@ -309,6 +359,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erinnerungen"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichern"
           }
         }
       }
@@ -378,7 +438,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Was passiert gerade?"
+            "value" : "Was erlebst du gerade?"
           }
         }
       }

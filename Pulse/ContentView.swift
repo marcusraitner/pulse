@@ -225,7 +225,7 @@ struct ContentView: View {
                 Text(selectedEntry.date.formatted(.dateTime.weekday(.wide)))
                 Text(
                     selectedEntry.date.formatted(
-                        .dateTime.day().month().year()
+                        .dateTime.day().month(.wide).year()
                     )
                 )
             }
