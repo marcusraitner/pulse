@@ -40,8 +40,7 @@ struct ContentView: View {
             VStack {
                 dateView
                 
-                
-                TimeLineView(allEntries: allEntries, selectedEntry: $selectedEntry)
+                TimeLineView(allEntries: allEntries, selectedEntry: $selectedEntry, needToScroll: $needToScroll)
                     .padding(.vertical)
                     .padding(.bottom, 10)
                 
@@ -127,6 +126,7 @@ struct ContentView: View {
             .onChange(of: allEntries, initial: true) {
                 // allEntries changes when a new day is added; let's scroll to it
                 selectedEntry = today
+                needToScroll = true
             }
             .onChange(of: scenePhase) { _, newPhase in
                 #if DEBUG
@@ -228,38 +228,6 @@ struct ContentView: View {
         context.insert(today)
         try? context.save()
     }
-    
-#if DEBUG
-    private func formatDate(_ date: Date) -> String {
-        let RFC3339DateFormatter = DateFormatter()
-        RFC3339DateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        RFC3339DateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
-        RFC3339DateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        
-        var systemImage: String {
-            switch self {
-            case .negative: return "cloud.rain.fill"
-            case .neutral: return "rainbow"
-            case .positive: return "sun.max.fill"
-            }
-        }
-    }
-
-    /// Returns a filter closure based on the mood for filtering all entries in the timeline
-    /// - Parameter mood:
-    /// - Returns: filter closure
-    private func getEntryFilter(_ mood: Mood) -> (DailyEntry) -> Bool {
-        return { entry in
-            switch mood {
-            case .neutral:
-                return true
-            case .positive:
-                return entry.averageScore >= 0
-            case .negative:
-                return entry.averageScore < 0
-            }
-        }
-    }
 
     #if DEBUG
         private func formatDate(_ date: Date) -> String {
@@ -271,7 +239,6 @@ struct ContentView: View {
             return RFC3339DateFormatter.string(from: date)
         }
     #endif  // DEBUG Only for testing
-
     
     private func closestFilteredEntry(
         in all: [DailyEntry],
@@ -300,35 +267,6 @@ struct ContentView: View {
         }
 
         return nil
-    }
-    
-    private var filterPicker: some View {
-        Group {
-            if #available(iOS 26.0, *) {
-                Picker("Mood", selection: $selectedMood) {
-                    ForEach(Mood.allCases) { mood in
-                        Label(mood.rawValue.capitalized, systemImage: mood.systemImage)
-                            .labelStyle(.iconOnly)
-                    }
-                }
-                .pickerStyle(.palette)
-                .padding(2)
-                .glassEffect(.regular, in: Capsule())
-                .padding(.horizontal)
-            } else {
-                // Fallback on earlier versions
-                Picker("Mood", selection: $selectedMood) {
-                    ForEach(Mood.allCases) { mood in
-                        Label(mood.rawValue.capitalized, systemImage: mood.systemImage)
-                            .labelStyle(.iconOnly)
-                    }
-                }
-                .pickerStyle(.palette)
-                .padding(2)
-                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 4))
-                .padding(.horizontal, 0)
-            }
-        }
     }
     
     private var dateView: some View {
