@@ -16,6 +16,7 @@ struct TimeLineView: View {
     @State private var frames: [DailyEntry: CGRect] = [:]
     @State private var position: ScrollPosition = .init(idType: Date.self)
     @State private var containerWidth: CGFloat = 0.0
+    @Binding var needToScroll: Bool
     private static let geometry = NamedCoordinateSpace.named("geometry")
 
     var body: some View {
@@ -91,7 +92,7 @@ struct TimeLineView: View {
                         containerWidth = newWidth
                     }
                 }
-
+                
                 // draw baseline and indicator for selected day
                 Group {
                     EquilateralTriangle()
@@ -104,12 +105,16 @@ struct TimeLineView: View {
                         .frame(width: 10, height: 10)
                         .offset(y: totalHeight * 0.5 + 5)
                 }
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundStyle(Color("neutral"))
             }
-            .onChange(of: frames) {
-                // initial scroll
-                DispatchQueue.main.async {
-                    position.scrollTo(id: selectedEntry.date, anchor: .center)
+            .onChange(of: needToScroll, initial: true) {
+                if needToScroll {
+                    DispatchQueue.main.async {
+                        withAnimation(.snappy) {
+                            position.scrollTo(id: selectedEntry.date, anchor: .center)
+                        }
+                        needToScroll = false
+                    }
                 }
             }
             .onChange(of: position) { _, new in
@@ -168,7 +173,7 @@ struct TimeLineViewPreviewContainer: View {
 
     var body: some View {
         if let entry = entries.randomElement() {
-            TimeLineView(allEntries: entries, selectedEntry: .constant(entry))
+            TimeLineView(allEntries: entries, selectedEntry: .constant(entry), needToScroll: .constant(true))
         } else {
             Text("No sample data available")
                 .padding()

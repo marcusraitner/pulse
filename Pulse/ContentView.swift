@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Query(sort: \DailyEntry.date) private var allEntries: [DailyEntry]
-    
+
     @Environment(\.modelContext) private var context
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var colorScheme
@@ -20,6 +20,7 @@ struct ContentView: View {
     @AppStorage("freezeHistory") private var freezeHistory: Bool = true
     
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
+    @State private var needToScroll: Bool = true
     @State private var isPresentingSettings: Bool = false
     @State private var isPresentingAbout: Bool = false
     
@@ -33,7 +34,7 @@ struct ContentView: View {
         // allEntries now contains at least today's entry
         return allEntries.last!
     }
-    
+
     var body: some View {
         NavigationStack {
             VStack {
@@ -62,7 +63,7 @@ struct ContentView: View {
                 NavigationStack {
                     AboutView()
                         .toolbar {
-                            ToolbarItem (placement: .confirmationAction) {
+                            ToolbarItem(placement: .confirmationAction) {
                                 if #available(iOS 26, *) {
                                     Button(role: .confirm) {
                                         isPresentingAbout = false
@@ -76,11 +77,14 @@ struct ContentView: View {
                         }
                 }
             }
-            .sheet(isPresented: $isPresentingSettings, onDismiss: setNotifications) {
+            .sheet(
+                isPresented: $isPresentingSettings,
+                onDismiss: setNotifications
+            ) {
                 NavigationStack {
                     SettingsView()
                         .toolbar {
-                            ToolbarItem (placement: .confirmationAction) {
+                            ToolbarItem(placement: .confirmationAction) {
                                 if #available(iOS 26, *) {
                                     Button(role: .confirm) {
                                         isPresentingSettings = false
@@ -125,83 +129,100 @@ struct ContentView: View {
                 selectedEntry = today
             }
             .onChange(of: scenePhase) { _, newPhase in
-#if DEBUG
-                let args = ProcessInfo.processInfo.arguments
+                #if DEBUG
+                    let args = ProcessInfo.processInfo.arguments
 
-                if args.contains("--remove-today-on-inactive") {
-                    if newPhase == .inactive && !testRemovedToday {
-                        testRemovedToday = true
-                        if let today = allEntries.last {
-                            context.delete(today)
-                            try? context.save()
+                    if args.contains("--remove-today-on-inactive") {
+                        if newPhase == .inactive && !testRemovedToday {
+                            testRemovedToday = true
+                            if let today = allEntries.last {
+                                context.delete(today)
+                                try? context.save()
+                            }
                         }
                     }
-                }
-#endif // DEBUG: Only for testing
+                #endif  // DEBUG: Only for testing
             }
         }
-#if DEBUG
-        // Expose an accessibility identifier
-        .accessibilityIdentifier("dateView")
-        // and a values containing the selectedEntry for UI Tests
-        .accessibilityValue(Text("selectedEntry:\(formatDate(selectedEntry.date))"))
-#endif // DEBUG only for UI Tests
+        #if DEBUG
+            // Expose an accessibility identifier
+            .accessibilityIdentifier("dateView")
+            // and a values containing the selectedEntry for UI Tests
+            .accessibilityValue(
+                Text("selectedEntry:\(formatDate(selectedEntry.date))")
+            )
+        #endif  // DEBUG only for UI Tests
     }
-    
-    private func initApplication() async {
-        
-#if DEBUG
-        let args = ProcessInfo.processInfo.arguments
 
-        if args.contains("--disable-animations") {
-            UIView.setAnimationsEnabled(false)
-        }
-#endif // DEBUG only for testing
+    private func initApplication() async {
+
+        #if DEBUG
+            let args = ProcessInfo.processInfo.arguments
+
+            if args.contains("--disable-animations") {
+                UIView.setAnimationsEnabled(false)
+            }
+        #endif  // DEBUG only for testing
 
         if !featureFlags.editHistory {
             // make sure, that history is frozen if feature is disabled
             freezeHistory = true
         }
-        
+
         // Request authorization for notifications
         do {
-            try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
+            try await UNUserNotificationCenter.current().requestAuthorization(
+                options: [.alert, .badge, .sound])
         } catch {
             print(error.localizedDescription)
         }
     }
-    
+
     private func setNotifications() {
         // Remove all pending notifications
-        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-        
+        UNUserNotificationCenter.current()
+            .removeAllPendingNotificationRequests()
+
         // Set new notifications based on user's choice
         if notificationsEnabled {
             let defaults = UserDefaults.standard
-            let notificationTimes = defaults.value(forKey: "notificationTimes") as? [Date] ?? []
-            
+            let notificationTimes =
+                defaults.value(forKey: "notificationTimes") as? [Date] ?? []
+
             for time in notificationTimes {
                 let content = UNMutableNotificationContent()
                 content.title = String(localized: "What's going on?")
-                content.body = String(localized: "It's time to log your activities and feelings!")
+                content.body = String(
+                    localized: "It's time to log your activities and feelings!"
+                )
                 content.sound = .default
-                
-                let components = Calendar.current.dateComponents([.hour, .minute], from: time)
-                let dateTrigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
-                let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: dateTrigger)
-                
+
+                let components = Calendar.current.dateComponents(
+                    [.hour, .minute],
+                    from: time
+                )
+                let dateTrigger = UNCalendarNotificationTrigger(
+                    dateMatching: components,
+                    repeats: true
+                )
+                let request = UNNotificationRequest(
+                    identifier: UUID().uuidString,
+                    content: content,
+                    trigger: dateTrigger
+                )
+
                 UNUserNotificationCenter.current().add(request)
             }
         }
     }
-    
+
     private func updateToday() {
         if let entry = allEntries.last {
             if Calendar.current.isDateInToday(entry.date) {
                 return
             }
         }
-        
+
         // entry for today missing: create and save it
         let today = DailyEntry(date: .now)
         context.insert(today)
@@ -215,9 +236,100 @@ struct ContentView: View {
         RFC3339DateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
         RFC3339DateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         
-        return RFC3339DateFormatter.string(from: date)
+        var systemImage: String {
+            switch self {
+            case .negative: return "cloud.rain.fill"
+            case .neutral: return "rainbow"
+            case .positive: return "sun.max.fill"
+            }
+        }
     }
-#endif // DEBUG Only for testing
+
+    /// Returns a filter closure based on the mood for filtering all entries in the timeline
+    /// - Parameter mood:
+    /// - Returns: filter closure
+    private func getEntryFilter(_ mood: Mood) -> (DailyEntry) -> Bool {
+        return { entry in
+            switch mood {
+            case .neutral:
+                return true
+            case .positive:
+                return entry.averageScore >= 0
+            case .negative:
+                return entry.averageScore < 0
+            }
+        }
+    }
+
+    #if DEBUG
+        private func formatDate(_ date: Date) -> String {
+            let RFC3339DateFormatter = DateFormatter()
+            RFC3339DateFormatter.locale = Locale(identifier: "en_US_POSIX")
+            RFC3339DateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
+            RFC3339DateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+
+            return RFC3339DateFormatter.string(from: date)
+        }
+    #endif  // DEBUG Only for testing
+
+    
+    private func closestFilteredEntry(
+        in all: [DailyEntry],
+        to target: DailyEntry,
+        where predicate: (DailyEntry) -> Bool,
+        preferLowerIndexOnTie: Bool = true) -> DailyEntry? {
+            
+        guard let targetIndex = all.firstIndex(of: target) else { return nil }
+        if predicate(target) { return target }
+
+        var offset = 1
+        while targetIndex - offset >= 0 || targetIndex + offset < all.count {
+            let leftIndex = targetIndex - offset
+            let rightIndex = targetIndex + offset
+
+            // Check left first or right first depending on tie preference
+            if preferLowerIndexOnTie {
+                if leftIndex >= 0, predicate(all[leftIndex]) { return all[leftIndex] }
+                if rightIndex < all.count, predicate(all[rightIndex]) { return all[rightIndex] }
+            } else {
+                if rightIndex < all.count, predicate(all[rightIndex]) { return all[rightIndex] }
+                if leftIndex >= 0, predicate(all[leftIndex]) { return all[leftIndex] }
+            }
+
+            offset += 1
+        }
+
+        return nil
+    }
+    
+    private var filterPicker: some View {
+        Group {
+            if #available(iOS 26.0, *) {
+                Picker("Mood", selection: $selectedMood) {
+                    ForEach(Mood.allCases) { mood in
+                        Label(mood.rawValue.capitalized, systemImage: mood.systemImage)
+                            .labelStyle(.iconOnly)
+                    }
+                }
+                .pickerStyle(.palette)
+                .padding(2)
+                .glassEffect(.regular, in: Capsule())
+                .padding(.horizontal)
+            } else {
+                // Fallback on earlier versions
+                Picker("Mood", selection: $selectedMood) {
+                    ForEach(Mood.allCases) { mood in
+                        Label(mood.rawValue.capitalized, systemImage: mood.systemImage)
+                            .labelStyle(.iconOnly)
+                    }
+                }
+                .pickerStyle(.palette)
+                .padding(2)
+                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 4))
+                .padding(.horizontal, 0)
+            }
+        }
+    }
     
     private var dateView: some View {
         HStack {

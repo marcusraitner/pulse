@@ -94,6 +94,7 @@ struct SettingsView: View {
                         DatePicker("Every day at",
                                    selection: $notificationTimes[index],
                                    displayedComponents: [.hourAndMinute])
+                        .padding(.vertical, featureFlags.iOS26 ? 0 : 5)
                         .swipeActions(edge: .trailing) {
                             Button(role: .destructive) {
                                 notificationTimes.remove(at: index)

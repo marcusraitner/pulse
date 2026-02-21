@@ -433,6 +433,9 @@
         }
       }
     },
+    "Text required" : {
+
+    },
     "Version: %@" : {
       "localizations" : {
         "de" : {
