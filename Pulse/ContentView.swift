@@ -48,54 +48,16 @@ struct ContentView: View {
             }
             .ignoresSafeArea(.keyboard)
             .background {
-                // for some reason, the GeometryReader is needed to prevent image from moving up when keyboard is shown
-                GeometryReader { geo in
-                    Image(colorScheme == .dark ? "mountain-dark" : "mountain")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(minWidth: 0, maxWidth: .infinity)
-                        .brightness(colorScheme == .dark ? 0.0 : -0.1)
-                }
-                .ignoresSafeArea(.all)
+                imageBackground
             }
             .sheet(isPresented: $isPresentingAbout) {
-                NavigationStack {
-                    AboutView()
-                        .toolbar {
-                            ToolbarItem(placement: .confirmationAction) {
-                                if #available(iOS 26, *) {
-                                    Button(role: .confirm) {
-                                        isPresentingAbout = false
-                                    }
-                                } else {
-                                    Button("Close") {
-                                        isPresentingAbout = false
-                                    }
-                                }
-                            }
-                        }
-                }
+                aboutSheetStack
             }
             .sheet(
                 isPresented: $isPresentingSettings,
                 onDismiss: setNotifications
             ) {
-                NavigationStack {
-                    SettingsView()
-                        .toolbar {
-                            ToolbarItem(placement: .confirmationAction) {
-                                if #available(iOS 26, *) {
-                                    Button(role: .confirm) {
-                                        isPresentingSettings = false
-                                    }
-                                } else {
-                                    Button("Close") {
-                                        isPresentingSettings = false
-                                    }
-                                }
-                            }
-                        }
-                }
+                settingsSheetStack
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -130,17 +92,7 @@ struct ContentView: View {
             }
             .onChange(of: scenePhase) { _, newPhase in
                 #if DEBUG
-                    let args = ProcessInfo.processInfo.arguments
-
-                    if args.contains("--remove-today-on-inactive") {
-                        if newPhase == .inactive && !testRemovedToday {
-                            testRemovedToday = true
-                            if let today = allEntries.last {
-                                context.delete(today)
-                                try? context.save()
-                            }
-                        }
-                    }
+                removeTodayOnInactive(newPhase: newPhase)
                 #endif  // DEBUG: Only for testing
             }
         }
@@ -154,6 +106,20 @@ struct ContentView: View {
         #endif  // DEBUG only for UI Tests
     }
 
+    private func removeTodayOnInactive(newPhase: ScenePhase) {
+        let args = ProcessInfo.processInfo.arguments
+        
+        if args.contains("--remove-today-on-inactive") {
+            if newPhase == .inactive && !testRemovedToday {
+                testRemovedToday = true
+                if let today = allEntries.last {
+                    context.delete(today)
+                    try? context.save()
+                }
+            }
+        }
+    }
+    
     private func initApplication() async {
 
         #if DEBUG
@@ -272,6 +238,53 @@ struct ContentView: View {
             .foregroundStyle(.white.opacity(0.85))
         }
         .padding(.vertical)
+    }
+    
+    private var aboutSheetStack: some View {
+        NavigationStack {
+            AboutView()
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        if #available(iOS 26, *) {
+                            Button(role: .confirm) {
+                                isPresentingAbout = false
+                            }
+                        } else {
+                            Button("Close") {
+                                isPresentingAbout = false
+                            }
+                        }
+                    }
+                }
+        }
+    }
+    
+    private var settingsSheetStack: some View {
+        NavigationStack {
+            SettingsView()
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        if #available(iOS 26, *) {
+                            Button(role: .confirm) {
+                                isPresentingSettings = false
+                            }
+                        } else {
+                            Button("Close") {
+                                isPresentingSettings = false
+                            }
+                        }
+                    }
+                }
+        }
+    }
+    
+    private var imageBackground: some View {
+        Image(colorScheme == .dark ? "mountain-dark" : "mountain")
+            .resizable()
+            .scaledToFill()
+            .frame(minWidth: 0, maxWidth: .infinity)
+            .brightness(colorScheme == .dark ? 0.0 : -0.1)
+            .ignoresSafeArea(.all)
     }
 }
 

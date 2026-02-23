@@ -113,9 +113,7 @@ struct TimeLineView: View {
             .onChange(of: needToScroll, initial: true) {
                 if needToScroll {
                     DispatchQueue.main.async {
-                        withAnimation(.snappy) {
-                            position.scrollTo(id: selectedEntry.date, anchor: .center)
-                        }
+                        position.scrollTo(id: selectedEntry.date, anchor: .center)
                         needToScroll = false
                     }
                 }

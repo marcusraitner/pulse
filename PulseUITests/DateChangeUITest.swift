@@ -24,7 +24,7 @@ final class DateChangeUITests: XCTestCase {
         
         // this represents the first element in the timeline for a scroll test
         let firstEntry = app.otherElements["entry0"].firstMatch
-        XCTAssertTrue(firstEntry.waitForExistence(timeout: 5), "dateView should exist")
+        XCTAssertTrue(firstEntry.waitForExistence(timeout: 5), "First entry should exist")
         
         let timelineView = app.scrollViews["timelineView"].firstMatch
         XCTAssertTrue(timelineView.waitForExistence(timeout: 5), "timelineView should exist")
