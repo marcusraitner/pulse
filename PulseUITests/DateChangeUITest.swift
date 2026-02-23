@@ -26,7 +26,26 @@ final class DateChangeUITests: XCTestCase {
         let firstEntry = app.otherElements["entry0"].firstMatch
         XCTAssertTrue(firstEntry.waitForExistence(timeout: 5), "dateView should exist")
         
+        let timelineView = app.scrollViews["timelineView"].firstMatch
+        XCTAssertTrue(timelineView.waitForExistence(timeout: 5), "timelineView should exist")
+
         app.activate() // ensure active
+        
+        // for the moment, only a screenshot; checking scrollposition would be better
+        let attachment0 = XCTAttachment(screenshot: app.screenshot())
+        attachment0.name = "After tapping first entry"
+        attachment0.lifetime = .keepAlways
+        add(attachment0)
+        
+        let expectation0 = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            if let selectedDate = self.extractDate(from: timelineView.label + " " + timelineView.value.debugDescription, for: "position:") {
+                return Calendar.current.isDateInToday(selectedDate)
+            } else {
+                return false
+            }
+        }, object: nil)
+        let result0 = XCTWaiter().wait(for: [expectation0], timeout: 5)
+        XCTAssertEqual(result0, .completed, "Expected initial selectedDate to be today")
         
         // tap on the first entry
         firstEntry.tap()
@@ -35,10 +54,10 @@ final class DateChangeUITests: XCTestCase {
         sleep(2)
        
         // for the moment, only a screenshot; checking scrollposition would be better
-        let attachment = XCTAttachment(screenshot: app.screenshot())
-        attachment.name = "After tapping first entry"
-        attachment.lifetime = .keepAlways
-        add(attachment)
+        let attachment1 = XCTAttachment(screenshot: app.screenshot())
+        attachment1.name = "After tapping first entry"
+        attachment1.lifetime = .keepAlways
+        add(attachment1)
         
         // set app inactive; this will (with "--remove-today-on-inactive") remove today's entry
         XCUIDevice.shared.press(.home)
@@ -59,7 +78,7 @@ final class DateChangeUITests: XCTestCase {
 
         // check that today has been recreated and is selected
         let expectation1 = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            if let selectedDate = self.extractDate(from: dateView.label + " " + dateView.value.debugDescription) {
+            if let selectedDate = self.extractDate(from: dateView.label + " " + dateView.value.debugDescription, for: "selectedEntry:") {
                 return Calendar.current.isDateInToday(selectedDate)
             } else {
                 return false
@@ -69,7 +88,7 @@ final class DateChangeUITests: XCTestCase {
         XCTAssertEqual(result1, .completed, "Expected selected entry being today")
     }
     
-    private func extractDate(from text: String?) -> Date? {
+    private func extractDate(from text: String?, for identifier: String) -> Date? {
         guard let text = text else { return nil }
         
         let RFC3339DateFormatter = DateFormatter()
@@ -77,7 +96,7 @@ final class DateChangeUITests: XCTestCase {
         RFC3339DateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
         RFC3339DateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         
-        if let range = text.range(of: "selectedEntry:") {
+        if let range = text.range(of: identifier) {
             let suffix = text[range.upperBound...].dropLast()
             // Take the first 26 characters which matches the RFC3339 format length used above
             let date = RFC3339DateFormatter.date(from: String(suffix))

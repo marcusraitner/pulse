@@ -149,7 +149,7 @@ struct ContentView: View {
             .accessibilityIdentifier("dateView")
             // and a values containing the selectedEntry for UI Tests
             .accessibilityValue(
-                Text("selectedEntry:\(formatDate(selectedEntry.date))")
+                Text("selectedEntry:\(DateFormatHelper.formatDate(selectedEntry.date))")
             )
         #endif  // DEBUG only for UI Tests
     }
@@ -229,17 +229,6 @@ struct ContentView: View {
         try? context.save()
     }
 
-    #if DEBUG
-        private func formatDate(_ date: Date) -> String {
-            let RFC3339DateFormatter = DateFormatter()
-            RFC3339DateFormatter.locale = Locale(identifier: "en_US_POSIX")
-            RFC3339DateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
-            RFC3339DateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-
-            return RFC3339DateFormatter.string(from: date)
-        }
-    #endif  // DEBUG Only for testing
-    
     private func closestFilteredEntry(
         in all: [DailyEntry],
         to target: DailyEntry,

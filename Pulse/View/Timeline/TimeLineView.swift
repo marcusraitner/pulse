@@ -74,6 +74,9 @@ struct TimeLineView: View {
                 .coordinateSpace(Self.geometry)
             }
             .accessibilityIdentifier("timelineView")
+            .accessibilityValue(
+                Text("position:\(DateFormatHelper.formatDate(position.viewID(type: Date.self)))")
+            )
             .scrollTargetBehavior(
                 TimeLineViewScrollTargetBehavior(
                     frames: frames
