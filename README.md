@@ -2,15 +2,18 @@
 
 A quick check-in for your mind. Capture your moments, understand your patterns.
 
-<img width="480" alt="Simulator Screenshot - iPhone 17 Pro Max - 2026-02-19 at 14 41 24" src="https://github.com/user-attachments/assets/e6db4c55-80e7-4217-8bb4-1b05c3853b0f" />
+<img width="480" alt="Simulator Screenshot - iPhone 17 Pro Max - 2026-02-24 at 18 43 56" src="https://github.com/user-attachments/assets/0310d282-6deb-4cb2-a1e5-806f2f053d48" />
 
-<img width="480" alt="Simulator Screenshot - iPhone 17 Pro Max - 2026-02-19 at 14 42 00" src="https://github.com/user-attachments/assets/7098f591-1e23-427c-8d22-67165eb90571" />
+<img width="480" alt="Simulator Screenshot - iPhone 17 Pro Max - 2026-02-24 at 18 45 06" src="https://github.com/user-attachments/assets/df076c4c-5c00-4b03-bbb7-b2b4da04cd86" />
 
-<img width="480" alt="Simulator Screenshot - iPhone 17 Pro Max - 2026-02-19 at 14 42 29" src="https://github.com/user-attachments/assets/6579826a-bdaf-430e-becc-90a9f62e0804" />
+<img width="480" alt="Simulator Screenshot - iPhone 17 Pro Max - 2026-02-24 at 18 45 43" src="https://github.com/user-attachments/assets/2103ae66-e81c-401f-93c1-fbcdb16a403f" />
 
-<img width="480" alt="Simulator Screenshot - iPhone 17 Pro Max - 2026-02-19 at 14 43 47" src="https://github.com/user-attachments/assets/defddb8d-a293-41da-8c29-a50b12caba12" />
+<img width="480" alt="Simulator Screenshot - iPhone 17 Pro Max - 2026-02-24 at 18 46 01" src="https://github.com/user-attachments/assets/4d8b565b-28fa-4907-835e-16c037c7607b" />
+
+
 
 ## Description
+
 
 How are you really feeling right now? In the rush of daily life, we often forget to pause. Pulse is your minimalist micro-journaling companion designed to make reflection as effortless as possible.
 
