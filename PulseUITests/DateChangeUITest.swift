@@ -33,12 +33,14 @@ final class DateChangeUITests: XCTestCase {
         
         // for the moment, only a screenshot; checking scrollposition would be better
         let attachment0 = XCTAttachment(screenshot: app.screenshot())
-        attachment0.name = "After tapping first entry"
+        attachment0.name = "After launch"
         attachment0.lifetime = .keepAlways
         add(attachment0)
         
+        let selectedDate = extractDate(from: timelineView.value.debugDescription, for: "position:")
+        
         let expectation0 = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            if let selectedDate = self.extractDate(from: timelineView.label + " " + timelineView.value.debugDescription, for: "position:") {
+            if let selectedDate {
                 return Calendar.current.isDateInToday(selectedDate)
             } else {
                 return false
@@ -76,10 +78,12 @@ final class DateChangeUITests: XCTestCase {
         attachment2.lifetime = .keepAlways
         add(attachment2)
 
+        let selectedDate1 = extractDate(from: dateView.value.debugDescription, for: "selectedEntry:")
+        
         // check that today has been recreated and is selected
         let expectation1 = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            if let selectedDate = self.extractDate(from: dateView.label + " " + dateView.value.debugDescription, for: "selectedEntry:") {
-                return Calendar.current.isDateInToday(selectedDate)
+            if let selectedDate1 {
+                return Calendar.current.isDateInToday(selectedDate1)
             } else {
                 return false
             }

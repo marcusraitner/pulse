@@ -7,9 +7,11 @@
 
 import SwiftUI
 import SwiftData
+import OSLog
 
 @main
 struct PulseApp: App {
+    private let logger = Logger(subsystem: "de.raitner.pulse", category: "PulseApp")
     
     var modelContainer: ModelContainer {
         let schema = Schema([DailyEntry.self])
@@ -21,7 +23,7 @@ struct PulseApp: App {
         do {
             return try ModelContainer(for: schema, configurations: modelconfiguration)
         } catch {
-            print("ModelContainer initialization failed: \(error)")
+            logger.error("ModelContainer initialization failed: \(error)")
             fatalError("Could not create ModelContainer: \(error)")
         }
     }
@@ -29,7 +31,7 @@ struct PulseApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.featureFlags, FeatureFlags(editHistory: false, adminEnabled: false))
+                .environment(\.featureFlags, FeatureFlags(editHistory: false, adminEnabled: true))
             
         }
         .modelContainer(modelContainer)

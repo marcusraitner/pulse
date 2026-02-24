@@ -18,6 +18,7 @@ struct TimeLineView: View {
     @State private var containerWidth: CGFloat = 0.0
     @Binding var needToScroll: Bool
     private static let geometry = NamedCoordinateSpace.named("geometry")
+    private let logger = Logger(subsystem: "de.raitner.pulse", category: "TimeLineView")
 
     var body: some View {
         let barWidth: CGFloat = 20
@@ -112,8 +113,11 @@ struct TimeLineView: View {
             }
             .onChange(of: needToScroll, initial: true) {
                 if needToScroll {
+                    logger.trace("Scrolling to: \(selectedEntry.date)")
                     DispatchQueue.main.async {
-                        position.scrollTo(id: selectedEntry.date, anchor: .center)
+                        withAnimation(.bouncy) {
+                            position.scrollTo(id: selectedEntry.date, anchor: .center)
+                        }
                         needToScroll = false
                     }
                 }
@@ -124,6 +128,7 @@ struct TimeLineView: View {
                     selectedEntry =
                         allEntries.first(
                             where: { $0.date == date }) ?? allEntries.first!
+                    logger.trace("New selected date: \(selectedEntry.date)")
                 }
             }
             .sensoryFeedback(.impact, trigger: selectedEntry)

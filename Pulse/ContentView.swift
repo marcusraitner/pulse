@@ -5,6 +5,7 @@
 //  Created by Marcus Raitner on 20.04.25.
 //
 
+import OSLog
 import SwiftData
 import SwiftUI
 
@@ -20,7 +21,8 @@ struct ContentView: View {
     @AppStorage("freezeHistory") private var freezeHistory: Bool = true
     
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
-    @State private var needToScroll: Bool = true
+    @State private var today: DailyEntry = DailyEntry(date: .now)
+    @State private var needToScroll: Bool = false
     @State private var isPresentingSettings: Bool = false
     @State private var isPresentingAbout: Bool = false
     
@@ -28,12 +30,7 @@ struct ContentView: View {
     @State private var testRemovedToday: Bool = false
 #endif // DEBUG only for UI Tests
     
-    private var today: DailyEntry {
-        // create today's entry if missing
-        updateToday()
-        // allEntries now contains at least today's entry
-        return allEntries.last!
-    }
+    private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
 
     var body: some View {
         NavigationStack {
@@ -85,15 +82,21 @@ struct ContentView: View {
             .task {
                 await initApplication()
             }
-            .onChange(of: allEntries, initial: true) {
-                // allEntries changes when a new day is added; let's scroll to it
-                selectedEntry = today
-                needToScroll = true
-            }
             .onChange(of: scenePhase) { _, newPhase in
                 #if DEBUG
                 removeTodayOnInactive(newPhase: newPhase)
                 #endif  // DEBUG: Only for testing
+                
+                // check if a day passed
+                if newPhase == .active {
+                    let newToday = updateToday()
+                    if newToday != today {
+                        logger.trace("New today: \(newToday.date)")
+                        today = newToday
+                        selectedEntry = today
+                        needToScroll = true
+                    }
+                }
             }
         }
         #if DEBUG
@@ -135,12 +138,19 @@ struct ContentView: View {
             freezeHistory = true
         }
 
+        // initially scroll to today's entry (create it if missing)
+        today = updateToday()
+        selectedEntry = today
+        needToScroll = true
+        
+        logger.trace("Init: Selected entry: \(selectedEntry.date)")
+        
         // Request authorization for notifications
         do {
             try await UNUserNotificationCenter.current().requestAuthorization(
                 options: [.alert, .badge, .sound])
         } catch {
-            print(error.localizedDescription)
+            logger.error("Error NotificationCenter: \(error.localizedDescription)")
         }
     }
 
@@ -182,10 +192,10 @@ struct ContentView: View {
         }
     }
 
-    private func updateToday() {
+    private func updateToday() -> DailyEntry {
         if let entry = allEntries.last {
             if Calendar.current.isDateInToday(entry.date) {
-                return
+                return entry
             }
         }
 
@@ -193,6 +203,8 @@ struct ContentView: View {
         let today = DailyEntry(date: .now)
         context.insert(today)
         try? context.save()
+        
+        return today
     }
 
     private func closestFilteredEntry(
