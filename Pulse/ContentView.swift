@@ -82,6 +82,12 @@ struct ContentView: View {
             .task {
                 await initApplication()
             }
+            .onChange(of: today) {
+                // if today changes, scroll to it
+                logger.trace("Today changed; scrolling to it: \(today.date)")
+                selectedEntry = today
+                needToScroll = true
+            }
             .onChange(of: scenePhase) { _, newPhase in
                 #if DEBUG
                 removeTodayOnInactive(newPhase: newPhase)
@@ -89,13 +95,7 @@ struct ContentView: View {
                 
                 // check if a day passed
                 if newPhase == .active {
-                    let newToday = updateToday()
-                    if newToday != today {
-                        logger.trace("New today: \(newToday.date)")
-                        today = newToday
-                        selectedEntry = today
-                        needToScroll = true
-                    }
+                    updateToday()
                 }
             }
         }
@@ -109,6 +109,7 @@ struct ContentView: View {
         #endif  // DEBUG only for UI Tests
     }
 
+#if DEBUG
     private func removeTodayOnInactive(newPhase: ScenePhase) {
         let args = ProcessInfo.processInfo.arguments
         
@@ -122,7 +123,8 @@ struct ContentView: View {
             }
         }
     }
-    
+#endif  // DEBUG only for UI Tests
+
     private func initApplication() async {
 
         #if DEBUG
@@ -138,10 +140,9 @@ struct ContentView: View {
             freezeHistory = true
         }
 
-        // initially scroll to today's entry (create it if missing)
-        today = updateToday()
-        selectedEntry = today
-        needToScroll = true
+        DispatchQueue.main.async {
+            updateToday()
+        }
         
         logger.trace("Init: Selected entry: \(selectedEntry.date)")
         
@@ -192,19 +193,26 @@ struct ContentView: View {
         }
     }
 
-    private func updateToday() -> DailyEntry {
+    private func updateToday() {
         if let entry = allEntries.last {
             if Calendar.current.isDateInToday(entry.date) {
-                return entry
+                if entry != today {
+                    // That shouldn't happen. Let's corret it
+                    logger.warning("Expected today \(today.date) to be \(entry.date)")
+                    today = entry
+                }
+                return
             }
         }
 
         // entry for today missing: create and save it
-        let today = DailyEntry(date: .now)
-        context.insert(today)
+        let newToday = DailyEntry(date: .now)
+        logger.debug("Creating a new day: \(newToday.date)")
+        context.insert(newToday)
         try? context.save()
         
-        return today
+        // this triggers also scrolling
+        today = newToday
     }
 
     private func closestFilteredEntry(
@@ -291,12 +299,14 @@ struct ContentView: View {
     }
     
     private var imageBackground: some View {
-        Image(colorScheme == .dark ? "mountain-dark" : "mountain")
-            .resizable()
-            .scaledToFill()
-            .frame(minWidth: 0, maxWidth: .infinity)
-            .brightness(colorScheme == .dark ? 0.0 : -0.1)
-            .ignoresSafeArea(.all)
+        GeometryReader { _ in
+            Image(colorScheme == .dark ? "mountain-dark" : "mountain")
+                .resizable()
+                .scaledToFill()
+                .frame(minWidth: 0, maxWidth: .infinity)
+                .brightness(colorScheme == .dark ? 0.0 : -0.1)
+                .ignoresSafeArea(.all)
+        }
     }
 }
 

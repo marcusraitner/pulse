@@ -113,13 +113,20 @@ struct TimeLineView: View {
             }
             .onChange(of: needToScroll, initial: true) {
                 if needToScroll {
-                    logger.trace("Scrolling to: \(selectedEntry.date)")
+                    logger.trace("Trigger needToScroll, Scrolling to: \(selectedEntry.date)")
                     DispatchQueue.main.async {
                         withAnimation(.bouncy) {
                             position.scrollTo(id: selectedEntry.date, anchor: .center)
                         }
                         needToScroll = false
                     }
+                }
+            }
+            .onChange(of: frames) {
+                logger.trace("Trigger frames, Scrolling to: \(selectedEntry.date)")
+                withAnimation(.bouncy) {
+                    position.scrollTo(id: selectedEntry.date, anchor: .center)
+                    needToScroll = false
                 }
             }
             .onChange(of: position) { _, new in
