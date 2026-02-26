@@ -10,13 +10,15 @@ import SwiftData
 import SwiftUI
 
 struct TimeLineView: View {
-    var allEntries: [DailyEntry]
+    @Query(sort: \DailyEntry.date) private var allEntries: [DailyEntry]
     @Environment(\.modelContext) private var context
+    @Environment(\.scenePhase) private var scenePhase
+    
     @Binding var selectedEntry: DailyEntry
+    @State private var today: DailyEntry = .init(date: .now)
     @State private var frames: [DailyEntry: CGRect] = [:]
     @State private var position: ScrollPosition = .init(idType: Date.self)
     @State private var containerWidth: CGFloat = 0.0
-    @Binding var needToScroll: Bool
     private static let geometry = NamedCoordinateSpace.named("geometry")
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "TimeLineView")
 
@@ -29,7 +31,7 @@ struct TimeLineView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 3) {
                     
-                    ForEach(Array(allEntries.enumerated()), id: \.offset) { i, entry in
+                    ForEach(allEntries, id: \.date ) { entry in
                         let avg: CGFloat = entry.averageScore
                         let barHeight: CGFloat = max(1, heightScale * abs(avg))
                         let yOffset: CGFloat = -0.5 * heightScale * avg
@@ -59,7 +61,6 @@ struct TimeLineView: View {
                                 }
                         }
                         .id(entry.date)
-                        .accessibilityIdentifier("entry\(i)")
                         .onTapGesture {
                             withAnimation(.default) {
                                 selectedEntry = entry
@@ -111,36 +112,63 @@ struct TimeLineView: View {
                 }
                 .foregroundStyle(Color("neutral"))
             }
-            .onChange(of: needToScroll, initial: true) {
-                if needToScroll {
-                    logger.trace("Trigger needToScroll, Scrolling to: \(selectedEntry.date)")
-                    DispatchQueue.main.async {
-                        withAnimation(.bouncy) {
-                            position.scrollTo(id: selectedEntry.date, anchor: .center)
-                        }
-                        needToScroll = false
+            .onChange(of: position) { _, new in
+                // set selectedEntry on scroll pos change
+                
+                if let date: Date = new.viewID(type: Date.self) {
+                    if let newSelected = allEntries.first(where: { $0.date == date }) {
+                        selectedEntry = newSelected
+                        logger.trace("New selected date: \(selectedEntry.date)")
+                    } else {
+                        logger.trace("Could not find entry for date \(date)")
                     }
+                } else {
+                    logger.trace("Could not find date in scroll position")
                 }
             }
             .onChange(of: frames) {
-                logger.trace("Trigger frames, Scrolling to: \(selectedEntry.date)")
-                withAnimation(.bouncy) {
-                    position.scrollTo(id: selectedEntry.date, anchor: .center)
-                    needToScroll = false
-                }
-            }
-            .onChange(of: position) { _, new in
-                // set selectedEntry on scroll pos change
-                if let date: Date = new.viewID(type: Date.self) {
-                    selectedEntry =
-                        allEntries.first(
-                            where: { $0.date == date }) ?? allEntries.first!
-                    logger.trace("New selected date: \(selectedEntry.date)")
+                logger.trace("Frames changed")
+                withAnimation(.snappy) {
+                    position.scrollTo(id: today.date, anchor: .center)
                 }
             }
             .sensoryFeedback(.impact, trigger: selectedEntry)
         }
+        .onChange(of: scenePhase) { _, newPhase in
+            // check if a day passed
+            if newPhase == .active {
+                updateToday()
+            }
+        }
+        .task {
+            if let last = allEntries.last {
+                withAnimation(.snappy) {
+                    position.scrollTo(id: last.date, anchor: .center)
+                }
+            }
+        }
     }
+    
+    private func updateToday() {
+        if let entry = allEntries.last {
+            if Calendar.current.isDateInToday(entry.date) {
+                if entry != today {
+                    today = entry
+                }
+                return
+            }
+        }
+
+        // entry for today missing: create and save it
+        let newToday = DailyEntry(date: .now)
+        logger.debug("Creating a new day: \(newToday.date)")
+        context.insert(newToday)
+        try? context.save()
+        
+        // this triggers also scrolling
+        today = newToday
+    }
+
 }
 
 struct EquilateralTriangle: Shape {
@@ -186,7 +214,7 @@ struct TimeLineViewPreviewContainer: View {
 
     var body: some View {
         if let entry = entries.randomElement() {
-            TimeLineView(allEntries: entries, selectedEntry: .constant(entry), needToScroll: .constant(true))
+            TimeLineView(selectedEntry: .constant(entry))
         } else {
             Text("No sample data available")
                 .padding()
