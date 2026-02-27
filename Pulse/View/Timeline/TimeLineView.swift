@@ -21,6 +21,7 @@ struct TimeLineView: View {
     @State private var containerWidth: CGFloat = 0.0
     private static let geometry = NamedCoordinateSpace.named("geometry")
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "TimeLineView")
+    @State private var todayFrameVisible: Bool = true
 
     var body: some View {
         let barWidth: CGFloat = 20
@@ -126,12 +127,6 @@ struct TimeLineView: View {
                     logger.trace("Could not find date in scroll position")
                 }
             }
-            .onChange(of: frames) {
-                logger.trace("Frames changed")
-                withAnimation(.snappy) {
-                    position.scrollTo(id: today.date, anchor: .center)
-                }
-            }
             .sensoryFeedback(.impact, trigger: selectedEntry)
         }
         .onChange(of: scenePhase) { _, newPhase in
@@ -140,11 +135,33 @@ struct TimeLineView: View {
                 updateToday()
             }
         }
+        .onChange(of: today) {
+            logger.trace("Today changed: \(today.date)")
+            if frames[today] != nil {
+                logger.trace("found frame; scrolling to it")
+                position.scrollTo(id: today.date, anchor: .center)
+            } else {
+                // frame for today not yet created
+                // scroll to the last frame
+                logger.trace("no frame for today; scrolling to last")
+                position.scrollTo(edge: .trailing)
+                todayFrameVisible = false
+            }
+        }
+        .onChange(of: frames) {
+            logger.trace("Frames changed")
+            if !todayFrameVisible {
+                logger.trace("today was not visible before")
+                if frames[today] != nil {
+                    logger.trace("now today's frame exists; scrolling to it")
+                    position.scrollTo(id: today.date, anchor: .center)
+                    todayFrameVisible = true
+                }
+            }
+        }
         .task {
             if let last = allEntries.last {
-                withAnimation(.snappy) {
-                    position.scrollTo(id: last.date, anchor: .center)
-                }
+                position.scrollTo(id: last.date, anchor: .center)
             }
         }
     }
