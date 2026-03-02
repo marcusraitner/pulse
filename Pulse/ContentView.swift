@@ -17,6 +17,7 @@ struct ContentView: View {
     
     @AppStorage("notificationsEnabled") private var notificationsEnabled: Bool = true
     @AppStorage("freezeHistory") private var freezeHistory: Bool = true
+    @AppStorage("showStats") private var showStats: Bool = true
     
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
     @State private var today: DailyEntry = DailyEntry(date: .now)
@@ -26,12 +27,14 @@ struct ContentView: View {
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
 
     private var countDays: Int {
-        let descriptor = FetchDescriptor<DailyEntry>(predicate: #Predicate { _ in true })
+        var descriptor = FetchDescriptor<DailyEntry>(predicate: #Predicate { _ in true })
+        descriptor.includePendingChanges = true
         return (try? context.fetchCount(descriptor)) ?? 0
     }
     
     private var countLog: Int {
-        let descriptor = FetchDescriptor<DailyLogEntry>(predicate: #Predicate { _ in true })
+        var descriptor = FetchDescriptor<DailyLogEntry>(predicate: #Predicate { _ in true })
+        descriptor.includePendingChanges = true
         return (try? context.fetchCount(descriptor)) ?? 0
     }
     
@@ -82,11 +85,16 @@ struct ContentView: View {
                         .tint(.white)
                     }
                     ToolbarItem(placement: .principal) {
-                        HStack {
-                            Text("\(countDays)")
-                                .foregroundStyle(.white)
-                            Text("\(countLog)")
-                                .foregroundStyle(.white)
+                        if showStats {
+                            HStack {
+                                Text("\(countDays)")
+                                Image(systemName: "calendar")
+                                Text("\(countLog)")
+                                    .padding(.leading, 4)
+                                Image(systemName: "list.bullet.rectangle")
+                            }
+                            .fontWeight(.light)
+                            .foregroundStyle(.white)
                         }
                     }
                     if featureFlags.adminEnabled {

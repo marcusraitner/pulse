@@ -13,15 +13,21 @@ import OSLog
 struct PulseApp: App {
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "PulseApp")
     
-    var modelContainer: ModelContainer {
-        let schema = Schema([DailyEntry.self])
+    let modelContainer: ModelContainer
+    
+    init() {
+        let schema = Schema([DailyEntry.self, DailyLogEntry.self])
         let modelconfiguration = ModelConfiguration(
             schema: schema,
             cloudKitDatabase: .automatic
         )
         
         do {
-            return try ModelContainer(for: schema, configurations: modelconfiguration)
+            modelContainer =  try ModelContainer(
+                for: schema,
+                migrationPlan: PulseMigrationPlan.self,
+                configurations: modelconfiguration
+            )
         } catch {
             logger.error("ModelContainer initialization failed: \(error)")
             fatalError("Could not create ModelContainer: \(error)")

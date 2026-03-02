@@ -14,6 +14,7 @@ struct LogEntriesView: View {
     @State private var isPresenting: Bool = false
     @AppStorage("freezeHistory") private var freezeHistory: Bool = true
     @Environment(\.featureFlags) private var featureFlags
+    @Environment(\.modelContext) private var context
 
     private var isToday: Bool {
         Calendar.current.isDateInToday(day.date)
@@ -23,6 +24,7 @@ struct LogEntriesView: View {
         if !newLogEntry.log.isEmpty {
             newLogEntry.timestamp = .now
             day.logEntries?.append(newLogEntry)
+            try? context.save()
             newLogEntry = DailyLogEntry(timestamp: .now, log: "", score: 0)
         }
     }
@@ -67,9 +69,8 @@ struct LogEntriesView: View {
                             .swipeActions(edge: .trailing) {
                                 if isToday || !freezeHistory {
                                     Button(role: .destructive) {
-                                        day.logEntries?.removeAll(where: {
-                                            $0 == entry
-                                        })
+                                        context.delete(entry)
+                                        try? context.save()
                                     } label: {
                                         Image(systemName: "trash")
                                     }

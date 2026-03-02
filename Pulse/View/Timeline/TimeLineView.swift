@@ -21,6 +21,7 @@ struct TimeLineView: View {
     @State private var frames: [DailyEntry: CGRect] = [:]
     @State private var position: ScrollPosition = .init(idType: Date.self)
     @State private var containerWidth: CGFloat = 0.0
+    @State private var countDays: Int = 0
     private static let geometry = NamedCoordinateSpace.named("geometry")
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "TimeLineView")
     @State private var todayFrameVisible: Bool = true
@@ -162,10 +163,11 @@ struct TimeLineView: View {
             }
         }
         .onChange(of: today.logEntries) {
-            if allEntries.count == 15
-                || allEntries.count == 21
-                || allEntries.count == 50 {
+            let descriptor = FetchDescriptor<DailyLogEntry>(predicate: #Predicate { _ in true })
+            if let count = try? context.fetchCount(descriptor) {
+                if count == 10 || count == 20 || count == 50 || count == 100 {
                     presentReview()
+                }
             }
         }
         .task {

@@ -12,6 +12,7 @@ import SwiftData
 
 struct SettingsView: View {
     @AppStorage("freezeHistory") private var freezeHistory: Bool = true
+    @AppStorage("showStats") private var showStats: Bool = true
     @AppStorage("notificationsEnabled") private var notificationsEnabled: Bool = true
     @AppStorage("notificationTime") private var notificationTime: Date = .now
     @State private var notificationTimes: [Date] = []
@@ -37,7 +38,7 @@ struct SettingsView: View {
                     }
                 }
             }
-            if featureFlags.editHistory {
+            
                 Section {
                     VStack(alignment: .leading) {
                         Image(systemName: "gear")
@@ -52,10 +53,16 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
 
                     }
-                    Toggle(isOn: $freezeHistory) {
-                        Text("Freeze History")
-                        Text("If enabled, entries in the past cannot be modified")
+                    Toggle(isOn: $showStats) {
+                        Text("Show Statistics")
+                        Text("Show number of days and entries")
                     }
+                    
+                    if featureFlags.editHistory {
+                        Toggle(isOn: $freezeHistory) {
+                            Text("Freeze History")
+                            Text("If enabled, entries in the past cannot be modified")
+                        }
                 }
             }
             Section {
