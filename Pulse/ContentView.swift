@@ -8,12 +8,14 @@
 import OSLog
 import SwiftData
 import SwiftUI
+import StoreKit
 
 struct ContentView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.featureFlags) private var featureFlags
+    @Environment(\.requestReview) private var requestReview
     
     @AppStorage("notificationsEnabled") private var notificationsEnabled: Bool = true
     @AppStorage("freezeHistory") private var freezeHistory: Bool = true
@@ -40,20 +42,18 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                GeometryReader { _ in
-
-                }
-                VStack {
-                    dateView
-                    
-                    TimeLineView(selectedEntry: $selectedEntry)
-                        .padding(.vertical)
-                        .padding(.bottom, 10)
-                    
-                    LogEntriesView(day: selectedEntry)
-                }
-                .background {
+            VStack {
+                dateView
+                
+                TimeLineView(selectedEntry: $selectedEntry)
+                    .padding(.vertical)
+                    .padding(.bottom, 10)
+                
+                LogEntriesView(day: selectedEntry)
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .background {
+                GeometryReader { geo in
                     Image(colorScheme == .dark ? "mountain-dark" : "mountain")
                         .resizable()
                         .scaledToFill()
@@ -61,65 +61,70 @@ struct ContentView: View {
                         .brightness(colorScheme == .dark ? 0.0 : -0.1)
                         .ignoresSafeArea(.all)
                 }
-                .ignoresSafeArea(.keyboard)
-                .sheet(isPresented: $isPresentingAbout) {
-                    aboutSheetStack
+            }
+            .ignoresSafeArea(.keyboard)
+            .sheet(isPresented: $isPresentingAbout) {
+                aboutSheetStack
+            }
+            .sheet(
+                isPresented: $isPresentingSettings,
+                onDismiss: setNotifications
+            ) {
+                settingsSheetStack
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Settings", systemImage: "gearshape.fill") {
+                        isPresentingSettings = true
+                    }
+                    .tint(.white)
                 }
-                .sheet(
-                    isPresented: $isPresentingSettings,
-                    onDismiss: setNotifications
-                ) {
-                    settingsSheetStack
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("About", systemImage: "line.3.horizontal") {
+                        isPresentingAbout = true
+                    }
+                    .tint(.white)
                 }
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Settings", systemImage: "gearshape.fill") {
-                            isPresentingSettings = true
+                ToolbarItem(placement: .principal) {
+                    if showStats {
+                        HStack {
+                            Text("\(countDays)")
+                            Image(systemName: "calendar")
+                            Text("\(countLog)")
+                                .padding(.leading, 4)
+                            Image(systemName: "list.bullet.rectangle")
+                        }
+                        .fontWeight(.light)
+                        .foregroundStyle(.white)
+                    }
+                }
+                if featureFlags.adminEnabled {
+                    ToolbarItem(placement: .bottomBar) {
+                        Button("Delete Entry", systemImage: "trash") {
+                            context.delete(selectedEntry)
+                            try? context.save()
                         }
                         .tint(.white)
                     }
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button("About", systemImage: "line.3.horizontal") {
-                            isPresentingAbout = true
-                        }
-                        .tint(.white)
-                    }
-                    ToolbarItem(placement: .principal) {
-                        if showStats {
-                            HStack {
-                                Text("\(countDays)")
-                                Image(systemName: "calendar")
-                                Text("\(countLog)")
-                                    .padding(.leading, 4)
-                                Image(systemName: "list.bullet.rectangle")
-                            }
-                            .fontWeight(.light)
-                            .foregroundStyle(.white)
-                        }
-                    }
-                    if featureFlags.adminEnabled {
-                        ToolbarItem(placement: .bottomBar) {
-                            Button("Delete Entry", systemImage: "trash") {
-                                context.delete(selectedEntry)
-                                try? context.save()
-                            }
-                            .tint(.white)
-                        }
-                    }
-                }
-                .task {
-                    await initApplication()
                 }
             }
+            .task {
+                await initApplication()
+            }
         }
-        #if DEBUG
-            // Expose an accessibility identifier
-            .accessibilityIdentifier("dateView")
-            // and a values containing the selectedEntry for UI Tests
-            .accessibilityValue(
-                Text("selectedEntry:\(DateFormatHelper.formatDate(selectedEntry.date))")
-            )
-        #endif  // DEBUG only for UI Tests
+        .onChange(of: countLog) { old, new in
+            if new > old && (new == 3 || new == 20 || new == 50 || new == 100) {
+                    presentReview()
+            }
+        }
+#if DEBUG
+        // Expose an accessibility identifier
+        .accessibilityIdentifier("dateView")
+        // and a values containing the selectedEntry for UI Tests
+        .accessibilityValue(
+            Text("selectedEntry:\(DateFormatHelper.formatDate(selectedEntry.date))")
+        )
+#endif  // DEBUG only for UI Tests
     }
 
     private func initApplication() async {
@@ -181,6 +186,14 @@ struct ContentView: View {
 
                 UNUserNotificationCenter.current().add(request)
             }
+        }
+    }
+    
+    private func presentReview() {
+        Task {
+            // Delay for two seconds to avoid interrupting the person using the app.
+            try await Task.sleep(for: .seconds(2))
+            requestReview()
         }
     }
     

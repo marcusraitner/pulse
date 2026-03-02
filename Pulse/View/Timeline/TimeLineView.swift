@@ -8,13 +8,12 @@
 import OSLog
 import SwiftData
 import SwiftUI
-import StoreKit
 
 struct TimeLineView: View {
     @Query(sort: \DailyEntry.date) private var allEntries: [DailyEntry]
     @Environment(\.modelContext) private var context
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(\.requestReview) private var requestReview
+
     
     @Binding var selectedEntry: DailyEntry
     @State private var today: DailyEntry = .init(date: .now)
@@ -162,14 +161,6 @@ struct TimeLineView: View {
                 }
             }
         }
-        .onChange(of: today.logEntries) {
-            let descriptor = FetchDescriptor<DailyLogEntry>(predicate: #Predicate { _ in true })
-            if let count = try? context.fetchCount(descriptor) {
-                if count == 10 || count == 20 || count == 50 || count == 100 {
-                    presentReview()
-                }
-            }
-        }
         .task {
             if let last = allEntries.last {
                 position.scrollTo(id: last.date, anchor: .center)
@@ -195,14 +186,6 @@ struct TimeLineView: View {
         
         // this triggers also scrolling
         today = newToday
-    }
-
-    private func presentReview() {
-        Task {
-            // Delay for two seconds to avoid interrupting the person using the app.
-            try await Task.sleep(for: .seconds(2))
-            requestReview()
-        }
     }
 }
 
