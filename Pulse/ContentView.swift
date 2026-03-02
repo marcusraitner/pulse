@@ -25,6 +25,16 @@ struct ContentView: View {
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
 
+    private var countDays: Int {
+        let descriptor = FetchDescriptor<DailyEntry>(predicate: #Predicate { _ in true })
+        return (try? context.fetchCount(descriptor)) ?? 0
+    }
+    
+    private var countLog: Int {
+        let descriptor = FetchDescriptor<DailyLogEntry>(predicate: #Predicate { _ in true })
+        return (try? context.fetchCount(descriptor)) ?? 0
+    }
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -70,6 +80,14 @@ struct ContentView: View {
                             isPresentingAbout = true
                         }
                         .tint(.white)
+                    }
+                    ToolbarItem(placement: .principal) {
+                        HStack {
+                            Text("\(countDays)")
+                                .foregroundStyle(.white)
+                            Text("\(countLog)")
+                                .foregroundStyle(.white)
+                        }
                     }
                     if featureFlags.adminEnabled {
                         ToolbarItem(placement: .bottomBar) {

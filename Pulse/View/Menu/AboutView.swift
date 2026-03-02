@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct AboutView: View {
+    @Environment(\.openURL) private var openURL
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 5) {
@@ -35,6 +37,23 @@ struct AboutView: View {
                 Text("And please leave a positive review in the App Store! That means a lot to us.")
                     .bold()
                     .padding(.top, 5)
+                HStack {
+                    Spacer()
+                    Button("Review") {
+                        let url = "https://apps.apple.com/app/id6759242390?action=write-review"
+
+
+                        guard let writeReviewURL = URL(string: url) else {
+                            fatalError("Expected a valid URL")
+                        }
+
+
+                        openURL(writeReviewURL)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .padding(.vertical)
+                    Spacer()
+                }
                 Text("Credits")
                     .font(Font.title3)
                     .padding(.top, 20)

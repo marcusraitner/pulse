@@ -395,6 +395,16 @@
         }
       }
     },
+    "Review" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewerten"
+          }
+        }
+      }
+    },
     "Save" : {
       "localizations" : {
         "de" : {
