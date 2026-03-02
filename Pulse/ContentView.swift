@@ -88,13 +88,17 @@ struct ContentView: View {
                 ToolbarItem(placement: .principal) {
                     if showStats {
                         HStack {
-                            Text("\(countDays)")
-                            Image(systemName: "calendar")
-                            Text("\(countLog)")
-                                .padding(.leading, 4)
-                            Image(systemName: "list.bullet.rectangle")
+                            VStack {
+                                Image(systemName: "calendar")
+                                Text("\(countDays)")
+                            }
+                            VStack {
+                                Image(systemName: "list.bullet.rectangle")
+                                Text("\(countLog)")
+                            }
+                            .padding(.leading, 4)
                         }
-                        .fontWeight(.light)
+                        .font(.footnote)
                         .foregroundStyle(.white)
                     }
                 }
@@ -113,7 +117,7 @@ struct ContentView: View {
             }
         }
         .onChange(of: countLog) { old, new in
-            if new > old && (new == 3 || new == 20 || new == 50 || new == 100) {
+            if new > old && (new == 5 || new == 10 || new == 25 || new == 50) {
                     presentReview()
             }
         }
