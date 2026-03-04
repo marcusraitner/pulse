@@ -27,6 +27,7 @@ struct ContentView: View {
     @State private var today: DailyEntry = DailyEntry(date: .now)
     @State private var isPresentingSettings: Bool = false
     @State private var isPresentingAbout: Bool = false
+    @State private var isPresentingNewEntry: Bool = false
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
 
@@ -44,97 +45,140 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVStack {
-                    dateView
-                    
-                    TimeLineView(selectedEntry: $selectedEntry)
-                        .padding(.vertical)
-                        .padding(.bottom, 10)
-                    
-                    LogEntriesView(day: selectedEntry)
-                }
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .background {
-                GeometryReader { geo in
-                    Image(colorScheme == .dark ? "mountain-dark" : "mountain")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(minWidth: 0, maxWidth: .infinity)
-                        .brightness(colorScheme == .dark ? 0.0 : -0.1)
-                        .ignoresSafeArea(.all)
-                }
-            }
-            .ignoresSafeArea(.keyboard)
-            .sheet(isPresented: $isPresentingAbout) {
-                aboutSheetStack
-            }
-            .sheet(
-                isPresented: $isPresentingSettings,
-                onDismiss: setNotifications
-            ) {
-                settingsSheetStack
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Settings", systemImage: "gearshape.fill") {
-                        isPresentingSettings = true
-                    }
-                    .tint(.white)
-                }
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("About", systemImage: "line.3.horizontal") {
-                        isPresentingAbout = true
-                    }
-                    .tint(.white)
-                }
-                ToolbarItem(placement: .principal) {
-                    if showStats {
-                        HStack {
-                            VStack {
-                                Image(systemName: "calendar")
-                                Text("\(countDays)")
-                            }
-                            VStack {
-                                Image(systemName: "list.bullet.rectangle")
-                                Text("\(countLog)")
-                            }
-                            .padding(.leading, 4)
-                        }
-                        .font(.footnote)
-                        .foregroundStyle(.white)
+            ZStack(alignment: .bottomTrailing) {
+                ScrollView {
+                    LazyVStack {
+                        dateView
+                        
+                        TimeLineView(selectedEntry: $selectedEntry)
+                            .padding(.vertical)
+                            .padding(.bottom, 10)
+                        
+                        LogEntriesView(day: selectedEntry)
                     }
                 }
-                if featureFlags.adminEnabled {
-                    ToolbarItem(placement: .bottomBar) {
-                        Button("Delete Entry", systemImage: "trash") {
-                            context.delete(selectedEntry)
-                            try? context.save()
+                .navigationBarTitleDisplayMode(.inline)
+                .background {
+                    GeometryReader { geo in
+                        Image(colorScheme == .dark ? "mountain-dark" : "mountain")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(minWidth: 0, maxWidth: .infinity)
+                            .brightness(colorScheme == .dark ? 0.0 : -0.1)
+                            .ignoresSafeArea(.all)
+                    }
+                }
+                .ignoresSafeArea(.keyboard)
+                .sheet(isPresented: $isPresentingAbout) {
+                    aboutSheetStack
+                }
+                .sheet(
+                    isPresented: $isPresentingSettings,
+                    onDismiss: setNotifications
+                ) {
+                    settingsSheetStack
+                }
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Settings", systemImage: "gearshape.fill") {
+                            isPresentingSettings = true
                         }
                         .tint(.white)
                     }
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("About", systemImage: "line.3.horizontal") {
+                            isPresentingAbout = true
+                        }
+                        .tint(.white)
+                    }
+                    ToolbarItem(placement: .principal) {
+                        if showStats {
+                            HStack {
+                                VStack {
+                                    Image(systemName: "calendar")
+                                    Text("\(countDays)")
+                                }
+                                VStack {
+                                    Image(systemName: "list.bullet.rectangle")
+                                    Text("\(countLog)")
+                                }
+                                .padding(.leading, 4)
+                            }
+                            .font(.footnote)
+                            .foregroundStyle(.white)
+                        }
+                    }
+                    if featureFlags.adminEnabled {
+                        ToolbarItem(placement: .bottomBar) {
+                            Button("Delete Entry", systemImage: "trash") {
+                                context.delete(selectedEntry)
+                                try? context.save()
+                            }
+                            .tint(.white)
+                        }
+                    }
+                }
+                .task {
+                    await initApplication()
+                }
+                .onChange(of: countLog) { old, new in
+                    if new > old && numberOfRequests < 3 && countLog > lastReviewRequest + (5 * (numberOfRequests + 1)) {
+                        presentReview()
+                        numberOfRequests += 1
+                        lastReviewRequest = countLog
+                    }
+                }
+                
+                if Calendar.current.isDateInToday(selectedEntry.date) || !freezeHistory {
+                    if #available(iOS 26.0, *) {
+                        Button(action: { isPresentingNewEntry = true } ) {
+                            Image(systemName: "plus")
+                                .font(.largeTitle)
+                                .padding()
+                                .glassEffect(.regular, in: Circle())
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.trailing, 20)
+                    } else {
+                        Button(action: { isPresentingNewEntry = true } ) {
+                            Image(systemName: "plus")
+                                .font(.largeTitle)
+                                .padding()
+                                .background(.regularMaterial, in: Circle())
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.trailing, 20)
+                    }
                 }
             }
-            .task {
-                await initApplication()
-            }
-            .onChange(of: countLog) { old, new in
-                if new > old && numberOfRequests < 3 && countLog > lastReviewRequest + (5 * (numberOfRequests + 1)) {
-                    presentReview()
-                    numberOfRequests += 1
-                    lastReviewRequest = countLog
+            .sheet(isPresented: $isPresentingNewEntry) {
+                NavigationStack {
+                    LogEntrySheet(entry: .constant(DailyLogEntry(timestamp: .now, log: "", score: 0)),
+                                  isEntryNew: .constant(true)) { editedEntry in
+                        // Only commit changes here when the user taps Submit in the sheet
+                        if selectedEntry.logEntries == nil {
+                            selectedEntry.logEntries = []
+                        }
+                        selectedEntry.logEntries?.append(editedEntry)
+                        
+                        do {
+                            try context.save()
+                        } catch {
+                            logger.error("Failed saving edited entry: \(String(describing: error))")
+                        }
+                        isPresentingNewEntry = false
+                    }
                 }
             }
-        }
 #if DEBUG
-        // Expose an accessibility identifier
-        .accessibilityIdentifier("dateView")
-        // and a values containing the selectedEntry for UI Tests
-        .accessibilityValue(
-            Text("selectedEntry:\(DateFormatHelper.formatDate(selectedEntry.date))")
-        )
+            // Expose an accessibility identifier
+            .accessibilityIdentifier("dateView")
+            // and a values containing the selectedEntry for UI Tests
+            .accessibilityValue(
+                Text("selectedEntry:\(DateFormatHelper.formatDate(selectedEntry.date))")
+            )
 #endif  // DEBUG only for UI Tests
+        }
     }
 
     private func initApplication() async {

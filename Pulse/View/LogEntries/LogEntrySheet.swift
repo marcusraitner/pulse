@@ -9,7 +9,7 @@ import SwiftUI
 import OSLog
 import SwiftData
 
-struct NewLogEntrySheet: View {
+struct LogEntrySheet: View {
     @State private var newEntry: DailyLogEntry = DailyLogEntry(timestamp: .now, log: "", score: 0)
     @Binding var entry: DailyLogEntry
     @Binding var isEntryNew: Bool
@@ -58,7 +58,7 @@ struct NewLogEntrySheet: View {
                             try? context.save()
                             dismiss()
                         }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(.automatic)
                     }
                     Spacer()
                 }
@@ -106,6 +106,6 @@ struct NewLogEntrySheet: View {
 
 #Preview {
     NavigationStack {
-        NewLogEntrySheet(entry: .constant(DailyLogEntry(timestamp: .now, log: "", score: 0)), isEntryNew: .constant(true), saveEntry: { entry in })
+        LogEntrySheet(entry: .constant(DailyLogEntry(timestamp: .now, log: "", score: 0)), isEntryNew: .constant(true), saveEntry: { entry in })
     }
 }

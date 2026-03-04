@@ -27,27 +27,27 @@ struct LogEntriesView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                if isToday || !freezeHistory {
-                    if #available(iOS 26.0, *) {
-                        Button(action: { isEntryNew = true; isPresenting = true } ) {
-                            Image(systemName: "plus")
-                                .font(.largeTitle)
-                                .padding()
-                                .glassEffect(.regular, in: Circle())
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.bottom)
-                    } else {
-                        Button(action: { isEntryNew = true; isPresenting = true } ) {
-                            Image(systemName: "plus")
-                                .font(.largeTitle)
-                                .padding()
-                                .background(.regularMaterial, in: Circle())
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.bottom)
-                    }
-                }
+//                if isToday || !freezeHistory {
+//                    if #available(iOS 26.0, *) {
+//                        Button(action: { isEntryNew = true; isPresenting = true } ) {
+//                            Image(systemName: "plus")
+//                                .font(.largeTitle)
+//                                .padding()
+//                                .glassEffect(.regular, in: Circle())
+//                        }
+//                        .buttonStyle(.plain)
+//                        .padding(.bottom)
+//                    } else {
+//                        Button(action: { isEntryNew = true; isPresenting = true } ) {
+//                            Image(systemName: "plus")
+//                                .font(.largeTitle)
+//                                .padding()
+//                                .background(.regularMaterial, in: Circle())
+//                        }
+//                        .buttonStyle(.plain)
+//                        .padding(.bottom)
+//                    }
+//                }
                 
                 let logEntries = day.logEntries?.sorted(by: {
                     $0.timestamp < $1.timestamp
@@ -69,7 +69,7 @@ struct LogEntriesView: View {
             }
             .sheet(isPresented: $isPresenting) {
                 NavigationStack {
-                    NewLogEntrySheet(entry: $logEntry, isEntryNew: $isEntryNew) { editedEntry in
+                    LogEntrySheet(entry: $logEntry, isEntryNew: $isEntryNew) { editedEntry in
                         // Only commit changes here when the user taps Submit in the sheet
                         if isEntryNew {
                             // Append to the day's entries if creating new
