@@ -7,26 +7,21 @@
 
 import SwiftData
 import SwiftUI
+import OSLog
 
 struct LogEntriesView: View {
     @Bindable var day: DailyEntry
-    @State private var newLogEntry = DailyLogEntry(timestamp: .now, log: "", score: 0)
+    @State private var logEntry = DailyLogEntry(timestamp: .now, log: "", score: 0)
     @State private var isPresenting: Bool = false
+    @State private var isEntryNew: Bool = true
     @AppStorage("freezeHistory") private var freezeHistory: Bool = true
     @Environment(\.featureFlags) private var featureFlags
     @Environment(\.modelContext) private var context
+    
+    private let logger = Logger(subsystem: "de.raitner.pulse", category: "LogEntriesView")
 
     private var isToday: Bool {
         Calendar.current.isDateInToday(day.date)
-    }
-    
-    private func saveNewLog() {
-        if !newLogEntry.log.isEmpty {
-            newLogEntry.timestamp = .now
-            day.logEntries?.append(newLogEntry)
-            try? context.save()
-            newLogEntry = DailyLogEntry(timestamp: .now, log: "", score: 0)
-        }
     }
     
     var body: some View {
@@ -34,7 +29,7 @@ struct LogEntriesView: View {
             VStack {
                 if isToday || !freezeHistory {
                     if #available(iOS 26.0, *) {
-                        Button(action: { isPresenting = true } ) {
+                        Button(action: { isEntryNew = true; isPresenting = true } ) {
                             Image(systemName: "plus")
                                 .font(.largeTitle)
                                 .padding()
@@ -43,7 +38,7 @@ struct LogEntriesView: View {
                         .buttonStyle(.plain)
                         .padding(.bottom)
                     } else {
-                        Button(action: { isPresenting = true } ) {
+                        Button(action: { isEntryNew = true; isPresenting = true } ) {
                             Image(systemName: "plus")
                                 .font(.largeTitle)
                                 .padding()
@@ -54,65 +49,45 @@ struct LogEntriesView: View {
                     }
                 }
                 
-                List {
-                    let logEntries = day.logEntries?.sorted(by: {
-                        $0.timestamp < $1.timestamp
-                    }) ?? []
+                let logEntries = day.logEntries?.sorted(by: {
+                    $0.timestamp < $1.timestamp
+                }) ?? []
                     
-                    ForEach(logEntries) { entry in
-                        LogEntryText(logEntry: entry)
-                            .padding(.vertical, featureFlags.iOS26 ? 0 : 5)
-                            .listRowBackground(
-                                ScoreStyleHelper.color(for: entry.score)
-                                    .opacity(0.85)
-                            )
-                            .swipeActions(edge: .trailing) {
-                                if isToday || !freezeHistory {
-                                    Button(role: .destructive) {
-                                        context.delete(entry)
-                                        try? context.save()
-                                    } label: {
-                                        Image(systemName: "trash")
-                                    }
-                                }
+                ForEach(logEntries) { entry in
+                    LogEntryText(logEntry: entry)
+                        .padding()
+                        .background(ScoreStyleHelper.color(for: entry.score)
+                            .opacity(0.85))
+                        .onTapGesture {
+                            if (isToday || !freezeHistory) {
+                                logEntry = entry
+                                isEntryNew = false
+                                isPresenting = true
                             }
-                    }
-                }
-                .scrollContentBackground(.hidden)
-                .listStyle(.plain)
-                .defaultScrollAnchor(.top)
-                .listRowSpacing(5)
-            }
-            .sheet(isPresented: $isPresenting, onDismiss: saveNewLog) {
-                NavigationStack {
-                    NewLogEntrySheet(newEntry: $newLogEntry)
-                        .toolbar {
-                            ToolbarItem (placement: .confirmationAction) {
-                                if #available(iOS 26, *) {
-                                    Button(role: .confirm) {
-                                        isPresenting = false
-                                    }
-                                    .disabled(newLogEntry.log.isEmpty)
-                                } else {
-                                    Button("Save") {
-                                        isPresenting = false
-                                    }
-                                    .disabled(newLogEntry.log.isEmpty)
-                                }
-                            }
-                            ToolbarItem (placement: .cancellationAction) {
-                                if #available(iOS 26, *) {
-                                    Button(role: .close) {
-                                        isPresenting = false
-                                    }
-                                } else {
-                                    Button("Cancel", role: .cancel) {
-                                        isPresenting = false
-                                    }
-                                }
-                            }
-
                         }
+                    }
+            }
+            .sheet(isPresented: $isPresenting) {
+                NavigationStack {
+                    NewLogEntrySheet(entry: $logEntry, isEntryNew: $isEntryNew) { editedEntry in
+                        // Only commit changes here when the user taps Submit in the sheet
+                        if isEntryNew {
+                            // Append to the day's entries if creating new
+                            if day.logEntries == nil {
+                                day.logEntries = []
+                            }
+                            day.logEntries?.append(editedEntry)
+                        } else {
+                            logEntry.log = editedEntry.log
+                            logEntry.score = editedEntry.score
+                        }
+                        do {
+                            try context.save()
+                        } catch {
+                            logger.error("Failed saving edited entry: \(String(describing: error))")
+                        }
+                        isPresenting = false
+                    }
                 }
                 
             }

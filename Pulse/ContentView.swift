@@ -20,6 +20,8 @@ struct ContentView: View {
     @AppStorage("notificationsEnabled") private var notificationsEnabled: Bool = true
     @AppStorage("freezeHistory") private var freezeHistory: Bool = true
     @AppStorage("showStats") private var showStats: Bool = true
+    @AppStorage("lastReviewRequest") private var lastReviewRequest: Int = 0
+    @AppStorage("numberOfRequests") private var numberOfRequests: Int = 0
     
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
     @State private var today: DailyEntry = DailyEntry(date: .now)
@@ -42,14 +44,16 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
-                dateView
-                
-                TimeLineView(selectedEntry: $selectedEntry)
-                    .padding(.vertical)
-                    .padding(.bottom, 10)
-                
-                LogEntriesView(day: selectedEntry)
+            ScrollView {
+                LazyVStack {
+                    dateView
+                    
+                    TimeLineView(selectedEntry: $selectedEntry)
+                        .padding(.vertical)
+                        .padding(.bottom, 10)
+                    
+                    LogEntriesView(day: selectedEntry)
+                }
             }
             .navigationBarTitleDisplayMode(.inline)
             .background {
@@ -115,10 +119,12 @@ struct ContentView: View {
             .task {
                 await initApplication()
             }
-        }
-        .onChange(of: countLog) { old, new in
-            if new > old && (new == 5 || new == 10 || new == 25 || new == 50) {
+            .onChange(of: countLog) { old, new in
+                if new > old && numberOfRequests < 3 && countLog > lastReviewRequest + (5 * (numberOfRequests + 1)) {
                     presentReview()
+                    numberOfRequests += 1
+                    lastReviewRequest = countLog
+                }
             }
         }
 #if DEBUG

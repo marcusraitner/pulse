@@ -213,6 +213,16 @@
         }
       }
     },
+    "Edit Moment" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moment bearbeiten"
+          }
+        }
+      }
+    },
     "Enable reminders" : {
       "localizations" : {
         "de" : {
@@ -426,7 +436,6 @@
       }
     },
     "selectedEntry:%@" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

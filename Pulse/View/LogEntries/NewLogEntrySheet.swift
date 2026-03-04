@@ -6,11 +6,21 @@
 //
 
 import SwiftUI
+import OSLog
+import SwiftData
 
 struct NewLogEntrySheet: View {
-    @Binding var newEntry: DailyLogEntry
+    @State private var newEntry: DailyLogEntry = DailyLogEntry(timestamp: .now, log: "", score: 0)
+    @Binding var entry: DailyLogEntry
+    @Binding var isEntryNew: Bool
     @State private var isNew = true
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var context
     
+    var saveEntry: (DailyLogEntry) -> Void
+    
+    private let logger = Logger(subsystem: "de.raitner.pulse", category: "NewLogEntrySheet")
+
     var body: some View {
         Form {
             VStack(alignment: .leading) {
@@ -39,16 +49,63 @@ struct NewLogEntrySheet: View {
                 }
                 .padding(.leading)
             }
+            Section {
+                HStack {
+                    Spacer()
+                    if !isEntryNew {
+                        Button("Delete Entry", role: .destructive) {
+                            context.delete(entry)
+                            try? context.save()
+                            dismiss()
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                    Spacer()
+                }
+            }
+            .listRowBackground(Color.clear)
         }
-        .navigationTitle("New Moment")
+        .task {
+            newEntry = DailyLogEntry(timestamp: .now, log: entry.log, score: entry.score)
+        }
         .onChange(of: newEntry.score) {
             isNew = false
+        }
+        .navigationTitle(isEntryNew ? "New Moment" : "Edit Moment")
+        .toolbar {
+            ToolbarItem (placement: .confirmationAction) {
+                if #available(iOS 26, *) {
+                    Button(role: .confirm) {
+                        saveEntry(newEntry)
+                        dismiss()
+                    }
+                    .disabled(newEntry.log.isEmpty)
+                } else {
+                    Button("Save") {
+                        saveEntry(newEntry)
+                        dismiss()
+                    }
+                    .disabled(newEntry.log.isEmpty)
+                }
+            }
+            ToolbarItem (placement: .cancellationAction) {
+                if #available(iOS 26, *) {
+                    Button(role: .close) {
+                        dismiss()
+                    }
+                } else {
+                    Button("Cancel", role: .cancel) {
+                        dismiss()
+                    }
+                }
+            }
+
         }
     }
 }
 
 #Preview {
     NavigationStack {
-        NewLogEntrySheet(newEntry: .constant(DailyLogEntry(timestamp: .now, log: "", score: 0)))
+        NewLogEntrySheet(entry: .constant(DailyLogEntry(timestamp: .now, log: "", score: 0)), isEntryNew: .constant(true), saveEntry: { entry in })
     }
 }
