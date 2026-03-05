@@ -475,6 +475,16 @@
         }
       }
     },
+    "selectedEntry:%@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "selectedEntry:%@"
+          }
+        }
+      }
+    },
     "Set multiple daily reminders to log what's happening and how you feel about it." : {
       "localizations" : {
         "de" : {
