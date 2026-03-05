@@ -20,7 +20,7 @@ class SampleData {
             logEntries: [
                 DailyLogEntry(
                     timestamp: Date(timeIntervalSinceNow: -5000),
-                    log: "Good start; got distracted after an hour",
+                    log: "Good start",
                     score: 2)
             ],
         ),
@@ -102,16 +102,22 @@ class SampleData {
     private let sampleData: [DailyEntry] = [
         .init(
             date: .now,
+            summary: "Strong start to the week; a bit of context switching in the afternoon.",
             logEntries: [
                 DailyLogEntry(
                     timestamp: Date(timeIntervalSinceNow: -5000),
                     log: "Good start; got distracted after an hour",
                     score: 2
-                )
+                ),
+                DailyLogEntry(
+                    timestamp: Date(timeIntervalSinceNow: -5000),
+                    log: "Got distracted after an hour",
+                    score: 1)
             ],
         ),
         .init(
             date: Date(timeIntervalSinceNow: -86400 * 2),
+            summary: "Low-energy day with minimal progress; prioritized rest.",
             logEntries: [
                 DailyLogEntry(
                     timestamp: Calendar.current.date(byAdding: .hour, value: -1, to: .now)!,
@@ -125,6 +131,7 @@ class SampleData {
         ),
         .init(
             date: Date(timeIntervalSinceNow: -86400 * 3),
+            summary: "Mixed focus: meaningful deep work tempered by distractions.",
             logEntries: [
                 DailyLogEntry(
                     timestamp: Date(timeIntervalSinceNow: -5000),
@@ -141,6 +148,7 @@ class SampleData {
         ),
         .init(
             date: Date(timeIntervalSinceNow: -86400 * 4),
+            summary: "Challenging day; momentum dipped significantly.",
             logEntries: [
                 DailyLogEntry(
                     timestamp: Date(timeIntervalSinceNow: -5000*5),
@@ -151,6 +159,7 @@ class SampleData {
         ),
         .init(
             date: Calendar.current.date(byAdding: .day, value: -5, to: .now)!,
+            summary: "Closed core work and improved stability; solid progress.",
             logEntries: [
                 DailyLogEntry(timestamp: Date(timeIntervalSinceNow: -3600 * 1), log: "Wrapped up core features", score: 2),
                 DailyLogEntry(timestamp: Date(timeIntervalSinceNow: -3600 * 2), log: "Fixed a couple of bugs", score: 1)
@@ -165,6 +174,7 @@ class SampleData {
         ),
         .init(
             date: Calendar.current.date(byAdding: .day, value: -7, to: .now)!,
+            summary: "Analytics review uncovered onboarding opportunities.",
             logEntries: [
                 DailyLogEntry(timestamp: Date(timeIntervalSinceNow: -7200), log: "Reviewed retention metrics", score: 0),
                 DailyLogEntry(timestamp: Date(timeIntervalSinceNow: -10800), log: "Identified a drop-off in onboarding", score: 1)
@@ -178,6 +188,7 @@ class SampleData {
         ),
         .init(
             date: Calendar.current.date(byAdding: .day, value: -9, to: .now)!,
+            summary: "Email management partially successful; focus fragmented.",
             logEntries: [
                 DailyLogEntry(timestamp: Date(timeIntervalSinceNow: -4000), log: "Inbox zero attempt failed", score: -1),
                 DailyLogEntry(timestamp: Date(timeIntervalSinceNow: -3000), log: "Flagged important threads", score: 0)

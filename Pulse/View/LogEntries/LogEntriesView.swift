@@ -27,45 +27,39 @@ struct LogEntriesView: View {
     var body: some View {
         NavigationStack {
             VStack {
-//                if isToday || !freezeHistory {
-//                    if #available(iOS 26.0, *) {
-//                        Button(action: { isEntryNew = true; isPresenting = true } ) {
-//                            Image(systemName: "plus")
-//                                .font(.largeTitle)
-//                                .padding()
-//                                .glassEffect(.regular, in: Circle())
-//                        }
-//                        .buttonStyle(.plain)
-//                        .padding(.bottom)
-//                    } else {
-//                        Button(action: { isEntryNew = true; isPresenting = true } ) {
-//                            Image(systemName: "plus")
-//                                .font(.largeTitle)
-//                                .padding()
-//                                .background(.regularMaterial, in: Circle())
-//                        }
-//                        .buttonStyle(.plain)
-//                        .padding(.bottom)
-//                    }
-//                }
                 
                 let logEntries = day.logEntries?.sorted(by: {
                     $0.timestamp < $1.timestamp
                 }) ?? []
                     
                 ForEach(logEntries) { entry in
-                    LogEntryText(logEntry: entry)
-                        .padding()
-                        .background(ScoreStyleHelper.color(for: entry.score)
-                            .opacity(0.85))
-                        .onTapGesture {
-                            if (isToday || !freezeHistory) {
-                                logEntry = entry
-                                isEntryNew = false
-                                isPresenting = true
+                    if #available(iOS 26.0, *) {
+                        LogEntryText(logEntry: entry)
+                            .padding(.vertical, 15)
+                            .padding(.horizontal)
+                            .glassEffect(.regular.tint(ScoreStyleHelper.color(for: entry.score)).interactive(), in: RoundedRectangle(cornerRadius: 10))
+                            .onTapGesture {
+                                if (isToday || !freezeHistory) {
+                                    logEntry = entry
+                                    isEntryNew = false
+                                    isPresenting = true
+                                }
                             }
-                        }
+                    } else {
+                        LogEntryText(logEntry: entry)
+                            .padding(.vertical, 15)
+                            .padding(.horizontal)
+                            .background(ScoreStyleHelper.color(for: entry.score)
+                                .opacity(0.85), in: RoundedRectangle(cornerRadius: 10))
+                            .onTapGesture {
+                                if (isToday || !freezeHistory) {
+                                    logEntry = entry
+                                    isEntryNew = false
+                                    isPresenting = true
+                                }
+                            }
                     }
+                }
             }
             .sheet(isPresented: $isPresenting) {
                 NavigationStack {

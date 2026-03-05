@@ -101,9 +101,11 @@ enum PulseVersionedSchemaV110: VersionedSchema {
         
         init(
             date: Date,
+            summary: String = "",
             logEntries: [DailyLogEntry] = [],
         ) {
             self.date = date
+            self.summary = summary
             self.logEntries = logEntries
         }
     }

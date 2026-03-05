@@ -28,6 +28,7 @@ struct ContentView: View {
     @State private var isPresentingSettings: Bool = false
     @State private var isPresentingAbout: Bool = false
     @State private var isPresentingNewEntry: Bool = false
+    @State private var isPresentingReflection: Bool = false
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
 
@@ -54,20 +55,69 @@ struct ContentView: View {
                             .padding(.vertical)
                             .padding(.bottom, 10)
                         
+                        if selectedEntry.summary.isEmpty {
+                            if #available(iOS 26.0, *) {
+                                Button("Reflect Your Day") {
+                                    isPresentingReflection = true
+                                }
+                                .padding(.vertical)
+                                .buttonStyle(.glass(.clear))
+                                .foregroundStyle(.white)
+                                .font(.title3)
+
+                            } else {
+                                Button(action: { isPresentingReflection = true }) {
+                                    Text("Reflect Your Day")
+                                        .padding(10)
+                                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
+                                        .font(.title3)
+                                        .foregroundStyle(.white)
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.vertical)
+                            }
+                        } else {
+                            if #available(iOS 26.0, *) {
+                                HStack {
+                                    VStack(alignment: .leading) {
+                                        Text("Reflection")
+                                            .font(.title3)
+                                            .padding(.bottom, 5)
+                                        Text(selectedEntry.summary)
+                                        
+                                    }
+                                    .foregroundStyle(.white)
+                                    .padding()
+                                    Spacer()
+                                }
+                                .glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
+                                .padding(.horizontal, 5)
+                                .onTapGesture(perform: { isPresentingReflection = true } )
+                            } else {
+                                HStack {
+                                    VStack(alignment: .leading) {
+                                        Text("Reflection")
+                                            .font(.title3)
+                                            .padding(.bottom, 5)
+                                        Text(selectedEntry.summary)
+                                        
+                                    }
+                                    .foregroundStyle(.white)
+                                    .padding()
+                                    Spacer()
+                                }
+                                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
+                                .padding(.horizontal, 5)
+                                .onTapGesture(perform: { isPresentingReflection = true } )
+                            }
+                        }
+                        
+
                         LogEntriesView(day: selectedEntry)
+                            .padding(.horizontal, 5)
                     }
                 }
                 .navigationBarTitleDisplayMode(.inline)
-                .background {
-                    GeometryReader { geo in
-                        Image(colorScheme == .dark ? "mountain-dark" : "mountain")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(minWidth: 0, maxWidth: .infinity)
-                            .brightness(colorScheme == .dark ? 0.0 : -0.1)
-                            .ignoresSafeArea(.all)
-                    }
-                }
                 .ignoresSafeArea(.keyboard)
                 .sheet(isPresented: $isPresentingAbout) {
                     aboutSheetStack
@@ -78,6 +128,31 @@ struct ContentView: View {
                 ) {
                     settingsSheetStack
                 }
+                .sheet(isPresented: $isPresentingNewEntry) {
+                    NavigationStack {
+                        LogEntrySheet() { editedEntry in
+                                
+                            if selectedEntry.logEntries == nil {
+                                selectedEntry.logEntries = []
+                            }
+                            selectedEntry.logEntries?.append(editedEntry)
+                            
+                            do {
+                                try context.save()
+                            } catch {
+                                logger.error("Failed saving edited entry: \(String(describing: error))")
+                            }
+                            
+                            isPresentingNewEntry = false
+                        }
+                    }
+                }
+                .sheet(isPresented: $isPresentingReflection) {
+                    NavigationStack {
+                        DailyReflectionSheet(day: $selectedEntry)
+                    }
+                }
+                .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("Settings", systemImage: "gearshape.fill") {
@@ -112,7 +187,11 @@ struct ContentView: View {
                         ToolbarItem(placement: .bottomBar) {
                             Button("Delete Entry", systemImage: "trash") {
                                 context.delete(selectedEntry)
-                                try? context.save()
+                                do {
+                                    try context.save()
+                                } catch {
+                                    logger.error("Failed saving deleted entry: \(String(describing: error))")
+                                }
                             }
                             .tint(.white)
                         }
@@ -128,14 +207,16 @@ struct ContentView: View {
                         lastReviewRequest = countLog
                     }
                 }
-                
+               
+                // The Add Button
                 if Calendar.current.isDateInToday(selectedEntry.date) || !freezeHistory {
                     if #available(iOS 26.0, *) {
                         Button(action: { isPresentingNewEntry = true } ) {
                             Image(systemName: "plus")
                                 .font(.largeTitle)
                                 .padding()
-                                .glassEffect(.regular, in: Circle())
+                                .glassEffect(.clear, in: Circle())
+                                .foregroundStyle(.white)
                         }
                         .buttonStyle(.plain)
                         .padding(.trailing, 20)
@@ -148,26 +229,18 @@ struct ContentView: View {
                         }
                         .buttonStyle(.plain)
                         .padding(.trailing, 20)
+                        .padding(.bottom, 20)
                     }
                 }
             }
-            .sheet(isPresented: $isPresentingNewEntry) {
-                NavigationStack {
-                    LogEntrySheet(entry: .constant(DailyLogEntry(timestamp: .now, log: "", score: 0)),
-                                  isEntryNew: .constant(true)) { editedEntry in
-                        // Only commit changes here when the user taps Submit in the sheet
-                        if selectedEntry.logEntries == nil {
-                            selectedEntry.logEntries = []
-                        }
-                        selectedEntry.logEntries?.append(editedEntry)
-                        
-                        do {
-                            try context.save()
-                        } catch {
-                            logger.error("Failed saving edited entry: \(String(describing: error))")
-                        }
-                        isPresentingNewEntry = false
-                    }
+            .background {
+                GeometryReader { geo in
+                    Image(colorScheme == .dark ? "mountain-dark" : "mountain")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(minWidth: 0, maxWidth: .infinity)
+                        .brightness(colorScheme == .dark ? 0.0 : -0.1)
+                        .ignoresSafeArea(.all)
                 }
             }
 #if DEBUG
@@ -179,6 +252,7 @@ struct ContentView: View {
             )
 #endif  // DEBUG only for UI Tests
         }
+        
     }
 
     private func initApplication() async {

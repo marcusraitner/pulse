@@ -103,17 +103,6 @@
         }
       }
     },
-    "Add" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hinzufügen"
-          }
-        }
-      }
-    },
     "Add reminder" : {
       "localizations" : {
         "de" : {
@@ -140,6 +129,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wir freuen uns über eine positive Bewertung im App-Store!"
+          }
+        }
+      }
+    },
+    "Are you sure?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bist du dir sicher?"
           }
         }
       }
@@ -204,12 +203,32 @@
         }
       }
     },
+    "Delete" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen"
+          }
+        }
+      }
+    },
     "Delete Entry" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eintrag löschen"
+          }
+        }
+      }
+    },
+    "Delete Moment" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moment löschen"
           }
         }
       }
@@ -230,17 +249,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erinnerungen senden"
-          }
-        }
-      }
-    },
-    "Enter something" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Etwas eingeben"
           }
         }
       }
@@ -397,6 +405,22 @@
         }
       }
     },
+    "Recorded at: *%@*" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfasst am: *%@*"
+          }
+        }
+      }
+    },
+    "Reflect Your Day" : {
+
+    },
+    "Reflection" : {
+
+    },
     "Reminders" : {
       "localizations" : {
         "de" : {
@@ -491,6 +515,16 @@
         }
       }
     },
+    "This will delete the moment permanently and cannot be undone." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Moment wird dadurch gelöscht und kann nicht wiederhergestellt werden."
+          }
+        }
+      }
+    },
     "Version: %@" : {
       "localizations" : {
         "de" : {
@@ -520,6 +554,12 @@
           }
         }
       }
+    },
+    "Your Moments" : {
+
+    },
+    "Your reflection of this day?" : {
+
     },
     "Your Reminders" : {
       "localizations" : {

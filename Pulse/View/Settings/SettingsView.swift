@@ -9,6 +9,7 @@
 import SwiftUI
 import UserNotifications
 import SwiftData
+import OSLog
 
 struct SettingsView: View {
     @AppStorage("freezeHistory") private var freezeHistory: Bool = true
@@ -20,6 +21,8 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.featureFlags) private var featureFlags
     @Environment(\.modelContext) private var context
+    
+    private let logger = Logger(subsystem: "de.raitner.pulse", category: "NewLogEntrySheet")
 
     private let imageFrame: CGFloat = 55
     private let imageSize: CGFloat = 32
@@ -34,7 +37,11 @@ struct SettingsView: View {
                         for entry in SampleData.shared.previewSampleData {
                             context.insert(entry)
                         }
-                        try? context.save()
+                            do {
+                                try context.save()
+                            } catch {
+                                logger.error("Failed saving mock data: \(String(describing: error))")
+                            }
                     }
                 }
             }

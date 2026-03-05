@@ -182,7 +182,12 @@ struct TimeLineView: View {
         let newToday = DailyEntry(date: .now)
         logger.debug("Creating a new day: \(newToday.date)")
         context.insert(newToday)
-        try? context.save()
+        
+        do {
+            try context.save()
+        } catch {
+            logger.error("Failed saving new day: \(String(describing: error))")
+        }
         
         // this triggers also scrolling
         today = newToday

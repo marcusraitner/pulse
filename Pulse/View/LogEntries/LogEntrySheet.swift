@@ -10,55 +10,85 @@ import OSLog
 import SwiftData
 
 struct LogEntrySheet: View {
+    // This holds the temporary values of the sheet; initialized in a task to entry
     @State private var newEntry: DailyLogEntry = DailyLogEntry(timestamp: .now, log: "", score: 0)
+    // The entry to edit (if passed at all; otherwise defaults to the above values (see init)
     @Binding var entry: DailyLogEntry
+    //
     @Binding var isEntryNew: Bool
+    // used to manage validation; showing the validation message only if stepper was touched
     @State private var isNew = true
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var context
-    
+    // closure gets called on save with the values in newEntry
+    @State private var isPresentingConfirm = false
     var saveEntry: (DailyLogEntry) -> Void
     
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var context
+
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "NewLogEntrySheet")
 
+    init(entry: Binding<DailyLogEntry> = .constant(DailyLogEntry(timestamp: .now, log: "", score: 0)),
+         isEntryNew: Binding<Bool> = .constant(true), saveEntry: @escaping (DailyLogEntry) -> Void) {
+        self._entry = entry
+        self._isEntryNew = isEntryNew
+        self.saveEntry = saveEntry
+    }
+    
     var body: some View {
         Form {
-            VStack(alignment: .leading) {
-                TextField("What's going on?", text: $newEntry.log, axis: .vertical)
-                    .multilineTextAlignment(.leading)
-                    .lineLimit(5...Int.max)
-                
-                Text("Please capture your moment here.")
-                    .font(.caption)
-                    .foregroundStyle(!isNew && newEntry.log.isEmpty ? .red : .clear)
-            }
-            HStack(alignment: .top) {
+            Section {
                 VStack(alignment: .leading) {
-                    Text("How are you feeling?")
-                    Text("Capture your mood on a scale from -2 (bad) to 2 (good)")
-                        .foregroundStyle(.secondary)
-                        .padding(.top, 2)
+                    TextField("What's going on?", text: $newEntry.log, axis: .vertical)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(5...Int.max)
+                    
+                    Text("Please capture your moment here.")
+                        .font(.caption)
+                        .foregroundStyle(!isNew && newEntry.log.isEmpty ? .red : .clear)
                 }
-                Spacer()
-                VStack {
-                    ScoreLabelView(score: newEntry.score, size: 72, radius: 12)
-                        .font(.title).bold()
-                    Stepper("", value: $newEntry.score, in: -2...2, step: 1)
-                    .labelsHidden()
-                    .padding(.top, 4)
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading) {
+                        Text("How are you feeling?")
+                        Text("Capture your mood on a scale from -2 (bad) to 2 (good)")
+                            .foregroundStyle(.secondary)
+                            .padding(.top, 2)
+                    }
+                    Spacer()
+                    VStack {
+                        ScoreLabelView(score: newEntry.score, size: 72, radius: 12)
+                            .font(.title).bold()
+                        Stepper("", value: $newEntry.score, in: -2...2, step: 1)
+                            .labelsHidden()
+                            .padding(.top, 4)
+                    }
+                    .padding(.leading)
                 }
-                .padding(.leading)
+                Text("Recorded at: *\(entry.timestamp.formatted(date: .numeric, time: .shortened))*")
             }
+            
             Section {
                 HStack {
                     Spacer()
                     if !isEntryNew {
-                        Button("Delete Entry", role: .destructive) {
-                            context.delete(entry)
-                            try? context.save()
-                            dismiss()
+                        Button("Delete Moment", role: .destructive) {
+                            isPresentingConfirm = true
                         }
                         .buttonStyle(.automatic)
+                        .confirmationDialog("Are you sure?",
+                                            isPresented: $isPresentingConfirm,
+                                            titleVisibility: .visible) {
+                            Button("Delete", role: .destructive) {
+                                context.delete(entry)
+                                do {
+                                    try context.save()
+                                } catch {
+                                    logger.error("Failed saving deleted entry: \(String(describing: error))")
+                                }
+                                dismiss()
+                            }
+                        } message: {
+                            Text("This will delete the moment permanently and cannot be undone.")
+                          }
                     }
                     Spacer()
                 }
@@ -106,6 +136,6 @@ struct LogEntrySheet: View {
 
 #Preview {
     NavigationStack {
-        LogEntrySheet(entry: .constant(DailyLogEntry(timestamp: .now, log: "", score: 0)), isEntryNew: .constant(true), saveEntry: { entry in })
+        LogEntrySheet() { entry in }
     }
 }
