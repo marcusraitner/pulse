@@ -416,10 +416,24 @@
       }
     },
     "Reflect Your Day" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Abendbilanz"
+          }
+        }
+      }
     },
     "Reflection" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abendbilanz"
+          }
+        }
+      }
     },
     "Reminders" : {
       "localizations" : {
@@ -462,14 +476,7 @@
       }
     },
     "selectedEntry:%@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "selectedEntry:%@"
-          }
-        }
-      }
+
     },
     "Set multiple daily reminders to log what's happening and how you feel about it." : {
       "localizations" : {
@@ -556,10 +563,24 @@
       }
     },
     "Your Moments" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Momente"
+          }
+        }
+      }
     },
     "Your reflection of this day?" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Gedanken über diesen Tag?"
+          }
+        }
+      }
     },
     "Your Reminders" : {
       "localizations" : {
