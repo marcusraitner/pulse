@@ -92,6 +92,7 @@ struct ContentView: View {
                                 }
                                 .glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
                                 .padding(.horizontal, 5)
+                                .contentShape(Rectangle())
                                 .onTapGesture(perform: { isPresentingReflection = true } )
                             } else {
                                 HStack {
@@ -108,6 +109,7 @@ struct ContentView: View {
                                 }
                                 .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
                                 .padding(.horizontal, 5)
+                                .contentShape(Rectangle())
                                 .onTapGesture(perform: { isPresentingReflection = true } )
                             }
                         }
@@ -147,7 +149,7 @@ struct ContentView: View {
                         }
                     }
                 }
-                .sheet(isPresented: $isPresentingReflection) {
+                .sheet(isPresented: $isPresentingReflection, onDismiss: { isPresentingReflection = false } ) {
                     NavigationStack {
                         DailyReflectionSheet(day: $selectedEntry)
                     }

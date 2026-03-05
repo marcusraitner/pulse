@@ -38,6 +38,7 @@ struct LogEntriesView: View {
                             .padding(.vertical, 15)
                             .padding(.horizontal)
                             .glassEffect(.regular.tint(ScoreStyleHelper.color(for: entry.score)).interactive(), in: RoundedRectangle(cornerRadius: 10))
+                            .contentShape(Rectangle())
                             .onTapGesture {
                                 if (isToday || !freezeHistory) {
                                     logEntry = entry
@@ -51,6 +52,7 @@ struct LogEntriesView: View {
                             .padding(.horizontal)
                             .background(ScoreStyleHelper.color(for: entry.score)
                                 .opacity(0.85), in: RoundedRectangle(cornerRadius: 10))
+                            .contentShape(Rectangle())
                             .onTapGesture {
                                 if (isToday || !freezeHistory) {
                                     logEntry = entry
