@@ -154,7 +154,6 @@ struct ContentView: View {
                         DailyReflectionSheet(day: $selectedEntry)
                     }
                 }
-                .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("Settings", systemImage: "gearshape.fill") {
