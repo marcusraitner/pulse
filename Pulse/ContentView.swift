@@ -57,13 +57,16 @@ struct ContentView: View {
                         
                         if selectedEntry.summary.isEmpty {
                             if #available(iOS 26.0, *) {
-                                Button("Reflect Your Day") {
-                                    isPresentingReflection = true
+                                Button(action: { isPresentingReflection = true }) {
+                                    Text("Reflect Your Day")
+                                        .foregroundStyle(.white)
+                                        .font(.title3)
+                                        .padding()
+                                        .glassEffect(.clear, in: Capsule())
+
                                 }
                                 .padding(.vertical)
-                                .buttonStyle(.glass(.clear))
-                                .foregroundStyle(.white)
-                                .font(.title3)
+                                .buttonStyle(.plain)
 
                             } else {
                                 Button(action: { isPresentingReflection = true }) {
