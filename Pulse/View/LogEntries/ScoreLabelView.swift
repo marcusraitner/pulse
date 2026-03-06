@@ -17,7 +17,7 @@ struct ScoreLabelView: View {
             .frame(width: size, height: size)
             .background(ScoreStyleHelper.color(for: score).gradient,
                         in: RoundedRectangle(cornerRadius: radius))
-            .shadow(radius: 5)
+            .shadow(radius: 2)
             .foregroundStyle(.primary)
     }
 }

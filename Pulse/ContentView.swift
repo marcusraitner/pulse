@@ -22,6 +22,7 @@ struct ContentView: View {
     @AppStorage("showStats") private var showStats: Bool = true
     @AppStorage("lastReviewRequest") private var lastReviewRequest: Int = 0
     @AppStorage("numberOfRequests") private var numberOfRequests: Int = 0
+    @AppStorage("backgroundImageData") private var backgroundImageData: Data?
     
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
     @State private var today: DailyEntry = DailyEntry(date: .now)
@@ -239,12 +240,19 @@ struct ContentView: View {
             }
             .background {
                 GeometryReader { geo in
-                    Image(colorScheme == .dark ? "mountain-dark" : "mountain")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(minWidth: 0, maxWidth: .infinity)
-                        .brightness(colorScheme == .dark ? 0.0 : -0.1)
-                        .ignoresSafeArea(.all)
+                    if let data = backgroundImageData, let uiImage = UIImage(data: data) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                            .brightness(colorScheme == .dark ? -0.2 : 0.0)
+                            .ignoresSafeArea()
+                    } else {
+                        Image(colorScheme == .dark ? "mountain-dark" : "mountain")
+                            .resizable()
+                            .scaledToFill()
+                            .brightness(colorScheme == .dark ? 0.0 : -0.1)
+                            .ignoresSafeArea(.all)
+                    }
                 }
             }
 #if DEBUG

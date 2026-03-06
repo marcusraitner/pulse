@@ -10,12 +10,15 @@ import SwiftUI
 import UserNotifications
 import SwiftData
 import OSLog
+import PhotosUI
 
 struct SettingsView: View {
     @AppStorage("freezeHistory") private var freezeHistory: Bool = true
     @AppStorage("showStats") private var showStats: Bool = true
     @AppStorage("notificationsEnabled") private var notificationsEnabled: Bool = true
     @AppStorage("notificationTime") private var notificationTime: Date = .now
+    @AppStorage("backgroundImageData") private var backgroundImageData: Data?
+    @State private var backgroundImageSelection: PhotosPickerItem?
     @State private var notificationTimes: [Date] = []
     @State private var notificationsAuthorized: Bool = true
     @Environment(\.dismiss) private var dismiss
@@ -26,6 +29,11 @@ struct SettingsView: View {
 
     private let imageFrame: CGFloat = 55
     private let imageSize: CGFloat = 32
+    
+    private var backgroundImage: Image? {
+        guard let data = backgroundImageData, let uiImage = UIImage(data: data) else { return nil }
+        return Image(uiImage: uiImage)
+    }
     
     var body: some View {
         Form {
@@ -62,6 +70,7 @@ struct SettingsView: View {
                     }
                     Toggle(isOn: $showStats) {
                         Text("Show Statistics")
+                            .font(.headline)
                         Text("Show number of days and entries")
                     }
                     
@@ -71,6 +80,50 @@ struct SettingsView: View {
                             Text("If enabled, entries in the past cannot be modified")
                         }
                 }
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Background Image")
+                            .font(.headline)
+                        Text("Select a custom background image. Darker backgrounds work best.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+
+                        PhotosPicker(selection: $backgroundImageSelection, matching: .images, photoLibrary: .shared()) {
+                            if let backgroundImage {
+                                backgroundImage
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(height: 120)
+                                    .clipped()
+                                    .cornerRadius(12)
+                                    .overlay(alignment: .topTrailing) {
+                                        Button(role: .destructive) {
+                                            backgroundImageData = nil
+                                        } label: {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .imageScale(.large)
+                                                .symbolRenderingMode(.hierarchical)
+                                                .foregroundStyle(.white, .blue)
+                                                .shadow(radius: 2)
+                                        }
+                                        .padding(8)
+                                    }
+                            } else {
+                                Image("mountain")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(height: 120)
+                                    .clipped()
+                                    .cornerRadius(12)
+                                    .overlay {
+                                            Image(systemName: "photo")
+                                                .imageScale(.large)
+                                                .symbolRenderingMode(.hierarchical)
+                                                .foregroundStyle(.white)
+                                                .shadow(radius: 2)
+                                    }
+                            }
+                        }
+                    }
             }
             Section {
                 VStack(alignment: .leading) {
@@ -124,6 +177,14 @@ struct SettingsView: View {
                 }
             }
         }
+        .onChange(of: backgroundImageSelection) { _, newValue in
+            guard let newValue else { return }
+            Task {
+                if let data = try? await newValue.loadTransferable(type: Data.self) {
+                    backgroundImageData = data
+                }
+            }
+        }
         .navigationTitle("Settings")
         .onChange(of: notificationTimes) {
             // update times in UserDefaults
@@ -142,3 +203,4 @@ struct SettingsView: View {
 #Preview {
     SettingsView()
 }
+
