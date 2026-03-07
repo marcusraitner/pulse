@@ -51,6 +51,17 @@ struct ContentView: View {
                 ScrollView {
                     LazyVStack {
                         dateView
+                        if featureFlags.adminEnabled {
+                            Button("Delete Entry", systemImage: "trash") {
+                                context.delete(selectedEntry)
+                                do {
+                                    try context.save()
+                                } catch {
+                                    logger.error("Failed saving deleted entry: \(String(describing: error))")
+                                }
+                            }
+                            .tint(.white)
+                        }
                         
                         TimeLineView(selectedEntry: $selectedEntry)
                             .padding(.vertical)
@@ -186,19 +197,6 @@ struct ContentView: View {
                             }
                             .font(.footnote)
                             .foregroundStyle(.white)
-                        }
-                    }
-                    if featureFlags.adminEnabled {
-                        ToolbarItem(placement: .bottomBar) {
-                            Button("Delete Entry", systemImage: "trash") {
-                                context.delete(selectedEntry)
-                                do {
-                                    try context.save()
-                                } catch {
-                                    logger.error("Failed saving deleted entry: \(String(describing: error))")
-                                }
-                            }
-                            .tint(.white)
                         }
                     }
                 }

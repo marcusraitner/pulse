@@ -20,8 +20,8 @@ struct LogEntriesView: View {
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "LogEntriesView")
 
-    private var isToday: Bool {
-        Calendar.current.isDateInToday(day.date)
+    private var areEntriesEditable: Bool {
+        !freezeHistory || Calendar.current.isDateInToday(day.date)
     }
     
     var body: some View {
@@ -37,10 +37,10 @@ struct LogEntriesView: View {
                         LogEntryText(logEntry: entry)
                             .padding(.vertical, 15)
                             .padding(.horizontal)
-                            .glassEffect(.regular.tint(ScoreStyleHelper.color(for: entry.score)).interactive(), in: RoundedRectangle(cornerRadius: 10))
+                            .glassEffect(.regular.tint(ScoreStyleHelper.color(for: entry.score)).interactive(areEntriesEditable), in: RoundedRectangle(cornerRadius: 10))
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                if (isToday || !freezeHistory) {
+                                if areEntriesEditable {
                                     logEntry = entry
                                     isEntryNew = false
                                     isPresenting = true
@@ -54,7 +54,7 @@ struct LogEntriesView: View {
                                 .opacity(0.85), in: RoundedRectangle(cornerRadius: 10))
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                if (isToday || !freezeHistory) {
+                                if (areEntriesEditable || !freezeHistory) {
                                     logEntry = entry
                                     isEntryNew = false
                                     isPresenting = true

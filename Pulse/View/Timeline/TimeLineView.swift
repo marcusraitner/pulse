@@ -30,110 +30,103 @@ struct TimeLineView: View {
         let heightScale: CGFloat = 20
         let totalHeight: CGFloat = 4 * heightScale
 
-        ZStack {
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: 3) {
-                    
-                    ForEach(allEntries, id: \.date ) { entry in
-                        let avg: CGFloat = entry.averageScore
-                        let barHeight: CGFloat = max(1, heightScale * abs(avg))
-                        let yOffset: CGFloat = -0.5 * heightScale * avg
+        ScrollView(.horizontal, showsIndicators: false) {
+            LazyHStack(spacing: 3) {
+                ForEach(allEntries, id: \.date ) { entry in
+                    let avg: CGFloat = entry.averageScore
+                    let barHeight: CGFloat = max(2, heightScale * avg.magnitude)
+                    let yOffset: CGFloat = -0.5 * heightScale * avg
 
-                        Group {
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(ScoreStyleHelper.gradient(for: avg))
-                                .frame(width: barWidth, height: barHeight)
-                                .offset(y: yOffset)
-                                .background {
-                                    // storing frame for scrolling
-                                    GeometryReader { proxy in
-                                        Color.clear
-                                            .onAppear {
-                                                frames[entry] = proxy.frame(
-                                                    in: Self.geometry
-                                                )
-                                            }
-                                            .onChange(
-                                                of: proxy.frame(
-                                                    in: Self.geometry
-                                                )
-                                            ) { _, newValue in
-                                                frames[entry] = newValue
-                                            }
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(ScoreStyleHelper.gradient(for: avg))
+                        .frame(width: barWidth, height: barHeight)
+                        .offset(y: yOffset)
+                        .background {
+                            // storing frame for scrolling
+                            GeometryReader { proxy in
+                                Color.clear
+                                    .onAppear {
+                                        logger.trace("\(entry.date) appears in frame")
+                                        frames[entry] = proxy.frame(
+                                            in: Self.geometry
+                                        )
                                     }
-                                }
+                                    .onChange(
+                                        of: proxy.frame(
+                                            in: Self.geometry
+                                        )
+                                    ) { _, newValue in
+                                        frames[entry] = newValue
+                                    }
+                            }
                         }
                         .id(entry.date)
                         .onTapGesture {
                             withAnimation(.default) {
-                                selectedEntry = entry
                                 position.scrollTo(
                                     id: entry.date,
                                     anchor: .center
                                 )
                             }
-                        }
                     }
-                }
-                .scrollTargetLayout()
-                .coordinateSpace(Self.geometry)
-            }
-            .accessibilityIdentifier("timelineView")
-            .accessibilityValue(
-                Text("position:\(DateFormatHelper.formatDate(position.viewID(type: Date.self)))")
-            )
-            .scrollTargetBehavior(
-                TimeLineViewScrollTargetBehavior(
-                    frames: frames
-                )
-            )
-            .scrollPosition($position, anchor: .center)
-            .frame(height: totalHeight)
-            .safeAreaPadding(.horizontal, containerWidth * 0.5)
-            .background {
-                // keep track of width
-                GeometryReader { proxy in
-                    Color.clear.onAppear {
-                        containerWidth = proxy.size.width
-                    }
-                    .onChange(of: proxy.size.width) { _, newWidth in
-                        containerWidth = newWidth
-                    }
-                }
-                
-                // draw baseline and indicator for selected day
-                Group {
-                    EquilateralTriangle()
-                        .frame(width: 10, height: 10)
-                        .rotationEffect(Angle(degrees: 180))
-                        .offset(y: -totalHeight * 0.5 - 5)
-                    Rectangle()
-                        .frame(width: 1, height: totalHeight + 10)
-                    EquilateralTriangle()
-                        .frame(width: 10, height: 10)
-                        .offset(y: totalHeight * 0.5 + 5)
-                }
-                .foregroundStyle(Color("neutral"))
-            }
-            .onChange(of: position) { _, new in
-                // set selectedEntry on scroll pos change
-                
-                if let date: Date = new.viewID(type: Date.self) {
-                    if let newSelected = allEntries.first(where: { $0.date == date }) {
-                        selectedEntry = newSelected
-                        logger.trace("New selected date: \(selectedEntry.date)")
-                    } else {
-                        logger.trace("Could not find entry for date \(date)")
-                    }
-                } else {
-                    logger.trace("Could not find date in scroll position")
                 }
             }
-            .sensoryFeedback(.impact, trigger: selectedEntry)
+            .scrollTargetLayout()
+            .defaultScrollAnchor(.bottom, for: .initialOffset )
+            .coordinateSpace(Self.geometry)
         }
+        .accessibilityIdentifier("timelineView")
+        .accessibilityValue(
+            Text("position:\(DateFormatHelper.formatDate(position.viewID(type: Date.self)))")
+        )
+        .scrollTargetBehavior(TimeLineViewScrollTargetBehavior(frames: frames))
+        .scrollPosition($position, anchor: .center)
+        .frame(height: totalHeight)
+        .safeAreaPadding(.horizontal, containerWidth * 0.5)
+        .background {
+            // keep track of width
+            GeometryReader { proxy in
+                Color.clear.onAppear {
+                    containerWidth = proxy.size.width
+                }
+                .onChange(of: proxy.size.width) { _, newWidth in
+                    containerWidth = newWidth
+                }
+            }
+            
+            // draw baseline and indicator for selected day
+            Group {
+                EquilateralTriangle()
+                    .frame(width: 10, height: 10)
+                    .rotationEffect(Angle(degrees: 180))
+                    .offset(y: -totalHeight * 0.5 - 5)
+                Rectangle()
+                    .frame(width: 1, height: totalHeight + 10)
+                EquilateralTriangle()
+                    .frame(width: 10, height: 10)
+                    .offset(y: totalHeight * 0.5 + 5)
+            }
+            .foregroundStyle(.white)
+        }
+        .onChange(of: position) { _, new in
+            // set selectedEntry on scroll pos change
+            
+            if let date: Date = new.viewID(type: Date.self) {
+                if let newSelected = allEntries.first(where: { $0.date == date }) {
+                    selectedEntry = newSelected
+                    logger.trace("New selected date: \(selectedEntry.date)")
+                } else {
+                    logger.trace("Could not find entry for date \(date)")
+                }
+            } else {
+                logger.trace("Could not find date in scroll position")
+            }
+        }
+        .sensoryFeedback(.impact, trigger: selectedEntry)
         .onChange(of: scenePhase) { _, newPhase in
             // check if a day passed
             if newPhase == .active {
+                logger.trace("scene is now active. Updating today.")
                 updateToday()
             }
         }
@@ -144,26 +137,19 @@ struct TimeLineView: View {
                 position.scrollTo(id: today.date, anchor: .center)
             } else {
                 // frame for today not yet created
-                // scroll to the last frame
+                // scroll to the trailing edge such that today becomes visible
                 logger.trace("no frame for today; scrolling to last")
                 position.scrollTo(edge: .trailing)
-                todayFrameVisible = false
-            }
-        }
-        .onChange(of: frames) {
-            logger.trace("Frames changed")
-            if !todayFrameVisible {
-                logger.trace("today was not visible before")
-                if frames[today] != nil {
-                    logger.trace("now today's frame exists; scrolling to it")
+                
+                Task {
+                    logger.trace("Task to scroll to today")
+                    guard frames[today] != nil else {
+                        logger.trace("frame for today still not there")
+                        return
+                    }
                     position.scrollTo(id: today.date, anchor: .center)
-                    todayFrameVisible = true
                 }
-            }
-        }
-        .task {
-            if let last = allEntries.last {
-                position.scrollTo(id: last.date, anchor: .center)
+                todayFrameVisible = false
             }
         }
     }
