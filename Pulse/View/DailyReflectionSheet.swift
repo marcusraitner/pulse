@@ -16,9 +16,11 @@ struct DailyReflectionSheet: View {
     
     var body: some View {
         List {
-            TextField("Your reflection of this day?", text: $reflection, axis: .vertical)
-                .multilineTextAlignment(.leading)
-                .lineLimit(5...Int.max)
+            Section("Reflect Your Day") {
+                TextField("Your reflection of this day?", text: $reflection, axis: .vertical)
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(5...Int.max)
+            }
             Section("Your Moments") {
                 ForEach(day.logEntries?.sorted(by: { $0.timestamp < $1.timestamp } ) ?? []) { logEntry in
                     LogEntryText(logEntry: logEntry)
@@ -26,7 +28,7 @@ struct DailyReflectionSheet: View {
                 }
             }
         }
-        .navigationTitle("Reflect Your Day")
+        .navigationTitle("\(day.date.formatted(.dateTime.weekday(.wide).day().month(.defaultDigits).year()))")
         .toolbar {
             ToolbarItem (placement: .confirmationAction) {
                 if #available(iOS 26, *) {
@@ -80,3 +82,4 @@ struct DailyReflectionSheetPreviewContainer: View {
             .modelContainer(SampleData.shared.modelContainer)
     }
 }
+

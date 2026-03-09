@@ -177,7 +177,6 @@ struct ContentView: View {
                     }
                     ToolbarItem(placement: .principal) {
                         if showStats {
-                            // TODO: Move to the Settings / About Section
                             HStack {
                                 VStack {
                                     Image(systemName: "calendar")
@@ -236,14 +235,16 @@ struct ContentView: View {
                         Image(uiImage: uiImage)
                             .resizable()
                             .scaledToFill()
+                            .frame(minWidth: 0, maxWidth: .infinity)
                             .brightness(colorScheme == .dark ? -0.2 : 0.0)
                             .ignoresSafeArea()
                     } else {
                         Image(colorScheme == .dark ? "mountain-dark" : "mountain")
                             .resizable()
                             .scaledToFill()
+                            .frame(minWidth: 0, maxWidth: .infinity)
                             .brightness(colorScheme == .dark ? 0.0 : -0.1)
-                            .ignoresSafeArea(.all)
+                            .ignoresSafeArea()
                     }
                 }
             }
