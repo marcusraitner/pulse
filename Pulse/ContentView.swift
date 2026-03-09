@@ -23,6 +23,8 @@ struct ContentView: View {
     @AppStorage("lastReviewRequest") private var lastReviewRequest: Int = 0
     @AppStorage("numberOfRequests") private var numberOfRequests: Int = 0
     @AppStorage("backgroundImageData") private var backgroundImageData: Data?
+    @AppStorage("reflectionReminder") private var reflectionReminder: Bool = true
+    @AppStorage("reflectionReminderTime") private var reflectionReminderTime: Date?
     
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
     @State private var today: DailyEntry = DailyEntry(date: .now)
@@ -262,6 +264,12 @@ struct ContentView: View {
             )
 #endif  // DEBUG only for UI Tests
         }
+        .onOpenURL { url in
+            guard let host = url.host(), host == "log" else {
+                return
+            }
+            isPresentingNewEntry = true
+        }
         
     }
 
@@ -324,6 +332,32 @@ struct ContentView: View {
 
                 UNUserNotificationCenter.current().add(request)
             }
+                
+            if reflectionReminder, let reflectionReminderTime {
+                let content = UNMutableNotificationContent()
+                content.title = String(localized: "Reflection Time")
+                content.body = String(
+                    localized: "It's time to reflect on your day!"
+                )
+                content.sound = .default
+
+                let components = Calendar.current.dateComponents(
+                    [.hour, .minute],
+                    from: reflectionReminderTime
+                )
+                let dateTrigger = UNCalendarNotificationTrigger(
+                    dateMatching: components,
+                    repeats: true
+                )
+                let request = UNNotificationRequest(
+                    identifier: UUID().uuidString,
+                    content: content,
+                    trigger: dateTrigger
+                )
+
+                UNUserNotificationCenter.current().add(request)
+
+            }
         }
     }
     
@@ -372,7 +406,7 @@ struct ContentView: View {
     
     private var settingsSheetStack: some View {
         NavigationStack {
-            SettingsView()
+            SettingsView(isPresented: $isPresentingSettings)
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
                         if #available(iOS 26, *) {

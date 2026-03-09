@@ -133,6 +133,16 @@
         }
       }
     },
+    "Appearance" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erscheinungsbild"
+          }
+        }
+      }
+    },
     "Are you sure?" : {
       "localizations" : {
         "de" : {
@@ -199,6 +209,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quellenangaben"
+          }
+        }
+      }
+    },
+    "Customize the overall appearance here." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier kannst du das Erscheinungsbild von Pulse anpassen."
+          }
+        }
+      }
+    },
+    "Daily Reflection Reminder" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerung für die Abendbilanz"
           }
         }
       }
@@ -303,6 +333,16 @@
         }
       }
     },
+    "Get a reminder every evening to reflect on your day" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erhalte eine Erinnerung für deine Abendbilanz  "
+          }
+        }
+      }
+    },
     "How are you feeling?" : {
       "localizations" : {
         "de" : {
@@ -329,6 +369,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nimm dir kurz Zeit deine Aktivitäten und Gefühle zu notieren."
+          }
+        }
+      }
+    },
+    "It's time to reflect on your day!" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es ist Zeit für deine Abendbilanz"
           }
         }
       }
@@ -441,6 +491,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abendbilanz"
+          }
+        }
+      }
+    },
+    "Reflection Time" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abendbilanz"
+          }
+        }
+      }
+    },
+    "Reminder for daily reflection" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerung für die Abendbilanz"
           }
         }
       }
