@@ -11,6 +11,7 @@ import OSLog
 
 @main
 struct PulseApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "PulseApp")
     
     let modelContainer: ModelContainer
@@ -41,5 +42,22 @@ struct PulseApp: App {
             
         }
         .modelContainer(modelContainer)
+    }
+}
+
+final class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        UNUserNotificationCenter.current().delegate = self
+        return true
+    }
+}
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
+        guard
+            let urlString = response.notification.request.content.userInfo["url"] as? String,
+            let url = URL(string: urlString)
+        else { return }
+        await UIApplication.shared.open(url)
     }
 }

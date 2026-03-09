@@ -16,6 +16,7 @@ struct TimeLineView: View {
 
     
     @Binding var selectedEntry: DailyEntry
+    @Binding var scrollToToday: Bool
     @State private var today: DailyEntry = .init(date: .now)
     @State private var frames: [DailyEntry: CGRect] = [:]
     @State private var position: ScrollPosition = .init(idType: Date.self)
@@ -23,7 +24,6 @@ struct TimeLineView: View {
     @State private var countDays: Int = 0
     private static let geometry = NamedCoordinateSpace.named("geometry")
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "TimeLineView")
-    @State private var todayFrameVisible: Bool = true
 
     var body: some View {
         let barWidth: CGFloat = 20
@@ -132,24 +132,33 @@ struct TimeLineView: View {
         }
         .onChange(of: today) {
             logger.trace("Today changed: \(today.date)")
-            if frames[today] != nil {
-                logger.trace("found frame; scrolling to it")
-                position.scrollTo(id: today.date, anchor: .center)
-            } else {
-                // frame for today not yet created
-                // scroll to the trailing edge such that today becomes visible
-                logger.trace("no frame for today; scrolling to last")
-                position.scrollTo(edge: .trailing)
-                
-                Task {
-                    logger.trace("Task to scroll to today")
-                    guard frames[today] != nil else {
-                        logger.trace("frame for today still not there")
-                        return
-                    }
-                    position.scrollTo(id: today.date, anchor: .center)
+            scrollTo(today)
+        }
+        .onChange(of: scrollToToday) {
+            if scrollToToday {
+                scrollTo(today)
+                scrollToToday = false
+            }
+        }
+    }
+    
+    private func scrollTo(_ entry: DailyEntry) {
+        if frames[entry] != nil {
+            logger.trace("found frame for \(entry.date); scrolling to it")
+            position.scrollTo(id: entry.date, anchor: .center)
+        } else {
+            // frame for today is not yet created
+            // scroll to the trailing edge such that today becomes visible
+            logger.trace("no frame for \(entry.date); scrolling to last")
+            position.scrollTo(edge: .trailing)
+            
+            Task {
+                logger.trace("Task to scroll to today")
+                guard frames[entry] != nil else {
+                    logger.trace("frame for \(entry.date) still not there")
+                    return
                 }
-                todayFrameVisible = false
+                position.scrollTo(id: entry.date, anchor: .center)
             }
         }
     }
@@ -223,7 +232,7 @@ struct TimeLineViewPreviewContainer: View {
 
     var body: some View {
         if let entry = entries.randomElement() {
-            TimeLineView(selectedEntry: .constant(entry))
+            TimeLineView(selectedEntry: .constant(entry), scrollToToday: .constant(true))
         } else {
             Text("No sample data available")
                 .padding()

@@ -26,8 +26,6 @@ struct SettingsView: View {
     @State private var notificationTimes: [Date] = []
     @State private var notificationsAuthorized: Bool = true
     
-    @Binding var isPresented: Bool
-    
     @Environment(\.dismiss) private var dismiss
     @Environment(\.featureFlags) private var featureFlags
     @Environment(\.modelContext) private var context
@@ -42,19 +40,20 @@ struct SettingsView: View {
         return Image(uiImage: uiImage)
     }
     
+    private var countDays: Int {
+        var descriptor = FetchDescriptor<DailyEntry>(predicate: #Predicate { _ in true })
+        descriptor.includePendingChanges = true
+        return (try? context.fetchCount(descriptor)) ?? 0
+    }
+    
+    private var countLogs: Int {
+        var descriptor = FetchDescriptor<DailyLogEntry>(predicate: #Predicate { _ in true })
+        descriptor.includePendingChanges = true
+        return (try? context.fetchCount(descriptor)) ?? 0
+    }
+    
     var body: some View {
         Form {
-            NavigationLink() {
-                AboutView()
-                    .confirmationToolbarItem($isPresented)
-            } label: {
-                Label {
-                    Text("About")
-                } icon: {
-                    Image(systemName: "questionmark.circle")
-                        .listLabelIcon(.accent)
-                }
-            }
             
             NavigationLink() {
                 Form {
@@ -83,7 +82,6 @@ struct SettingsView: View {
                         }
                     }
                 }
-                .confirmationToolbarItem($isPresented)
             } label: {
                 Label {
                     Text("General")
@@ -151,7 +149,6 @@ struct SettingsView: View {
                         }
                     }
                 }
-                .confirmationToolbarItem($isPresented)
                 
             } label: {
                 Label {
@@ -223,8 +220,6 @@ struct SettingsView: View {
                         }
                     }
                 }
-                .confirmationToolbarItem($isPresented)
-                
             } label: {
                 Label {
                     Text("Reminders")
@@ -233,6 +228,55 @@ struct SettingsView: View {
                         .listLabelIcon(.red)
                 }
 
+            }
+            
+            Section {
+                NavigationLink() {
+                    AboutView()
+                } label: {
+                    Label {
+                        Text("About")
+                    } icon: {
+                        Image("AppIcon-iOS-Default")
+                            .resizable()
+                            .frame(width: 30, height: 30)
+                            .aspectRatio(1, contentMode: .fill)
+                    }
+                }
+                
+                NavigationLink() {
+                    List {
+                        Section {
+                            VStack(alignment: .leading) {
+                                Image(systemName: "chart.bar.horizontal.page.fill")
+                                    .titleLabelIcon(.gray)
+                                Text("Statistics")
+                                    .font(.title2.bold())
+                                    .padding(.top, 4)
+                                Text("See your current statistics here.")
+                                    .foregroundStyle(.secondary)
+                                
+                            }
+                        }
+                        HStack {
+                            Text("Number of days")
+                            Spacer()
+                            Text("\(countDays)")
+                        }
+                        HStack {
+                            Text("Number of moments")
+                            Spacer()
+                            Text("\(countLogs)")
+                        }
+                    }
+                } label: {
+                    Label {
+                        Text("Statistics")
+                    } icon: {
+                        Image(systemName: "chart.bar.horizontal.page.fill")
+                            .listLabelIcon(.gray)
+                    }
+                }
             }
             
             if featureFlags.adminEnabled {
@@ -274,28 +318,6 @@ struct SettingsView: View {
         }
     }
 }
-
-
-struct ConfirmButtonModifier: ViewModifier {
-    @Binding var isPresented: Bool
-    
-    func body(content: Content) -> some View {
-        content
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    if #available(iOS 26, *) {
-                        Button(role: .confirm) {
-                            isPresented = false
-                        }
-                    } else {
-                        Button("Close") {
-                            isPresented = false
-                        }
-                    }
-                }
-            }
-    }
-}
                                     
 struct ListLabelIcon: ViewModifier {
     let color: Color
@@ -328,14 +350,14 @@ extension View {
         modifier(ListLabelIcon(color: color, iconFrame: 55, iconSize: 32, cornerRaduis: 16))
     }
     
-    func confirmationToolbarItem(_ isPresented: Binding<Bool>) -> some View {
-        modifier(ConfirmButtonModifier(isPresented: isPresented))
-    }
+//    func confirmationToolbarItem() -> some View {
+//        modifier(ConfirmButtonModifier())
+//    }
 }
 
 #Preview {
     NavigationStack {
-        SettingsView(isPresented: .constant(true))
+        SettingsView()
     }
 }
 

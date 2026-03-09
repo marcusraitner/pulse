@@ -27,9 +27,9 @@ struct ContentView: View {
     @AppStorage("reflectionReminderTime") private var reflectionReminderTime: Date?
     
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
+    @State private var triggerScrollToToday: Bool = false
     @State private var today: DailyEntry = DailyEntry(date: .now)
     @State private var isPresentingSettings: Bool = false
-    @State private var isPresentingAbout: Bool = false
     @State private var isPresentingNewEntry: Bool = false
     @State private var isPresentingReflection: Bool = false
     
@@ -65,7 +65,7 @@ struct ContentView: View {
                             .tint(.white)
                         }
                         
-                        TimeLineView(selectedEntry: $selectedEntry)
+                        TimeLineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
                             .padding(.vertical)
                             .padding(.bottom, 10)
                         
@@ -138,9 +138,6 @@ struct ContentView: View {
                 }
                 .navigationBarTitleDisplayMode(.inline)
                 .ignoresSafeArea(.keyboard)
-                .sheet(isPresented: $isPresentingAbout) {
-                    aboutSheetStack
-                }
                 .sheet(
                     isPresented: $isPresentingSettings,
                     onDismiss: setNotifications
@@ -178,14 +175,9 @@ struct ContentView: View {
                         }
                         .tint(.white)
                     }
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button("About", systemImage: "line.3.horizontal") {
-                            isPresentingAbout = true
-                        }
-                        .tint(.white)
-                    }
                     ToolbarItem(placement: .principal) {
                         if showStats {
+                            // TODO: Move to the Settings / About Section
                             HStack {
                                 VStack {
                                     Image(systemName: "calendar")
@@ -265,12 +257,17 @@ struct ContentView: View {
 #endif  // DEBUG only for UI Tests
         }
         .onOpenURL { url in
-            guard let host = url.host(), host == "log" else {
+            switch url.host() {
+            case "log":
+                triggerScrollToToday = true
+                isPresentingNewEntry = true
+            case "reflect":
+                triggerScrollToToday = true
+                isPresentingReflection = true
+            default:
                 return
             }
-            isPresentingNewEntry = true
         }
-        
     }
 
     private func initApplication() async {
@@ -315,6 +312,7 @@ struct ContentView: View {
                     localized: "It's time to log your activities and feelings!"
                 )
                 content.sound = .default
+                content.userInfo = ["url": "pulseapp://log"]
 
                 let components = Calendar.current.dateComponents(
                     [.hour, .minute],
@@ -340,6 +338,7 @@ struct ContentView: View {
                     localized: "It's time to reflect on your day!"
                 )
                 content.sound = .default
+                content.userInfo = ["url": "pulseapp://reflect"]
 
                 let components = Calendar.current.dateComponents(
                     [.hour, .minute],
@@ -385,28 +384,9 @@ struct ContentView: View {
         .padding(.vertical)
     }
     
-    private var aboutSheetStack: some View {
-        NavigationStack {
-            AboutView()
-                .toolbar {
-                    ToolbarItem(placement: .confirmationAction) {
-                        if #available(iOS 26, *) {
-                            Button(role: .confirm) {
-                                isPresentingAbout = false
-                            }
-                        } else {
-                            Button("Close") {
-                                isPresentingAbout = false
-                            }
-                        }
-                    }
-                }
-        }
-    }
-    
     private var settingsSheetStack: some View {
         NavigationStack {
-            SettingsView(isPresented: $isPresentingSettings)
+            SettingsView()
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
                         if #available(iOS 26, *) {
@@ -423,6 +403,7 @@ struct ContentView: View {
         }
     }
 }
+
 
 #Preview {
     ContentView()

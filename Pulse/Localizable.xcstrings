@@ -423,6 +423,36 @@
         }
       }
     },
+    "Number of days" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzahl der Tage"
+          }
+        }
+      }
+    },
+    "Number of moments" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzahl der Momente"
+          }
+        }
+      }
+    },
+    "Number of words" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzahl von Worten"
+          }
+        }
+      }
+    },
     "Open Settings" : {
       "localizations" : {
         "de" : {
@@ -545,6 +575,16 @@
         }
       }
     },
+    "See your current statistics here." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier kannst du deine Nutzungsstatistik sehen"
+          }
+        }
+      }
+    },
     "Seed Samples" : {
       "localizations" : {
         "de" : {
@@ -615,6 +655,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Statistiken anzeigen"
+          }
+        }
+      }
+    },
+    "Statistics" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statistiken"
           }
         }
       }
