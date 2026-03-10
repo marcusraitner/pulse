@@ -50,9 +50,28 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
+                if let data = backgroundImageData, let uiImage = UIImage(data: data) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(minWidth: 0, maxWidth: .infinity)
+                        .brightness(colorScheme == .dark ? -0.2 : 0.0)
+                        .ignoresSafeArea()
+                } else {
+                    Image(colorScheme == .dark ? "mountain-dark" : "mountain")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(minWidth: 0, maxWidth: .infinity)
+                        .brightness(colorScheme == .dark ? 0.0 : -0.1)
+                        .ignoresSafeArea()
+                }
+
                 ScrollView {
                     LazyVStack {
+                        // The currently selected date
                         dateView
+                        
+                        // Delete Button (only admin mode)
                         if featureFlags.adminEnabled {
                             Button("Delete Entry", systemImage: "trash") {
                                 context.delete(selectedEntry)
@@ -65,83 +84,23 @@ struct ContentView: View {
                             .tint(.white)
                         }
                         
+                        // The timeline scroll view
                         TimeLineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
                             .padding(.vertical)
                             .padding(.bottom, 10)
                         
-                        if selectedEntry.summary.isEmpty {
-                            if #available(iOS 26.0, *) {
-                                Button(action: { isPresentingReflection = true }) {
-                                    Text("Reflect Your Day")
-                                        .foregroundStyle(.white)
-                                        .font(.title3)
-                                        .padding()
-                                        .glassEffect(.clear, in: Capsule())
+                        // The daily reflection
+                        reflectionView
 
-                                }
-                                .padding(.vertical)
-                                .buttonStyle(.plain)
-
-                            } else {
-                                Button(action: { isPresentingReflection = true }) {
-                                    Text("Reflect Your Day")
-                                        .padding(10)
-                                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
-                                        .font(.title3)
-                                        .foregroundStyle(.white)
-                                }
-                                .buttonStyle(.plain)
-                                .padding(.vertical)
-                            }
-                        } else {
-                            if #available(iOS 26.0, *) {
-                                HStack {
-                                    VStack(alignment: .leading) {
-                                        Text("Reflection")
-                                            .font(.title3)
-                                            .padding(.bottom, 5)
-                                        Text(selectedEntry.summary)
-                                        
-                                    }
-                                    .foregroundStyle(.white)
-                                    .padding()
-                                    Spacer()
-                                }
-                                .glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
-                                .padding(.horizontal, 5)
-                                .contentShape(Rectangle())
-                                .onTapGesture(perform: { isPresentingReflection = true } )
-                            } else {
-                                HStack {
-                                    VStack(alignment: .leading) {
-                                        Text("Reflection")
-                                            .font(.title3)
-                                            .padding(.bottom, 5)
-                                        Text(selectedEntry.summary)
-                                        
-                                    }
-                                    .foregroundStyle(.white)
-                                    .padding()
-                                    Spacer()
-                                }
-                                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
-                                .padding(.horizontal, 5)
-                                .contentShape(Rectangle())
-                                .onTapGesture(perform: { isPresentingReflection = true } )
-                            }
-                        }
-                        
-
+                        // The log entries for this day
                         LogEntriesView(day: selectedEntry)
                             .padding(.horizontal, 5)
                     }
                 }
                 .navigationBarTitleDisplayMode(.inline)
                 .ignoresSafeArea(.keyboard)
-                .sheet(
-                    isPresented: $isPresentingSettings,
-                    onDismiss: setNotifications
-                ) {
+                .sheet(isPresented: $isPresentingSettings,
+                    onDismiss: setNotifications) {
                     settingsSheetStack
                 }
                 .sheet(isPresented: $isPresentingNewEntry) {
@@ -226,25 +185,6 @@ struct ContentView: View {
                         .buttonStyle(.plain)
                         .padding(.trailing, 20)
                         .padding(.bottom, 20)
-                    }
-                }
-            }
-            .background {
-                GeometryReader { geo in
-                    if let data = backgroundImageData, let uiImage = UIImage(data: data) {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(minWidth: 0, maxWidth: .infinity)
-                            .brightness(colorScheme == .dark ? -0.2 : 0.0)
-                            .ignoresSafeArea()
-                    } else {
-                        Image(colorScheme == .dark ? "mountain-dark" : "mountain")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(minWidth: 0, maxWidth: .infinity)
-                            .brightness(colorScheme == .dark ? 0.0 : -0.1)
-                            .ignoresSafeArea()
                     }
                 }
             }
@@ -403,6 +343,70 @@ struct ContentView: View {
                 }
         }
     }
+    
+    @ViewBuilder private var reflectionView: some View {
+        if selectedEntry.summary.isEmpty {
+            if #available(iOS 26.0, *) {
+                Button(action: { isPresentingReflection = true }) {
+                    Text("Reflect Your Day")
+                        .foregroundStyle(.white)
+                        .font(.title3)
+                        .padding()
+                        .glassEffect(.clear, in: Capsule())
+
+                }
+                .buttonStyle(.plain)
+                .padding(.vertical)
+
+            } else {
+                Button(action: { isPresentingReflection = true }) {
+                    Text("Reflect Your Day")
+                        .padding(10)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
+                        .font(.title3)
+                        .foregroundStyle(.white)
+                }
+                .buttonStyle(.plain)
+                .padding(.vertical)
+            }
+        } else {
+            if #available(iOS 26.0, *) {
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("Reflection")
+                            .font(.title3)
+                            .padding(.bottom, 5)
+                        Text(selectedEntry.summary)
+                        
+                    }
+                    .foregroundStyle(.white)
+                    .padding()
+                    Spacer()
+                }
+                .glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
+                .padding(.horizontal, 5)
+                .contentShape(Rectangle())
+                .onTapGesture(perform: { isPresentingReflection = true } )
+            } else {
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("Reflection")
+                            .font(.title3)
+                            .padding(.bottom, 5)
+                        Text(selectedEntry.summary)
+                        
+                    }
+                    .foregroundStyle(.white)
+                    .padding()
+                    Spacer()
+                }
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
+                .padding(.horizontal, 5)
+                .contentShape(Rectangle())
+                .onTapGesture(perform: { isPresentingReflection = true } )
+            }
+        }
+    }
 }
 
 
@@ -410,3 +414,4 @@ struct ContentView: View {
     ContentView()
         .modelContainer(SampleData.shared.modelContainer)
 }
+

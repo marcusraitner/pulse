@@ -444,6 +444,7 @@
       }
     },
     "Number of words" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

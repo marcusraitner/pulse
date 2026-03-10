@@ -14,14 +14,15 @@ struct TimeLineView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.scenePhase) private var scenePhase
 
-    
     @Binding var selectedEntry: DailyEntry
     @Binding var scrollToToday: Bool
+    
     @State private var today: DailyEntry = .init(date: .now)
     @State private var frames: [DailyEntry: CGRect] = [:]
     @State private var position: ScrollPosition = .init(idType: Date.self)
     @State private var containerWidth: CGFloat = 0.0
     @State private var countDays: Int = 0
+    
     private static let geometry = NamedCoordinateSpace.named("geometry")
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "TimeLineView")
 
