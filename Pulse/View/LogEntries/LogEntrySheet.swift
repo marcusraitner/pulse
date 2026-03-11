@@ -8,6 +8,8 @@
 import SwiftUI
 import OSLog
 import SwiftData
+import CoreLocation
+import CoreLocationUI
 
 struct LogEntrySheet: View {
     // This holds the temporary values of the sheet; initialized in a task to entry
@@ -21,6 +23,8 @@ struct LogEntrySheet: View {
     // closure gets called on save with the values in newEntry
     @State private var isPresentingConfirm = false
     var saveEntry: (DailyLogEntry) -> Void
+    
+    @StateObject var locationManager = LocationManager()
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
@@ -63,7 +67,23 @@ struct LogEntrySheet: View {
                     }
                     .padding(.leading)
                 }
+                
                 Text("Recorded at: *\(entry.timestamp.formatted(date: .numeric, time: .shortened))*")
+            }
+            
+            Section {
+                VStack {
+                    if let location = locationManager.location {
+                        Text("Your location: \(location.latitude), \(location.longitude)")
+                    }
+                    
+                    LocationButton {
+                        locationManager.requestLocation()
+                    }
+                    .frame(width: 44, height: 44)
+                    .symbolVariant(.fill)
+                    .padding()
+                }
             }
             
             Section {

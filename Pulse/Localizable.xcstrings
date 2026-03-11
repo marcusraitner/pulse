@@ -710,6 +710,16 @@
         }
       }
     },
+    "Your location: %lf, %lf" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your location: %1$lf, %2$lf"
+          }
+        }
+      }
+    },
     "Your Moments" : {
       "localizations" : {
         "de" : {
