@@ -10,6 +10,7 @@ import OSLog
 import SwiftData
 import CoreLocation
 import CoreLocationUI
+import MapKit
 
 struct LogEntrySheet: View {
     // This holds the temporary values of the sheet; initialized in a task to entry
@@ -23,7 +24,7 @@ struct LogEntrySheet: View {
     // closure gets called on save with the values in newEntry
     @State private var isPresentingConfirm = false
     var saveEntry: (DailyLogEntry) -> Void
-    
+    @AppStorage("storeLocations") private var storeLocations: Bool = false
     @StateObject var locationManager = LocationManager()
     
     @Environment(\.dismiss) private var dismiss
@@ -68,21 +69,22 @@ struct LogEntrySheet: View {
                     .padding(.leading)
                 }
                 
-                Text("Recorded at: *\(entry.timestamp.formatted(date: .numeric, time: .shortened))*")
+                VStack(alignment: .leading) {
+                    Text("\(entry.timestamp.formatted(date: .numeric, time: .shortened))")
+                    if storeLocations {
+                        if let item = locationManager.mapItems.first {
+                            Text("\(item.placemark.name ?? "Unknown")")
+                            Map {
+                                Marker(item: item)
+                            }
+                            .frame(height: 300)
+                        }
+                    }
+                }
             }
-            
-            Section {
-                VStack {
-                    if let location = locationManager.location {
-                        Text("Your location: \(location.latitude), \(location.longitude)")
-                    }
-                    
-                    LocationButton {
-                        locationManager.requestLocation()
-                    }
-                    .frame(width: 44, height: 44)
-                    .symbolVariant(.fill)
-                    .padding()
+            .task {
+                if storeLocations {
+                    locationManager.requestLocation()
                 }
             }
             

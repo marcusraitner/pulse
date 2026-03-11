@@ -123,6 +123,9 @@
         }
       }
     },
+    "Allow saving your location with entries" : {
+
+    },
     "And please leave a positive review in the App Store! That means a lot to us." : {
       "localizations" : {
         "de" : {
@@ -152,6 +155,9 @@
           }
         }
       }
+    },
+    "Automatically store location with your entries." : {
+
     },
     "Background Image" : {
       "localizations" : {
@@ -283,6 +289,9 @@
         }
       }
     },
+    "Enable location access" : {
+
+    },
     "Enable reminders" : {
       "localizations" : {
         "de" : {
@@ -393,6 +402,12 @@
         }
       }
     },
+    "Location" : {
+
+    },
+    "Location services are disabled. Please open settings to enable location services." : {
+
+    },
     "New Moment" : {
       "localizations" : {
         "de" : {
@@ -497,6 +512,7 @@
       }
     },
     "Recorded at: *%@*" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -670,6 +686,12 @@
         }
       }
     },
+    "Store location" : {
+
+    },
+    "Store Locations" : {
+
+    },
     "This will delete the moment permanently and cannot be undone." : {
       "localizations" : {
         "de" : {
@@ -710,15 +732,8 @@
         }
       }
     },
-    "Your location: %lf, %lf" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Your location: %1$lf, %2$lf"
-          }
-        }
-      }
+    "Your current location is stored with your moments." : {
+
     },
     "Your Moments" : {
       "localizations" : {
