@@ -123,9 +123,6 @@
         }
       }
     },
-    "Allow saving your location with entries" : {
-
-    },
     "And please leave a positive review in the App Store! That means a lot to us." : {
       "localizations" : {
         "de" : {
@@ -155,9 +152,6 @@
           }
         }
       }
-    },
-    "Automatically store location with your entries." : {
-
     },
     "Background Image" : {
       "localizations" : {
@@ -289,9 +283,6 @@
         }
       }
     },
-    "Enable location access" : {
-
-    },
     "Enable reminders" : {
       "localizations" : {
         "de" : {
@@ -402,11 +393,15 @@
         }
       }
     },
-    "Location" : {
-
-    },
     "Location services are disabled. Please open settings to enable location services." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ortungsdienste sind deaktiviert. Bitte aktiviere sie in den Systemeinstellungen."
+          }
+        }
+      }
     },
     "New Moment" : {
       "localizations" : {
@@ -419,7 +414,14 @@
       }
     },
     "No location available" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Ort verfügbar"
+          }
+        }
+      }
     },
     "No sample data available" : {
       "localizations" : {
@@ -457,17 +459,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Anzahl der Momente"
-          }
-        }
-      }
-    },
-    "Number of words" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anzahl von Worten"
           }
         }
       }
@@ -514,13 +505,12 @@
         }
       }
     },
-    "Recorded at: *%@*" : {
-      "extractionState" : "stale",
+    "Recorded at" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erfasst am: *%@*"
+            "value" : "Erfasst am *%@*"
           }
         }
       }
@@ -690,10 +680,14 @@
       }
     },
     "Store location" : {
-
-    },
-    "Store Locations" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichere Ortsdaten"
+          }
+        }
+      }
     },
     "This will delete the moment permanently and cannot be undone." : {
       "localizations" : {
@@ -734,9 +728,6 @@
           }
         }
       }
-    },
-    "Your current location is stored with your moments." : {
-
     },
     "Your Moments" : {
       "localizations" : {

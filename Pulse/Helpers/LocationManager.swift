@@ -14,11 +14,19 @@ internal import Combine
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private let locationManager = CLLocationManager()
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
+    var setItem: (MKMapItem) -> Void = { _ in }
     
     @Published var location: CLLocation?
-    @Published var mapItems: [MKMapItem] = []
+    @Published var mapItems: [MKMapItem] = [] {
+        didSet {
+            if let item = mapItems.first { setItem(item) }
+        }
+    }
+    
+    @Published var authorizationStatus: CLAuthorizationStatus
     
     override init() {
+        self.authorizationStatus = locationManager.authorizationStatus
         super.init()
         locationManager.delegate = self
     }
@@ -37,6 +45,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         print(#function)
+        self.authorizationStatus = manager.authorizationStatus
         switch locationManager.authorizationStatus {
         case .authorizedWhenInUse, .authorizedAlways:
             locationManager.requestLocation()
@@ -92,3 +101,4 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         logger.error("\(error.localizedDescription)")
     }
 }
+

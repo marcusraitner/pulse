@@ -22,7 +22,6 @@ struct SettingsView: View {
         Calendar.current.date(bySetting: .hour, value: 20, of: .now) ?? Date.now
     @AppStorage("notificationTime") private var notificationTime: Date = .now
     @AppStorage("backgroundImageData") private var backgroundImageData: Data?
-    @AppStorage("storeLocations") private var storeLocations: Bool = false
     
     @State private var backgroundImageSelection: PhotosPickerItem?
     @State private var notificationTimes: [Date] = []
@@ -82,24 +81,6 @@ struct SettingsView: View {
                             Toggle(isOn: $freezeHistory) {
                                 Text("Freeze History")
                                 Text("If enabled, entries in the past cannot be modified")
-                            }
-                        }
-                        Toggle(isOn: $storeLocations) {
-                            Text("Store Locations")
-                            Text("Allow saving your location with entries")
-                        }
-                        .onChange(of: storeLocations) { oldValue, newValue in
-                            if newValue {
-                                switch localLocationManager.authorizationStatus {
-                                case .notDetermined:
-                                    localLocationManager.requestWhenInUseAuthorization()
-                                case .denied, .restricted:
-                                    if let url = URL(string: UIApplication.openSettingsURLString) {
-                                        UIApplication.shared.open(url)
-                                    }
-                                default:
-                                    break
-                                }
                             }
                         }
                     }
@@ -248,55 +229,6 @@ struct SettingsView: View {
                 } icon: {
                     Image(systemName: "bell.badge.fill")
                         .listLabelIcon(.red)
-                }
-
-            }
-            // Location Section
-            NavigationLink() {
-                Form {
-                    Section {
-                        VStack(alignment: .leading) {
-                            Image(systemName: "location.fill")
-                                .titleLabelIcon(.blue)
-                            Text("Location")
-                                .font(.title2.bold())
-                                .padding(.top, 4)
-                            Text("Automatically store location with your entries.")
-                                .foregroundStyle(.secondary)
-                        }
-                        
-                        switch localLocationManager.authorizationStatus {
-                        case .authorizedAlways, .authorizedWhenInUse:
-                            Toggle(isOn: $storeLocations) {
-                                Text("Store location")
-                                Text("Your current location is stored with your moments.")
-                            }
-                        case .notDetermined:
-                            Button("Enable location access") {
-                                localLocationManager.requestWhenInUseAuthorization()
-                            }
-                        case .denied, .restricted:
-                            Text("Location services are disabled. Please open settings to enable location services.")
-                            
-                            if let url = URL(string: UIApplication.openSettingsURLString) {
-                                Button("Open Settings") {
-                                    UIApplication.shared.open(url)
-                                }
-                                .listRowSeparator(.hidden)
-                            }
-                        @unknown default:
-                            fatalError()
-                        }
-                        
-                    }
-                    
-                }
-            } label: {
-                Label {
-                    Text("Location")
-                } icon: {
-                    Image(systemName: "location.fill")
-                        .listLabelIcon(.blue)
                 }
 
             }

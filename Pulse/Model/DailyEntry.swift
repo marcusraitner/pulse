@@ -181,6 +181,7 @@ enum PulseVersionedSchemaV120: VersionedSchema {
         var score: Int = 0
         var entry: DailyEntry?
  
+        // TODO: Check if an MKMapItem or CLCoordinate would be more suitable?
         // New fields
         var latitude: Double?
         var longitude: Double?

@@ -17,15 +17,17 @@ struct LogEntrySheet: View {
     @State private var newEntry: DailyLogEntry = DailyLogEntry(timestamp: .now, log: "", score: 0)
     // The entry to edit (if passed at all; otherwise defaults to the above values (see init)
     @Binding var entry: DailyLogEntry
-    //
+    // Determines whether sheet is shown for a new entry or an existing
     @Binding var isEntryNew: Bool
     // used to manage validation; showing the validation message only if stepper was touched
     @State private var isNew = true
-    // closure gets called on save with the values in newEntry
     @State private var isPresentingConfirm = false
+    @State private var storeLocations: Bool = false
+    // closure gets called on save with the values in newEntry
     var saveEntry: (DailyLogEntry) -> Void
-    @AppStorage("storeLocations") private var storeLocations: Bool = false
+    
     @StateObject var locationManager = LocationManager()
+    @State private var mapPosition: MapCameraPosition = .automatic
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
@@ -37,6 +39,31 @@ struct LogEntrySheet: View {
         self._entry = entry
         self._isEntryNew = isEntryNew
         self.saveEntry = saveEntry
+    }
+    
+    private func setItem(item: MKMapItem) -> Void {
+        var coordinate: CLLocationCoordinate2D = CLLocationCoordinate2D()
+        
+        if #available(iOS 26.0, *) {
+            coordinate = item.location.coordinate
+        } else {
+            coordinate = item.placemark.coordinate
+        }
+        
+        newEntry.latitude = coordinate.latitude
+        newEntry.longitude = coordinate.longitude
+        
+        let region = MKCoordinateRegion(
+            center: coordinate,
+            span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01) // ~1–2 km depending on latitude
+        )
+        mapPosition = .region(region)
+
+        if #available(iOS 26.0, *) {
+            newEntry.address = item.addressRepresentations?.fullAddress(includingRegion: false, singleLine: true) ?? "Unknown"
+        } else {
+            newEntry.address = item.placemark.name ?? "Unknown"
+        }
     }
     
     var body: some View {
@@ -68,33 +95,66 @@ struct LogEntrySheet: View {
                     }
                     .padding(.leading)
                 }
+                HStack {
+                    Text("Recorded at")
+                    Spacer()
+                    Text("\(entry.timestamp.formatted(date: .numeric, time: .shortened))")
+                }
                 
                 VStack(alignment: .leading) {
-                    Text("\(entry.timestamp.formatted(date: .numeric, time: .shortened))")
-                    if storeLocations {
-                        if let item = locationManager.mapItems.first {
-                            Text("\(item.placemark.name ?? "Unknown")")
-                            Map {
-                                Marker(item: item)
-                            }
-                            .frame(height: 300)
-                        } else {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.gray.opacity(0.2))
-                                .frame(height: 300)
-                                .overlay {
-                                    VStack {
-                                        ProgressView()
-                                        Text("No location available")
+                    Toggle(isOn: $storeLocations) {
+                        Text("Store location")
+                    }
+                    
+                    Group {
+                        if isEntryNew {
+                            if storeLocations {
+                                if locationManager.authorizationStatus == .denied || locationManager.authorizationStatus == .restricted {
+                                    Text("Location services are disabled. Please open settings to enable location services.")
+                                    
+                                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                                        Button("Open Settings") {
+                                            UIApplication.shared.open(url)
+                                        }
+                                        .listRowSeparator(.hidden)
                                     }
-                                    .foregroundStyle(.white)
+                                } else {
+                                    if let item = locationManager.mapItems.first {
+                                        Text("\(newEntry.address ?? "Unknown")")
+                                        
+                                        Map(position: $mapPosition) {
+                                            Marker(item: item)
+                                        }
+                                        .frame(height: 300)
+                                        .mapStyle(.standard(elevation: .realistic))
+                                        .mapControls {
+                                            MapUserLocationButton()
+                                        }
+                                    } else {
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color.gray.opacity(0.2))
+                                            .frame(height: 300)
+                                            .overlay {
+                                                VStack {
+                                                    ProgressView()
+                                                    Text("No location available")
+                                                }
+                                                .foregroundStyle(.primary)
+                                            }
+                                    }
                                 }
+                            }
+                                
+                        } else {
+                            // TODO: Handle existing entries; do not override location
                         }
                     }
+                    .padding(.top)
                 }
             }
-            .task {
+            .onChange(of: storeLocations) {
                 if storeLocations {
+                    locationManager.setItem = self.setItem
                     locationManager.requestLocation()
                 }
             }
