@@ -78,6 +78,17 @@ struct LogEntrySheet: View {
                                 Marker(item: item)
                             }
                             .frame(height: 300)
+                        } else {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.gray.opacity(0.2))
+                                .frame(height: 300)
+                                .overlay {
+                                    VStack {
+                                        ProgressView()
+                                        Text("No location available")
+                                    }
+                                    .foregroundStyle(.white)
+                                }
                         }
                     }
                 }
