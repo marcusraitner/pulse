@@ -102,12 +102,12 @@ struct LogEntrySheet: View {
                 }
                 
                 VStack(alignment: .leading) {
-                    Toggle(isOn: $storeLocations) {
-                        Text("Store location")
-                    }
-                    
                     Group {
                         if isEntryNew {
+                            Toggle(isOn: $storeLocations) {
+                                Text("Store location")
+                            }
+                            
                             if storeLocations {
                                 if locationManager.authorizationStatus == .denied || locationManager.authorizationStatus == .restricted {
                                     Text("Location services are disabled. Please open settings to enable location services.")
@@ -146,7 +146,26 @@ struct LogEntrySheet: View {
                             }
                                 
                         } else {
-                            // TODO: Handle existing entries; do not override location
+                            if let address = entry.address {
+                                Label("\(address)", systemImage: "location.circle.fill")
+                                    .labelStyle(.titleAndIcon)
+                                
+                                if let latitude = entry.latitude, let longitude = entry.longitude {
+                                    let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                                    let region = MKCoordinateRegion(
+                                        center: coordinate,
+                                        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01) // ~1–2 km depending on latitude
+                                    )
+                                    
+                                    Map(position: .constant(.region(region))) {
+                                        Marker("", coordinate: CLLocationCoordinate2D(latitude: entry.latitude ?? 0, longitude: entry.longitude ?? 0))
+                                    }
+                                    .mapControls {
+                                        MapScaleView()
+                                    }
+                                    .frame(height: 300)
+                                }
+                            }
                         }
                     }
                     .padding(.top)

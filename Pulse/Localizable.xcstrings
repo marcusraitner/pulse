@@ -510,7 +510,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erfasst am *%@*"
+            "value" : "Erfasst am"
           }
         }
       }
