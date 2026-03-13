@@ -23,6 +23,13 @@ struct LogEntrySheet: View {
     @State private var isNew = true
     @State private var isPresentingConfirm = false
     @State private var storeLocations: Bool = false
+
+    @AppStorage("freezeHistory") private var freezeHistory: Bool = true
+
+    private var isEntryEditable: Bool {
+        !freezeHistory || Calendar.current.isDateInToday(entry.timestamp)
+    }
+    
     // closure gets called on save with the values in newEntry
     var saveEntry: (DailyLogEntry) -> Void
     
@@ -55,7 +62,7 @@ struct LogEntrySheet: View {
         
         let region = MKCoordinateRegion(
             center: coordinate,
-            span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01) // ~1–2 km depending on latitude
+            span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
         )
         mapPosition = .region(region)
 
@@ -69,32 +76,41 @@ struct LogEntrySheet: View {
     var body: some View {
         Form {
             Section {
-                VStack(alignment: .leading) {
-                    TextField("What's going on?", text: $newEntry.log, axis: .vertical)
-                        .multilineTextAlignment(.leading)
-                        .lineLimit(5...Int.max)
-                    
-                    Text("Please capture your moment here.")
-                        .font(.caption)
-                        .foregroundStyle(!isNew && newEntry.log.isEmpty ? .red : .clear)
-                }
-                HStack(alignment: .top) {
+                if isEntryEditable {
                     VStack(alignment: .leading) {
-                        Text("How are you feeling?")
-                        Text("Capture your mood on a scale from -2 (bad) to 2 (good)")
-                            .foregroundStyle(.secondary)
-                            .padding(.top, 2)
+                        TextField("What's going on?", text: $newEntry.log, axis: .vertical)
+                            .multilineTextAlignment(.leading)
+                            .lineLimit(5...Int.max)
+                        
+                        Text("Please capture your moment here.")
+                            .font(.caption)
+                            .foregroundStyle(!isNew && newEntry.log.isEmpty ? .red : .clear)
                     }
-                    Spacer()
-                    VStack {
-                        ScoreLabelView(score: newEntry.score, size: 72, radius: 12)
-                            .font(.title).bold()
-                        Stepper("", value: $newEntry.score, in: -2...2, step: 1)
-                            .labelsHidden()
-                            .padding(.top, 4)
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading) {
+                            Text("How are you feeling?")
+                            Text("Capture your mood on a scale from -2 (bad) to 2 (good)")
+                                .foregroundStyle(.secondary)
+                                .padding(.top, 2)
+                        }
+                        Spacer()
+                        VStack {
+                            ScoreLabelView(score: newEntry.score, size: 72, radius: 12)
+                                .font(.title).bold()
+                            Stepper("", value: $newEntry.score, in: -2...2, step: 1)
+                                .labelsHidden()
+                                .padding(.top, 4)
+                        }
+                        .padding(.leading)
                     }
-                    .padding(.leading)
+                } else {
+                    HStack (alignment: .top) {
+                        Text("\(entry.log)")
+                        Spacer()
+                        ScoreLabelView(score: entry.score, size: 72, radius: 12)
+                    }
                 }
+                
                 HStack {
                     Text("Recorded at")
                     Spacer()
@@ -102,73 +118,72 @@ struct LogEntrySheet: View {
                 }
                 
                 VStack(alignment: .leading) {
-                    Group {
-                        if isEntryNew {
-                            Toggle(isOn: $storeLocations) {
-                                Text("Store location")
-                            }
-                            
-                            if storeLocations {
-                                if locationManager.authorizationStatus == .denied || locationManager.authorizationStatus == .restricted {
-                                    Text("Location services are disabled. Please open settings to enable location services.")
-                                    
-                                    if let url = URL(string: UIApplication.openSettingsURLString) {
-                                        Button("Open Settings") {
-                                            UIApplication.shared.open(url)
-                                        }
-                                        .listRowSeparator(.hidden)
+                    if isEntryNew {
+                        Toggle(isOn: $storeLocations) {
+                            Text("Store location")
+                        }
+                        
+                        if storeLocations {
+                            if locationManager.authorizationStatus == .denied || locationManager.authorizationStatus == .restricted {
+                                Text("Location services are disabled. Please open settings to enable location services.")
+                                
+                                if let url = URL(string: UIApplication.openSettingsURLString) {
+                                    Button("Open Settings") {
+                                        UIApplication.shared.open(url)
                                     }
-                                } else {
-                                    if let item = locationManager.mapItems.first {
-                                        Text("\(newEntry.address ?? "Unknown")")
-                                        
-                                        Map(position: $mapPosition) {
-                                            Marker(item: item)
-                                        }
-                                        .frame(height: 300)
-                                        .mapStyle(.standard(elevation: .realistic))
-                                        .mapControls {
-                                            MapUserLocationButton()
-                                        }
-                                    } else {
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color.gray.opacity(0.2))
-                                            .frame(height: 300)
-                                            .overlay {
-                                                VStack {
-                                                    ProgressView()
-                                                    Text("No location available")
-                                                }
-                                                .foregroundStyle(.primary)
-                                            }
-                                    }
+                                    .listRowSeparator(.hidden)
                                 }
-                            }
-                                
-                        } else {
-                            if let address = entry.address {
-                                Label("\(address)", systemImage: "location.circle.fill")
-                                    .labelStyle(.titleAndIcon)
-                                
-                                if let latitude = entry.latitude, let longitude = entry.longitude {
-                                    let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-                                    let region = MKCoordinateRegion(
-                                        center: coordinate,
-                                        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01) // ~1–2 km depending on latitude
-                                    )
+                            } else {
+                                if let item = locationManager.mapItems.first {
+                                    Text("\(newEntry.address ?? "Unknown")")
                                     
-                                    Map(position: .constant(.region(region))) {
-                                        Marker("", coordinate: CLLocationCoordinate2D(latitude: entry.latitude ?? 0, longitude: entry.longitude ?? 0))
-                                    }
-                                    .mapControls {
-                                        MapScaleView()
+                                    Map(position: $mapPosition) {
+                                        Marker(item: item)
                                     }
                                     .frame(height: 300)
+                                    .mapStyle(.standard(elevation: .realistic))
+                                    .mapControls {
+                                        MapUserLocationButton()
+                                    }
+                                } else {
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color.gray.opacity(0.2))
+                                        .frame(height: 300)
+                                        .overlay {
+                                            VStack {
+                                                ProgressView()
+                                                Text("No location available")
+                                            }
+                                            .foregroundStyle(.primary)
+                                        }
                                 }
                             }
                         }
+                        
+                    } else {
+                        if let address = entry.address {
+                            Label("\(address)", systemImage: "location.circle.fill")
+                                .labelStyle(.titleAndIcon)
+                            
+                            if let latitude = entry.latitude, let longitude = entry.longitude {
+                                let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                                let region = MKCoordinateRegion(
+                                    center: coordinate,
+                                    span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01) // ~1–2 km depending on latitude
+                                )
+                                
+                                Map(position: .constant(.region(region))) {
+                                    Marker("", coordinate: CLLocationCoordinate2D(latitude: entry.latitude ?? 0, longitude: entry.longitude ?? 0))
+                                }
+                                .mapControls {
+                                    MapScaleView()
+                                }
+                                .frame(height: 300)
+                            }
+                        } else {
+                            Text("No location available")
+                        }
                     }
-                    .padding(.top)
                 }
             }
             .onChange(of: storeLocations) {

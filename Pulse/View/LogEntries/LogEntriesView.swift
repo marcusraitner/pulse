@@ -14,15 +14,10 @@ struct LogEntriesView: View {
     @State private var logEntry = DailyLogEntry(timestamp: .now, log: "", score: 0)
     @State private var isPresenting: Bool = false
     @State private var isEntryNew: Bool = true
-    @AppStorage("freezeHistory") private var freezeHistory: Bool = true
     @Environment(\.featureFlags) private var featureFlags
     @Environment(\.modelContext) private var context
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "LogEntriesView")
-
-    private var areEntriesEditable: Bool {
-        !freezeHistory || Calendar.current.isDateInToday(day.date)
-    }
     
     var body: some View {
         NavigationStack {
@@ -37,14 +32,12 @@ struct LogEntriesView: View {
                         LogEntryText(logEntry: entry)
                             .padding(.vertical, 15)
                             .padding(.horizontal)
-                            .glassEffect(.regular.tint(ScoreStyleHelper.color(for: entry.score)).interactive(areEntriesEditable), in: RoundedRectangle(cornerRadius: 10))
+                            .glassEffect(.regular.tint(ScoreStyleHelper.color(for: entry.score)).interactive(), in: RoundedRectangle(cornerRadius: 10))
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                if areEntriesEditable {
-                                    logEntry = entry
-                                    isEntryNew = false
-                                    isPresenting = true
-                                }
+                                logEntry = entry
+                                isEntryNew = false
+                                isPresenting = true
                             }
                     } else {
                         LogEntryText(logEntry: entry)
@@ -54,11 +47,9 @@ struct LogEntriesView: View {
                                 .opacity(0.85), in: RoundedRectangle(cornerRadius: 10))
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                if (areEntriesEditable || !freezeHistory) {
-                                    logEntry = entry
-                                    isEntryNew = false
-                                    isPresenting = true
-                                }
+                                logEntry = entry
+                                isEntryNew = false
+                                isPresenting = true
                             }
                     }
                 }

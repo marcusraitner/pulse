@@ -423,6 +423,9 @@
         }
       }
     },
+    "No location available." : {
+
+    },
     "No sample data available" : {
       "localizations" : {
         "de" : {
