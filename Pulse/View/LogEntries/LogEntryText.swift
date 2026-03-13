@@ -24,7 +24,7 @@ struct LogEntryText: View {
                 }
             }
             Spacer()
-            ScoreLabelView(score: logEntry.score)
+            ScoreLabelView(score: logEntry.score, opacity: 0.5)
         }
     }
 }

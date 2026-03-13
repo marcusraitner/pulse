@@ -32,7 +32,7 @@ struct LogEntriesView: View {
                         LogEntryText(logEntry: entry)
                             .padding(.vertical, 15)
                             .padding(.horizontal)
-                            .glassEffect(.regular.tint(ScoreStyleHelper.color(for: entry.score)).interactive(), in: RoundedRectangle(cornerRadius: 10))
+                            .glassEffect(.clear.tint(ScoreStyleHelper.color(for: entry.score)).interactive(), in: RoundedRectangle(cornerRadius: 10))
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 logEntry = entry

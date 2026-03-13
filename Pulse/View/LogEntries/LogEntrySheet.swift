@@ -108,6 +108,7 @@ struct LogEntrySheet: View {
                         Text("\(entry.log)")
                         Spacer()
                         ScoreLabelView(score: entry.score, size: 72, radius: 12)
+                            .font(.title).bold()
                     }
                 }
                 
@@ -173,7 +174,7 @@ struct LogEntrySheet: View {
                                 )
                                 
                                 Map(position: .constant(.region(region))) {
-                                    Marker("", coordinate: CLLocationCoordinate2D(latitude: entry.latitude ?? 0, longitude: entry.longitude ?? 0))
+                                    Marker("\(address)", coordinate: CLLocationCoordinate2D(latitude: entry.latitude ?? 0, longitude: entry.longitude ?? 0))
                                 }
                                 .mapControls {
                                     MapScaleView()
@@ -196,9 +197,13 @@ struct LogEntrySheet: View {
             Section {
                 HStack {
                     Spacer()
-                    if !isEntryNew {
-                        Button("Delete Moment", role: .destructive) {
+                    if !isEntryNew && isEntryEditable {
+                        Button(role: .destructive) {
                             isPresentingConfirm = true
+                        } label: {
+                            Label("Delete Moment", systemImage: "trash")
+                                .labelStyle(.titleAndIcon)
+                                .foregroundStyle(.red)
                         }
                         .buttonStyle(.automatic)
                         .confirmationDialog("Are you sure?",

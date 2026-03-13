@@ -11,14 +11,30 @@ struct ScoreLabelView: View {
     var score: Int
     var size: CGFloat = 35
     var radius: CGFloat = 4
+    var opacity: CGFloat = 1.0
     
     var body: some View {
-        Text("\(score)")
-            .frame(width: size, height: size)
-            .background(ScoreStyleHelper.color(for: score).gradient,
-                        in: RoundedRectangle(cornerRadius: radius))
-            .shadow(radius: 2)
-            .foregroundStyle(.primary)
+        if #available(iOS 26.0, *) {
+            Text("\(score)")
+                .frame(width: size, height: size)
+                .glassEffect(.regular.tint(ScoreStyleHelper.color(for: score).opacity(opacity)), in: RoundedRectangle(cornerRadius: radius))
+                .foregroundStyle(.primary)
+        } else {
+            // Fallback on earlier versions
+            if opacity < 1.0 {
+                Text("\(score)")
+                    .frame(width: size, height: size)
+                    .background(.thinMaterial,
+                                in: RoundedRectangle(cornerRadius: radius))
+                    .foregroundStyle(.primary)
+            } else {
+                Text("\(score)")
+                    .frame(width: size, height: size)
+                    .background(ScoreStyleHelper.color(for: score),
+                                in: RoundedRectangle(cornerRadius: radius))
+                    .foregroundStyle(.primary)
+            }
+        }
     }
 }
 
