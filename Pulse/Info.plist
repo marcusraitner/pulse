@@ -16,7 +16,7 @@
 		</dict>
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>You can choose to attach your current location to log entries</string>
+	<string>Your location is saved locally with your entries to provide a complete picture of your day. Your data stays private and on your device.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

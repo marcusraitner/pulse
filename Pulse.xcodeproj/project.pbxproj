@@ -22,7 +22,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		2C9CCF2B2F44AA4300CDAA15 /* Exceptions for "Pulse" folder in "Pulse" target */ = {
+		2DE4A2E82F646F2500FED667 /* Exceptions for "Pulse" folder in "Pulse" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -35,7 +35,7 @@
 		2C37498A2F4308270079D893 /* Pulse */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				2C9CCF2B2F44AA4300CDAA15 /* Exceptions for "Pulse" folder in "Pulse" target */,
+				2DE4A2E82F646F2500FED667 /* Exceptions for "Pulse" folder in "Pulse" target */,
 			);
 			path = Pulse;
 			sourceTree = "<group>";
@@ -156,6 +156,7 @@
 			knownRegions = (
 				en,
 				Base,
+				de,
 			);
 			mainGroup = 2C37497F2F4308270079D893;
 			minimizedProjectReferenceProxies = 1;
@@ -274,6 +275,7 @@
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -332,6 +334,7 @@
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
