@@ -61,7 +61,6 @@ struct TimeLineView: View {
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition($position, anchor: .center)
         .contentMargins(.horizontal, (containerWidth - barWidth) * 0.5, for: .scrollContent)
-//        .frame(idealHeight: totalHeight)
         .task {
             if let last = allEntries.last {
                 position.scrollTo(id: last.date, anchor: .center)
@@ -118,34 +117,15 @@ struct TimeLineView: View {
             logger.trace("Today changed: \(today.date)")
             position.scrollTo(id: today.date, anchor: .center)
         }
-//        .onChange(of: scrollToToday) {
-//            if scrollToToday {
-//                scrollTo(today)
-//                scrollToToday = false
-//            }
-//        }
+        .onChange(of: scrollToToday) { _, new in
+            if new {
+                logger.trace("scroll to today triggered")
+                position.scrollTo(id: today.date, anchor: .center)
+                scrollToToday = false
+            }
+            
+        }
     }
-    
-//    private func scrollTo(_ entry: DailyEntry) {
-//        if frames[entry] != nil {
-//            logger.trace("found frame for \(entry.date); scrolling to it")
-//            position.scrollTo(id: entry.date, anchor: .center)
-//        } else {
-//            // frame for today is not yet created
-//            // scroll to the trailing edge such that today becomes visible
-//            logger.trace("no frame for \(entry.date); scrolling to last")
-//            position.scrollTo(edge: .trailing)
-//            
-//            Task {
-//                logger.trace("Task to scroll to today")
-//                guard frames[entry] != nil else {
-//                    logger.trace("frame for \(entry.date) still not there")
-//                    return
-//                }
-//                position.scrollTo(id: entry.date, anchor: .center)
-//            }
-//        }
-//    }
     
     private func updateToday() {
         if let entry = allEntries.last {
@@ -191,24 +171,6 @@ struct EquilateralTriangle: Shape {
         return path
     }
 }
-
-//struct TimeLineViewScrollTargetBehavior: ScrollTargetBehavior {
-//    var frames: [DailyEntry: CGRect]
-//
-//    func updateTarget(_ target: inout ScrollTarget, context: TargetContext) {
-//        let xProposed = target.rect.midX
-//        guard
-//            let nearestEntry =
-//                frames
-//                .min(by: {
-//                    ($0.value.midX - xProposed).magnitude
-//                        < ($1.value.midX - xProposed).magnitude
-//                })
-//        else { return }
-//        target.rect.origin.x =
-//            nearestEntry.value.midX - 0.5 * target.rect.size.width
-//    }
-//}
 
 struct TimeLineViewPreviewContainer: View {
     @Query(sort: \DailyEntry.date, order: .reverse) private var entries:

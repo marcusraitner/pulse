@@ -352,10 +352,6 @@ extension View {
     func titleLabelIcon(_ color: Color) -> some View {
         modifier(ListLabelIcon(color: color, iconFrame: 55, iconSize: 32, cornerRaduis: 16))
     }
-    
-//    func confirmationToolbarItem() -> some View {
-//        modifier(ConfirmButtonModifier())
-//    }
 }
 
 #Preview {
