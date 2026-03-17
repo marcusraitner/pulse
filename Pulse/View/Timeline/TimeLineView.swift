@@ -66,30 +66,28 @@ struct TimeLineView: View {
                 position.scrollTo(id: last.date, anchor: .center)
             }
         }
+        .onGeometryChange(for: CGSize.self) { proxy in
+            proxy.size
+        } action: { old, new in
+            containerWidth = new.width
+        }
         .background {
-            // keep track of width
-            GeometryReader { proxy in
-                Color.clear.onAppear {
-                    containerWidth = proxy.size.width
-                }
-                .onChange(of: proxy.size.width) { _, newWidth in
-                    containerWidth = newWidth
-                }
-            }
-            
             // draw baseline and indicator for selected day
             Group {
                 EquilateralTriangle()
                     .frame(width: 10, height: 10)
                     .rotationEffect(Angle(degrees: 180))
-                    .offset(y: -totalHeight * 0.5 - 5)
-                Rectangle()
-                    .frame(width: 1, height: totalHeight + 10)
-                EquilateralTriangle()
-                    .frame(width: 10, height: 10)
-                    .offset(y: totalHeight * 0.5 + 5)
+                    .offset(y: -totalHeight * 0.5 - 15)
+                RoundedRectangle(cornerRadius: 4)
+                    .stroke(style: StrokeStyle(lineWidth: 1))
+                    .frame(width: barWidth + 3, height: totalHeight + 3)
+//                Rectangle()
+//                    .frame(width: 1, height: totalHeight)
+//                EquilateralTriangle()
+//                    .frame(width: 10, height: 10)
+//                    .offset(y: totalHeight * 0.5 + 10)
             }
-            .foregroundStyle(.white)
+            .foregroundStyle(.white.opacity(0.8))
         }
         .onChange(of: position) { _, new in
             // set selectedEntry on scroll pos change

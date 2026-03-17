@@ -32,6 +32,7 @@ struct ContentView: View {
     @State private var isPresentingSettings: Bool = false
     @State private var isPresentingNewEntry: Bool = false
     @State private var isPresentingReflection: Bool = false
+    @State private var uiImage: UIImage?
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
 
@@ -50,7 +51,7 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
-                if let data = backgroundImageData, let uiImage = UIImage(data: data) {
+                if let uiImage = uiImage {
                     Image(uiImage: uiImage)
                         .resizable()
                         .scaledToFill()
@@ -70,6 +71,12 @@ struct ContentView: View {
                     LazyVStack {
                         // The currently selected date
                         dateView
+                            .padding(.horizontal)
+                            .background(alignment: .bottom) {
+                                Rectangle()
+                                    .frame(height: 1)
+                                    .foregroundStyle(.white)
+                            }
                         
                         // Delete Button (only admin mode)
                         if featureFlags.adminEnabled {
@@ -87,7 +94,6 @@ struct ContentView: View {
                         // The timeline scroll view
                         TimeLineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
                             .padding(.vertical)
-                            .padding(.bottom, 10)
                         
                         // The daily reflection
                         reflectionView
@@ -98,7 +104,7 @@ struct ContentView: View {
                     }
                 }
                 .navigationBarTitleDisplayMode(.inline)
-                .ignoresSafeArea(.keyboard)
+//                .ignoresSafeArea(.keyboard)
                 .sheet(isPresented: $isPresentingSettings,
                     onDismiss: setNotifications) {
                     settingsSheetStack
@@ -196,6 +202,11 @@ struct ContentView: View {
                 Text("selectedEntry:\(DateFormatHelper.formatDate(selectedEntry.date))")
             )
 #endif  // DEBUG only for UI Tests
+        }
+        .onChange(of: backgroundImageData, initial: true) {
+            if let data = backgroundImageData, let uiImage = UIImage(data: data) {
+                self.uiImage = uiImage
+            }
         }
         .onOpenURL { url in
             switch url.host() {
