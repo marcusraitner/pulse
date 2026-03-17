@@ -233,7 +233,7 @@ struct LogEntrySheet: View {
         .onChange(of: newEntry.score) {
             isNew = false
         }
-        .navigationTitle(isEntryNew ? "New Moment" : "Edit Moment")
+        .navigationTitle(isEntryNew ? "New Moment" : isEntryEditable ? "Edit Moment" : "View Moment")
         .toolbar {
             ToolbarItem (placement: .confirmationAction) {
                 if #available(iOS 26, *) {

@@ -87,7 +87,7 @@ struct TimeLineView: View {
 //                    .frame(width: 10, height: 10)
 //                    .offset(y: totalHeight * 0.5 + 10)
             }
-            .foregroundStyle(.white.opacity(0.8))
+            .foregroundStyle(.white.opacity(1))
         }
         .onChange(of: position) { _, new in
             // set selectedEntry on scroll pos change

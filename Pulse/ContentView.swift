@@ -204,8 +204,12 @@ struct ContentView: View {
 #endif  // DEBUG only for UI Tests
         }
         .onChange(of: backgroundImageData, initial: true) {
-            if let data = backgroundImageData, let uiImage = UIImage(data: data) {
-                self.uiImage = uiImage
+            if let data = backgroundImageData {
+                if let uiImage = UIImage(data: data) {
+                    self.uiImage = uiImage
+                }
+            } else {
+                self.uiImage = nil
             }
         }
         .onOpenURL { url in
