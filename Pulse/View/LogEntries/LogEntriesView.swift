@@ -54,7 +54,7 @@ struct LogEntriesView: View {
                     }
                 }
             }
-            .sheet(isPresented: $isPresenting) {
+            .fullScreenCover(isPresented: $isPresenting) {
                 NavigationStack {
                     LogEntrySheet(entry: $logEntry, isEntryNew: $isEntryNew) { editedEntry in
                         // Only commit changes here when the user taps Submit in the sheet

@@ -104,12 +104,11 @@ struct ContentView: View {
                     }
                 }
                 .navigationBarTitleDisplayMode(.inline)
-//                .ignoresSafeArea(.keyboard)
-                .sheet(isPresented: $isPresentingSettings,
+                .fullScreenCover(isPresented: $isPresentingSettings,
                     onDismiss: setNotifications) {
                     settingsSheetStack
                 }
-                .sheet(isPresented: $isPresentingNewEntry) {
+                .fullScreenCover(isPresented: $isPresentingNewEntry) {
                     NavigationStack {
                         LogEntrySheet() { editedEntry in
                                 
@@ -128,7 +127,7 @@ struct ContentView: View {
                         }
                     }
                 }
-                .sheet(isPresented: $isPresentingReflection, onDismiss: { isPresentingReflection = false } ) {
+                .fullScreenCover(isPresented: $isPresentingReflection, onDismiss: { isPresentingReflection = false } ) {
                     NavigationStack {
                         DailyReflectionSheet(day: $selectedEntry)
                     }

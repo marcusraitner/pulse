@@ -56,8 +56,8 @@ struct TimeLineView: View {
                 }
             }
             .scrollTargetLayout()
-            .frame(idealHeight: totalHeight)
         }
+        .frame(idealHeight: totalHeight)
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition($position, anchor: .center)
         .contentMargins(.horizontal, (containerWidth - barWidth) * 0.5, for: .scrollContent)
@@ -78,11 +78,13 @@ struct TimeLineView: View {
                     .frame(width: 10, height: 10)
                     .rotationEffect(Angle(degrees: 180))
                     .offset(y: -totalHeight * 0.5 - 15)
-                RoundedRectangle(cornerRadius: 4)
-                    .stroke(style: StrokeStyle(lineWidth: 1))
-                    .frame(width: barWidth + 3, height: totalHeight + 3)
-//                Rectangle()
-//                    .frame(width: 1, height: totalHeight)
+
+//                RoundedRectangle(cornerRadius: 4)
+//                    .stroke(style: StrokeStyle(lineWidth: 1))
+//                    .frame(width: barWidth + 3, height: totalHeight + 3)
+                Rectangle()
+                    .frame(width: 1, height: totalHeight + 12)
+//                    .foregroundStyle(.white.opacity(1))
 //                EquilateralTriangle()
 //                    .frame(width: 10, height: 10)
 //                    .offset(y: totalHeight * 0.5 + 10)
