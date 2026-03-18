@@ -84,7 +84,7 @@ struct TimeLineView: View {
 //                    .frame(width: barWidth + 3, height: totalHeight + 3)
                 Rectangle()
                     .frame(width: 1, height: totalHeight + 12)
-//                    .foregroundStyle(.white.opacity(1))
+                    .foregroundStyle(.white.opacity(1))
 //                EquilateralTriangle()
 //                    .frame(width: 10, height: 10)
 //                    .offset(y: totalHeight * 0.5 + 10)
@@ -99,10 +99,10 @@ struct TimeLineView: View {
                     selectedEntry = newSelected
                     logger.trace("New selected date: \(selectedEntry.date)")
                 } else {
-                    logger.trace("Could not find entry for date \(date)")
+                    logger.warning("Could not find entry for date \(date)")
                 }
             } else {
-                logger.trace("Could not find date in scroll position")
+                logger.warning("Could not find date in scroll position")
             }
         }
         .sensoryFeedback(.impact, trigger: selectedEntry)
