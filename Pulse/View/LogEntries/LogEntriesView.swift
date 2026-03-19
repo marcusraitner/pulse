@@ -14,6 +14,7 @@ struct LogEntriesView: View {
     @State private var logEntry = DailyLogEntry(timestamp: .now, log: "", score: 0)
     @State private var isPresenting: Bool = false
     @State private var isEntryNew: Bool = true
+    @StateObject private var themeStore: ThemeStore = .init()
     @Environment(\.featureFlags) private var featureFlags
     @Environment(\.modelContext) private var context
     
@@ -32,7 +33,7 @@ struct LogEntriesView: View {
                         LogEntryText(logEntry: entry)
                             .padding(.vertical, 15)
                             .padding(.horizontal)
-                            .glassEffect(.clear.tint(ScoreStyleHelper.color(for: entry.score)).interactive(), in: RoundedRectangle(cornerRadius: 10))
+                            .glassEffect(.clear.tint(ScoreStyleHelper.color(for: entry.score, store: themeStore)).interactive(), in: RoundedRectangle(cornerRadius: 10))
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 logEntry = entry
@@ -43,7 +44,7 @@ struct LogEntriesView: View {
                         LogEntryText(logEntry: entry)
                             .padding(.vertical, 15)
                             .padding(.horizontal)
-                            .background(ScoreStyleHelper.color(for: entry.score)
+                            .background(ScoreStyleHelper.color(for: entry.score, store: themeStore)
                                 .opacity(0.85), in: RoundedRectangle(cornerRadius: 10))
                             .contentShape(Rectangle())
                             .onTapGesture {

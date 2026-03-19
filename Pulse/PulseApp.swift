@@ -38,7 +38,7 @@ struct PulseApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.featureFlags, FeatureFlags(editHistory: false, adminEnabled: false))
+                .environment(\.featureFlags, FeatureFlags(editHistory: true, adminEnabled: false))
             
         }
         .modelContainer(modelContainer)

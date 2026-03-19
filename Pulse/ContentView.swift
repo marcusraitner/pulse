@@ -25,6 +25,7 @@ struct ContentView: View {
     @AppStorage("backgroundImageData") private var backgroundImageData: Data?
     @AppStorage("reflectionReminder") private var reflectionReminder: Bool = true
     @AppStorage("reflectionReminderTime") private var reflectionReminderTime: Date?
+    @AppStorage("theme") private var theme: String = "default"
     
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
     @State private var triggerScrollToToday: Bool = false
@@ -33,6 +34,7 @@ struct ContentView: View {
     @State private var isPresentingNewEntry: Bool = false
     @State private var isPresentingReflection: Bool = false
     @State private var uiImage: UIImage?
+    @State private var refreshView: Bool = false
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
 
@@ -250,67 +252,76 @@ struct ContentView: View {
     }
 
     private func setNotifications() {
+        Task {
         // Remove all pending notifications
         UNUserNotificationCenter.current()
             .removeAllPendingNotificationRequests()
 
         // Set new notifications based on user's choice
-        if notificationsEnabled {
-            let defaults = UserDefaults.standard
-            let notificationTimes =
+            if notificationsEnabled {
+                let defaults = UserDefaults.standard
+                let notificationTimes =
                 defaults.value(forKey: "notificationTimes") as? [Date] ?? []
-
-            for time in notificationTimes {
-                let content = UNMutableNotificationContent()
-                content.title = String(localized: "What's going on?")
-                content.body = String(
-                    localized: "It's time to log your activities and feelings!"
-                )
-                content.sound = .default
-                content.userInfo = ["url": "pulseapp://log"]
-
-                let components = Calendar.current.dateComponents(
-                    [.hour, .minute],
-                    from: time
-                )
-                let dateTrigger = UNCalendarNotificationTrigger(
-                    dateMatching: components,
-                    repeats: true
-                )
-                let request = UNNotificationRequest(
-                    identifier: UUID().uuidString,
-                    content: content,
-                    trigger: dateTrigger
-                )
-
-                UNUserNotificationCenter.current().add(request)
-            }
                 
-            if reflectionReminder, let reflectionReminderTime {
-                let content = UNMutableNotificationContent()
-                content.title = String(localized: "Reflection Time")
-                content.body = String(
-                    localized: "It's time to reflect on your day!"
-                )
-                content.sound = .default
-                content.userInfo = ["url": "pulseapp://reflect"]
-
-                let components = Calendar.current.dateComponents(
-                    [.hour, .minute],
-                    from: reflectionReminderTime
-                )
-                let dateTrigger = UNCalendarNotificationTrigger(
-                    dateMatching: components,
-                    repeats: true
-                )
-                let request = UNNotificationRequest(
-                    identifier: UUID().uuidString,
-                    content: content,
-                    trigger: dateTrigger
-                )
-
-                UNUserNotificationCenter.current().add(request)
-
+                for time in notificationTimes {
+                    let content = UNMutableNotificationContent()
+                    content.title = String(localized: "What's going on?")
+                    content.body = String(
+                        localized: "It's time to log your activities and feelings!"
+                    )
+                    content.sound = .default
+                    content.userInfo = ["url": "pulseapp://log"]
+                    
+                    let components = Calendar.current.dateComponents(
+                        [.hour, .minute],
+                        from: time
+                    )
+                    let dateTrigger = UNCalendarNotificationTrigger(
+                        dateMatching: components,
+                        repeats: true
+                    )
+                    let request = UNNotificationRequest(
+                        identifier: UUID().uuidString,
+                        content: content,
+                        trigger: dateTrigger
+                    )
+                    
+                    do {
+                        try await UNUserNotificationCenter.current().add(request)
+                    } catch {
+                        logger.error("Failed to schedule notification: \(String(describing: error))")
+                    }
+                }
+                
+                if reflectionReminder, let reflectionReminderTime {
+                    let content = UNMutableNotificationContent()
+                    content.title = String(localized: "Reflection Time")
+                    content.body = String(
+                        localized: "It's time to reflect on your day!"
+                    )
+                    content.sound = .default
+                    content.userInfo = ["url": "pulseapp://reflect"]
+                    
+                    let components = Calendar.current.dateComponents(
+                        [.hour, .minute],
+                        from: reflectionReminderTime
+                    )
+                    let dateTrigger = UNCalendarNotificationTrigger(
+                        dateMatching: components,
+                        repeats: true
+                    )
+                    let request = UNNotificationRequest(
+                        identifier: UUID().uuidString,
+                        content: content,
+                        trigger: dateTrigger
+                    )
+                    
+                    do {
+                        try await UNUserNotificationCenter.current().add(request)
+                    } catch {
+                        logger.error("Failed to schedule notification: \(String(describing: error))")
+                    }
+                }
             }
         }
     }

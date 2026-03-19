@@ -20,6 +20,7 @@ struct TimeLineView: View {
     @State private var today: DailyEntry = .init(date: .now)
     @State private var position: ScrollPosition = .init(idType: Date.self)
     @State private var containerWidth: CGFloat = 0.0
+    @StateObject private var themeStore: ThemeStore = .init()
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "TimeLineView")
 
@@ -40,7 +41,7 @@ struct TimeLineView: View {
                         .frame(width: barWidth, height: totalHeight)
                         .overlay {
                             RoundedRectangle(cornerRadius: 4)
-                                .fill(ScoreStyleHelper.gradient(for: avg))
+                                .fill(ScoreStyleHelper.gradient(for: avg, store: themeStore))
                                 .frame(width: barWidth, height: barHeight)
                                 .offset(y: yOffset)
                         }

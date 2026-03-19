@@ -22,6 +22,7 @@ struct SettingsView: View {
         Calendar.current.date(bySetting: .hour, value: 20, of: .now) ?? Date.now
     @AppStorage("notificationTime") private var notificationTime: Date = .now
     @AppStorage("backgroundImageData") private var backgroundImageData: Data?
+    @AppStorage("theme") private var theme: String = "default"
     
     @State private var backgroundImageSelection: PhotosPickerItem?
     @State private var notificationTimes: [Date] = []
@@ -106,6 +107,17 @@ struct SettingsView: View {
                             Text("Customize the overall appearance here.")
                                 .foregroundStyle(.secondary)
                         }
+                        Picker(selection: $theme) {
+                            ThemePreview("default")
+                                .tag("default")
+                            ThemePreview("sea")
+                                .tag("sea")
+                            ThemePreview("tropical")
+                                .tag("tropical")
+                        } label: {
+                            Text("Theme: ")
+                        }
+                        .pickerStyle(.navigationLink)
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Background Image")
                                 .font(.headline)
