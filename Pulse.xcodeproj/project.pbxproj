@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 100;
 	objects = {
 
 /* Begin PBXContainerItemProxy section */
@@ -50,17 +50,13 @@
 /* Begin PBXFrameworksBuildPhase section */
 		2C3749852F4308270079D893 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		2C9CCF112F44350000CDAA15 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
@@ -96,14 +92,10 @@
 			);
 			buildRules = (
 			);
-			dependencies = (
-			);
 			fileSystemSynchronizedGroups = (
 				2C37498A2F4308270079D893 /* Pulse */,
 			);
 			name = Pulse;
-			packageProductDependencies = (
-			);
 			productName = Pulse;
 			productReference = 2C3749882F4308270079D893 /* Pulse.app */;
 			productType = "com.apple.product-type.application";
@@ -125,8 +117,6 @@
 				2C9CCF152F44350000CDAA15 /* PulseUITests */,
 			);
 			name = PulseUITests;
-			packageProductDependencies = (
-			);
 			productName = PulseUITests;
 			productReference = 2C9CCF142F44350000CDAA15 /* PulseUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -139,7 +129,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2620;
-				LastUpgradeCheck = 2630;
+				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					2C3749872F4308270079D893 = {
 						CreatedOnToolsVersion = 26.2;
@@ -160,7 +150,7 @@
 			);
 			mainGroup = 2C37497F2F4308270079D893;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
+			preferredProjectObjectVersion = 100;
 			productRefGroup = 2C3749892F4308270079D893 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -174,34 +164,26 @@
 /* Begin PBXResourcesBuildPhase section */
 		2C3749862F4308270079D893 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		2C9CCF122F44350000CDAA15 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		2C3749842F4308270079D893 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		2C9CCF102F44350000CDAA15 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
@@ -214,11 +196,12 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		2C3749932F4308280079D893 /* Debug */ = {
+		2C3749932F4308280079D893 /* Debug configuration for PBXProject "Pulse" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -280,11 +263,12 @@
 			};
 			name = Debug;
 		};
-		2C3749942F4308280079D893 /* Release */ = {
+		2C3749942F4308280079D893 /* Release configuration for PBXProject "Pulse" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -339,7 +323,7 @@
 			};
 			name = Release;
 		};
-		2C3749962F4308280079D893 /* Debug */ = {
+		2C3749962F4308280079D893 /* Debug configuration for PBXNativeTarget "Pulse" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -383,7 +367,7 @@
 			};
 			name = Debug;
 		};
-		2C3749972F4308280079D893 /* Release */ = {
+		2C3749972F4308280079D893 /* Release configuration for PBXNativeTarget "Pulse" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -427,7 +411,7 @@
 			};
 			name = Release;
 		};
-		2C9CCF1D2F44350000CDAA15 /* Debug */ = {
+		2C9CCF1D2F44350000CDAA15 /* Debug configuration for PBXNativeTarget "PulseUITests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -452,7 +436,7 @@
 			};
 			name = Debug;
 		};
-		2C9CCF1E2F44350000CDAA15 /* Release */ = {
+		2C9CCF1E2F44350000CDAA15 /* Release configuration for PBXNativeTarget "PulseUITests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -483,28 +467,25 @@
 		2C3749832F4308270079D893 /* Build configuration list for PBXProject "Pulse" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2C3749932F4308280079D893 /* Debug */,
-				2C3749942F4308280079D893 /* Release */,
+				2C3749932F4308280079D893 /* Debug configuration for PBXProject "Pulse" */,
+				2C3749942F4308280079D893 /* Release configuration for PBXProject "Pulse" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		2C3749952F4308280079D893 /* Build configuration list for PBXNativeTarget "Pulse" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2C3749962F4308280079D893 /* Debug */,
-				2C3749972F4308280079D893 /* Release */,
+				2C3749962F4308280079D893 /* Debug configuration for PBXNativeTarget "Pulse" */,
+				2C3749972F4308280079D893 /* Release configuration for PBXNativeTarget "Pulse" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		2C9CCF1C2F44350000CDAA15 /* Build configuration list for PBXNativeTarget "PulseUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2C9CCF1D2F44350000CDAA15 /* Debug */,
-				2C9CCF1E2F44350000CDAA15 /* Release */,
+				2C9CCF1D2F44350000CDAA15 /* Debug configuration for PBXNativeTarget "PulseUITests" */,
+				2C9CCF1E2F44350000CDAA15 /* Release configuration for PBXNativeTarget "PulseUITests" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */

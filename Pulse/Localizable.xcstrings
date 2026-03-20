@@ -603,16 +603,6 @@
         }
       }
     },
-    "selectedEntry:%@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "selectedEntry:%@"
-          }
-        }
-      }
-    },
     "Set multiple daily reminders to log what's happening and how you feel about it." : {
       "localizations" : {
         "de" : {
@@ -677,8 +667,15 @@
         }
       }
     },
-    "Theme" : {
-
+    "Theme: " : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Farbschema:"
+          }
+        }
+      }
     },
     "This will delete the moment permanently and cannot be undone." : {
       "localizations" : {
