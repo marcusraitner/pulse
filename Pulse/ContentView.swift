@@ -94,7 +94,7 @@ struct ContentView: View {
                         }
                         
                         // The timeline scroll view
-                        TimeLineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
+                        HorizontalTimelineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
                             .padding(.vertical)
                         
                         // The daily reflection
