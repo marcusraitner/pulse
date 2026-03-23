@@ -9,7 +9,7 @@ import OSLog
 import SwiftData
 import SwiftUI
 
-struct TimeLineView: View {
+struct HorizontalTimelineView: View {
     @Query(sort: \DailyEntry.date) private var allEntries: [DailyEntry]
     @Environment(\.modelContext) private var context
     @Environment(\.scenePhase) private var scenePhase
@@ -179,7 +179,7 @@ struct TimeLineViewPreviewContainer: View {
 
     var body: some View {
         if let entry = entries.randomElement() {
-            TimeLineView(selectedEntry: .constant(entry), scrollToToday: .constant(true))
+            HorizontalTimelineView(selectedEntry: .constant(entry), scrollToToday: .constant(true))
         } else {
             Text("No sample data available")
                 .padding()
