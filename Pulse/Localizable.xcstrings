@@ -668,7 +668,14 @@
       }
     },
     "Theme: " : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Farbschema:"
+          }
+        }
+      }
     },
     "This will delete the moment permanently and cannot be undone." : {
       "localizations" : {
