@@ -12,6 +12,7 @@ struct TimelineView: View {
     @Query(sort: \DailyEntry.date) private var allEntries: [DailyEntry]
     @State private var isExpanded: Bool = true
 
+
     var body: some View {
         NavigationStack {
             List(allEntries) { entry in
@@ -27,11 +28,11 @@ struct TimelineView: View {
                                     VStack(alignment: .leading) {
                                         Text("**\(logEntry.timestamp.formatted(.dateTime.hour().minute()))**: \(logEntry.log) (\(Image(systemName: "location.fill"))\u{00a0}\(logEntry.address ?? ""))")
                                             .font(.caption)
-                                        if let address = logEntry.address {
+//                                        if let address = logEntry.address {
 //                                            Label("\(address)", systemImage: "location.square")
 //                                                .font(.caption2)
 //                                                .padding(.top, 1)
-                                        }
+//                                        }
                                     }
                                     Spacer()
                                     RoundedRectangle(cornerRadius: 2)
