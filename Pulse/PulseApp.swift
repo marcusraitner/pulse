@@ -37,9 +37,15 @@ struct PulseApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(\.featureFlags, FeatureFlags(editHistory: true, adminEnabled: false))
-            
+            TabView {
+                Tab("Today", systemImage: "house") {
+                    ContentView()
+                }
+                Tab("Timeline", systemImage: "calendar") {
+                    TimelineView()
+                }
+            }
+            .environment(\.featureFlags, FeatureFlags(editHistory: true, adminEnabled: true))
         }
         .modelContainer(modelContainer)
     }

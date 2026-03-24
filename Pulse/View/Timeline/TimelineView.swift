@@ -12,6 +12,7 @@ struct TimelineView: View {
     @Query(sort: \DailyEntry.date) private var allEntries: [DailyEntry]
     @State private var isExpanded: Bool = true
     @State private var scoreFilter: Set<Int> = []
+    @State private var isPresentingInsights: Bool = false
 
     var filteredEntries: [DailyEntry] {
         guard !scoreFilter.isEmpty else { return allEntries }
@@ -79,7 +80,23 @@ struct TimelineView: View {
                     }
                 }
             }
+            .sheet(isPresented: $isPresentingInsights) {
+                if #available(iOS 26.0, *) {
+                    NavigationStack {
+                        InsightsView()
+                    }
+                }
+            }
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    if #available(iOS 26.0, *) {
+                        Button {
+                            isPresentingInsights = true
+                        } label: {
+                            Image(systemName: "sparkles")
+                        }
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         ForEach([-2, -1, 0, 1, 2], id: \.self) { score in
