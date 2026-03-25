@@ -84,7 +84,7 @@ struct InsightsView: View {
     }
 
     @ViewBuilder
-    private func insightsSection(title: String, items: [String], systemImage: String, tint: Color) -> some View {
+    private func insightsSection(title: LocalizedStringKey, items: [String], systemImage: String, tint: Color) -> some View {
         Section {
             if items.isEmpty {
                 Text("No patterns identified yet.")
@@ -128,7 +128,8 @@ struct InsightsView: View {
         let prompt = String(format: template, formatted)
 
         do {
-            let session = LanguageModelSession()
+            let instructions = String(localized: "insights.sessionInstructions", bundle: .main)
+            let session = LanguageModelSession(instructions: instructions)
             let stream = session.streamResponse(to: prompt, generating: PatternInsights.self)
             for try await partial in stream {
                 insights = partial.content
