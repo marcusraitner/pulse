@@ -29,7 +29,6 @@ struct ContentView: View {
     
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
     @State private var triggerScrollToToday: Bool = false
-    @State private var today: DailyEntry = DailyEntry(date: .now)
     @State private var isPresentingSettings: Bool = false
     @State private var isPresentingNewEntry: Bool = false
     @State private var isPresentingReflection: Bool = false
@@ -161,6 +160,13 @@ struct ContentView: View {
                 }
                 .task {
                     await initApplication()
+                    updateToday()
+                }
+                .onChange(of: scenePhase) { _, newPhase in
+                    if newPhase == .active {
+                        logger.trace("scene is now active. Updating today.")
+                        updateToday()
+                    }
                 }
                 .onChange(of: countLog) { old, new in
                     if new > old && numberOfRequests < 3 && countLog > lastReviewRequest + (5 * (numberOfRequests + 1)) {
@@ -225,6 +231,29 @@ struct ContentView: View {
                 return
             }
         }
+    }
+
+    private func updateToday() {
+        var descriptor = FetchDescriptor<DailyEntry>(sortBy: [SortDescriptor(\.date, order: .reverse)])
+        descriptor.fetchLimit = 1
+
+        if let last = try? context.fetch(descriptor).first,
+           Calendar.current.isDateInToday(last.date) {
+            return
+        }
+
+        let newToday = DailyEntry(date: .now)
+        logger.debug("Creating a new day: \(newToday.date)")
+        context.insert(newToday)
+
+        do {
+            try context.save()
+        } catch {
+            logger.error("Failed saving new day: \(String(describing: error))")
+        }
+
+        selectedEntry = newToday
+        triggerScrollToToday = true
     }
 
     private func initApplication() async {

@@ -7,11 +7,10 @@
 
 import Foundation
 import SwiftUI
-internal import Combine
 
 struct ScoreStyleHelper {
-    static func color(for score: Int, store: ThemeStore? = nil) -> Color {
-        let theme: String = store?.themeName ?? "default"
+    static func color(for score: Int, themeName: String? = nil) -> Color {
+        let theme: String = themeName ?? "default"
         
         switch score {
         case -2: return Color("\(theme)/minus2")
@@ -23,11 +22,7 @@ struct ScoreStyleHelper {
         }
     }
     
-    static func gradient(for score: CGFloat, store: ThemeStore? = nil) -> AnyGradient {
-        return color(for: Int(round(score)), store: store).gradient
+    static func gradient(for score: CGFloat, themeName: String? = nil) -> AnyGradient {
+        return color(for: Int(round(score)), themeName: themeName).gradient
     }
-}
-
-class ThemeStore: ObservableObject {
-    @AppStorage("theme") var themeName: String = "default"
 }

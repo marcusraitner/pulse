@@ -11,16 +11,13 @@ import SwiftUI
 
 struct HorizontalTimelineView: View {
     @Query(sort: \DailyEntry.date) private var allEntries: [DailyEntry]
-    @Environment(\.modelContext) private var context
-    @Environment(\.scenePhase) private var scenePhase
 
     @Binding var selectedEntry: DailyEntry
     @Binding var scrollToToday: Bool
-    
-    @State private var today: DailyEntry = .init(date: .now)
+
     @State private var position: ScrollPosition = .init(idType: Date.self)
     @State private var containerWidth: CGFloat = 0.0
-    @StateObject private var themeStore: ThemeStore = .init()
+    @AppStorage("theme") var themeName: String = "default"
     @State private var isPresentingInsights: Bool = false
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "TimeLineView")
@@ -42,7 +39,7 @@ struct HorizontalTimelineView: View {
                         .frame(width: barWidth, height: totalHeight)
                         .overlay {
                             RoundedRectangle(cornerRadius: 4)
-                                .fill(ScoreStyleHelper.gradient(for: avg, store: themeStore))
+                                .fill(ScoreStyleHelper.gradient(for: avg, themeName: themeName))
                                 .frame(width: barWidth, height: barHeight)
                                 .offset(y: yOffset)
                         }
@@ -126,50 +123,15 @@ struct HorizontalTimelineView: View {
             }
         }
         .sensoryFeedback(.impact, trigger: selectedEntry)
-        .onChange(of: scenePhase) { _, newPhase in
-            // check if a day passed
-            if newPhase == .active {
-                logger.trace("scene is now active. Updating today.")
-                updateToday()
-            }
-        }
-        .onChange(of: today) {
-            logger.trace("Today changed: \(today.date)")
-            position.scrollTo(id: today.date, anchor: .center)
-        }
         .onChange(of: scrollToToday) { _, new in
             if new {
                 logger.trace("scroll to today triggered")
-                position.scrollTo(id: today.date, anchor: .center)
+                if let last = allEntries.last {
+                    position.scrollTo(id: last.date, anchor: .center)
+                }
                 scrollToToday = false
             }
-            
         }
-    }
-    
-    private func updateToday() {
-        if let entry = allEntries.last {
-            if Calendar.current.isDateInToday(entry.date) {
-                if entry != today {
-                    today = entry
-                }
-                return
-            }
-        }
-
-        // entry for today missing: create and save it
-        let newToday = DailyEntry(date: .now)
-        logger.debug("Creating a new day: \(newToday.date)")
-        context.insert(newToday)
-        
-        do {
-            try context.save()
-        } catch {
-            logger.error("Failed saving new day: \(String(describing: error))")
-        }
-        
-        // this triggers also scrolling
-        today = newToday
     }
 }
 
