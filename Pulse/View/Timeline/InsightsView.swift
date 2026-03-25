@@ -36,16 +36,7 @@ struct InsightsView: View {
 
     var body: some View {
         List {
-            if isAnalyzing {
-                Section {
-                    HStack(spacing: 12) {
-                        ProgressView()
-                        Text("Analyzing your entries…")
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.vertical, 4)
-                }
-            } else if let error = errorMessage {
+            if let error = errorMessage {
                 Section {
                     Text(error)
                         .foregroundStyle(.red)
@@ -56,8 +47,21 @@ struct InsightsView: View {
                 insightsSection(title: "Actionable tips", items: insights.actionableTips ?? [], systemImage: "lightbulb.fill", tint: .yellow)
             } else {
                 Section {
-                    Text("Tap **Analyze** to discover what drives your best and worst moments.")
-                        .foregroundStyle(.secondary)
+                    HStack {
+                        Spacer()
+                        if isAnalyzing {
+                            ProgressView("Analyzing your entries…")
+                        } else {
+                            Button {
+                                Task { await analyze() }
+                            } label: {
+                                Label("Analyze", systemImage: "sparkles")
+                            }
+                            .disabled(allLogEntries.isEmpty)
+                        }
+                        Spacer()
+                    }
+                    .padding(.vertical, 24)
                 }
             }
         }
@@ -65,14 +69,6 @@ struct InsightsView: View {
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button(role: .confirm) { dismiss() }
-            }
-            ToolbarItem(placement: .bottomBar) {
-                Button {
-                    Task { await analyze() }
-                } label: {
-                    Label("Analyze", systemImage: "sparkles")
-                }
-                .disabled(isAnalyzing || allLogEntries.isEmpty)
             }
         }
         if insights != nil, !isAnalyzing {
@@ -91,14 +87,7 @@ struct InsightsView: View {
                     .foregroundStyle(.secondary)
             } else {
                 ForEach(items, id: \.self) { item in
-                    Label {
-                        Text(item)
-                    } icon: {
-                        Image(systemName: "circle.fill")
-                            .font(.system(size: 6))
-                            .foregroundStyle(tint)
-                            .padding(.top, 5)
-                    }
+                    Text(item)
                 }
             }
         } header: {

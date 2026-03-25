@@ -21,6 +21,7 @@ struct HorizontalTimelineView: View {
     @State private var position: ScrollPosition = .init(idType: Date.self)
     @State private var containerWidth: CGFloat = 0.0
     @StateObject private var themeStore: ThemeStore = .init()
+    @State private var isPresentingInsights: Bool = false
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "TimeLineView")
 
@@ -104,6 +105,24 @@ struct HorizontalTimelineView: View {
                 }
             } else {
                 logger.warning("Could not find date in scroll position")
+            }
+        }
+        .sheet(isPresented: $isPresentingInsights) {
+            if #available(iOS 26.0, *) {
+                NavigationStack {
+                    InsightsView()
+                }
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                if #available(iOS 26.0, *) {
+                    Button {
+                        isPresentingInsights = true
+                    } label: {
+                        Image(systemName: "sparkles")
+                    }
+                }
             }
         }
         .sensoryFeedback(.impact, trigger: selectedEntry)
