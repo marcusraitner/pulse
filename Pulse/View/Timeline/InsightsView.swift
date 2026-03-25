@@ -12,13 +12,13 @@ import FoundationModels
 @available(iOS 26.0, *)
 @Generable
 struct PatternInsights {
-    @Guide(description: "Short bullet points describing patterns or themes that characterise great moments (score +1 or +2). Each item is one concise sentence grounded in the journal entries.")
+    @Guide(description: "Up to 3 synthesised insights — NOT a list of entries — explaining what underlying theme or condition made high-scoring moments (+1/+2) great. Each item names a recurring pattern and briefly explains why it mattered, e.g. 'Physical activity consistently lifts mood: workouts and walks appear in nearly all +2 entries.'")
     var greatMoments: [String]
 
-    @Guide(description: "Short bullet points describing patterns or themes that characterise poor moments (score -1 or -2). Each item is one concise sentence grounded in the journal entries.")
+    @Guide(description: "Up to 3 synthesised insights — NOT a list of entries — explaining what underlying theme or condition drove low-scoring moments (-1/-2). Each item names a recurring pattern and briefly explains the impact, e.g. 'Lack of sleep amplifies stress: most -2 entries mention tiredness combined with a demanding task.'")
     var poorMoments: [String]
 
-    @Guide(description: "Short, actionable tips the person can apply to have more great moments and fewer poor ones. Each item is one concise sentence.")
+    @Guide(description: "Up to 3 concrete, personalised actions derived from the patterns above. Each tip is directly actionable and specific to the data, e.g. 'Schedule at least one outdoor activity on days with back-to-back meetings to counteract the recurring stress pattern.'")
     var actionableTips: [String]
 }
 
@@ -125,14 +125,24 @@ struct InsightsView: View {
         }.joined(separator: "\n")
 
         let prompt = """
-        Below are personal journal entries with mood scores from -2 (very bad) to +2 (very good). \
-        Each line starts with the score in brackets.
+        You are a personal wellbeing analyst. Below are journal entries scored from -2 (very bad) \
+        to +2 (very good). Each line: [score] text.
 
         \(formatted)
 
-        Analyse these entries and populate the three fields: patterns behind great moments (+1/+2), \
-        patterns behind poor moments (-1/-2), and actionable tips. \
-        Be concise and specific, grounding each point in the actual entries.
+        Your task is to synthesise — not list — up to 3 insights per section:
+
+        greatMoments: What recurring themes, contexts, or conditions appear across the high-scoring \
+        entries (+1, +2)? Identify the underlying pattern, not individual entries.
+
+        poorMoments: What recurring themes, contexts, or conditions appear across the low-scoring \
+        entries (-1, -2)? Identify the underlying pattern, not individual entries.
+
+        actionableTips: Based on the patterns above, what are up to 3 specific, personalised actions \
+        this person could take to have more great moments and fewer poor ones?
+
+        Each insight must be one sentence that names the pattern and explains why it matters. \
+        Do not simply restate or quote individual entries.
         """
 
         do {
