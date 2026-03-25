@@ -13,26 +13,22 @@ import StoreKit
 struct ContentView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.featureFlags) private var featureFlags
     @Environment(\.requestReview) private var requestReview
     
     @AppStorage("notificationsEnabled") private var notificationsEnabled: Bool = true
     @AppStorage("freezeHistory") private var freezeHistory: Bool = true
     @AppStorage("showStats") private var showStats: Bool = true
-    @AppStorage("lastReviewRequest") private var lastReviewRequest: Int = 0
-    @AppStorage("numberOfRequests") private var numberOfRequests: Int = 0
-    @AppStorage("backgroundImageData") private var backgroundImageData: Data?
     @AppStorage("reflectionReminder") private var reflectionReminder: Bool = true
     @AppStorage("reflectionReminderTime") private var reflectionReminderTime: Date?
     @AppStorage("theme") private var theme: String = "default"
     
+    @State private var reviewService = ReviewService()
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
     @State private var triggerScrollToToday: Bool = false
     @State private var isPresentingSettings: Bool = false
     @State private var isPresentingNewEntry: Bool = false
     @State private var isPresentingReflection: Bool = false
-    @State private var uiImage: UIImage?
     @State private var refreshView: Bool = false
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
@@ -52,26 +48,13 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
-                if let uiImage = uiImage {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(minWidth: 0, maxWidth: .infinity)
-                        .brightness(colorScheme == .dark ? -0.2 : 0.0)
-                        .ignoresSafeArea()
-                } else {
-                    Image(colorScheme == .dark ? "mountain-dark" : "mountain")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(minWidth: 0, maxWidth: .infinity)
-                        .brightness(colorScheme == .dark ? 0.0 : -0.1)
-                        .ignoresSafeArea()
-                }
+
+                BackgroundImageView()
 
                 ScrollView {
                     LazyVStack {
                         // The currently selected date
-                        dateView
+                        SelectedDateView(date: selectedEntry.date)
                             .padding(.horizontal)
                             .background(alignment: .bottom) {
                                 Rectangle()
@@ -97,7 +80,9 @@ struct ContentView: View {
                             .padding(.vertical)
                         
                         // The daily reflection
-                        reflectionView
+                        DailyReflectionCard(summary: selectedEntry.summary) {
+                            isPresentingReflection = true
+                        }
 
                         // The log entries for this day
                         LogEntriesView(day: selectedEntry)
@@ -169,10 +154,8 @@ struct ContentView: View {
                     }
                 }
                 .onChange(of: countLog) { old, new in
-                    if new > old && numberOfRequests < 3 && countLog > lastReviewRequest + (5 * (numberOfRequests + 1)) {
-                        presentReview()
-                        numberOfRequests += 1
-                        lastReviewRequest = countLog
+                    if new > old {
+                        reviewService.considerRequesting(countLog: countLog) { requestReview() }
                     }
                 }
                
@@ -209,15 +192,6 @@ struct ContentView: View {
                 Text("selectedEntry:\(DateFormatHelper.formatDate(selectedEntry.date))")
             )
 #endif  // DEBUG only for UI Tests
-        }
-        .onChange(of: backgroundImageData, initial: true) {
-            if let data = backgroundImageData {
-                if let uiImage = UIImage(data: data) {
-                    self.uiImage = uiImage
-                }
-            } else {
-                self.uiImage = nil
-            }
         }
         .onOpenURL { url in
             switch url.host() {
@@ -355,30 +329,6 @@ struct ContentView: View {
         }
     }
     
-    private func presentReview() {
-        Task {
-            // Delay for two seconds to avoid interrupting the person using the app.
-            try await Task.sleep(for: .seconds(2))
-            requestReview()
-        }
-    }
-    
-    private var dateView: some View {
-        HStack {
-            VStack(alignment: .center) {
-                Text(selectedEntry.date.formatted(.dateTime.weekday(.wide)))
-                Text(
-                    selectedEntry.date.formatted(
-                        .dateTime.day().month(.wide).year()
-                    )
-                )
-            }
-            .font(.system(.title, design: .serif).bold())
-            .foregroundStyle(.white.opacity(0.85))
-        }
-        .padding(.vertical)
-    }
-    
     private var settingsSheetStack: some View {
         NavigationStack {
             SettingsView()
@@ -398,69 +348,6 @@ struct ContentView: View {
         }
     }
     
-    @ViewBuilder private var reflectionView: some View {
-        if selectedEntry.summary.isEmpty {
-            if #available(iOS 26.0, *) {
-                Button(action: { isPresentingReflection = true }) {
-                    Text("Reflect Your Day")
-                        .foregroundStyle(.white)
-                        .font(.title3)
-                        .padding()
-                        .glassEffect(.clear, in: Capsule())
-
-                }
-                .buttonStyle(.plain)
-                .padding(.vertical)
-
-            } else {
-                Button(action: { isPresentingReflection = true }) {
-                    Text("Reflect Your Day")
-                        .padding(10)
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
-                        .font(.title3)
-                        .foregroundStyle(.white)
-                }
-                .buttonStyle(.plain)
-                .padding(.vertical)
-            }
-        } else {
-            if #available(iOS 26.0, *) {
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("Reflection")
-                            .font(.title3)
-                            .padding(.bottom, 5)
-                        Text(selectedEntry.summary)
-                        
-                    }
-                    .foregroundStyle(.white)
-                    .padding()
-                    Spacer()
-                }
-                .glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
-                .padding(.horizontal, 5)
-                .contentShape(Rectangle())
-                .onTapGesture(perform: { isPresentingReflection = true } )
-            } else {
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("Reflection")
-                            .font(.title3)
-                            .padding(.bottom, 5)
-                        Text(selectedEntry.summary)
-                        
-                    }
-                    .foregroundStyle(.white)
-                    .padding()
-                    Spacer()
-                }
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
-                .padding(.horizontal, 5)
-                .contentShape(Rectangle())
-                .onTapGesture(perform: { isPresentingReflection = true } )
-            }
-        }
-    }
 }
 
 
