@@ -75,7 +75,7 @@ struct InsightsView: View {
                 .disabled(isAnalyzing || allLogEntries.isEmpty)
             }
         }
-        if let insights, !isAnalyzing {
+        if insights != nil, !isAnalyzing {
             Text("Based on \(allLogEntries.count) log entries across \(allEntries.count) days")
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -124,26 +124,8 @@ struct InsightsView: View {
             return "[\(scoreLabel)] \(entry.log)"
         }.joined(separator: "\n")
 
-        let prompt = """
-        You are a personal wellbeing analyst. Below are journal entries scored from -2 (very bad) \
-        to +2 (very good). Each line: [score] text.
-
-        \(formatted)
-
-        Your task is to synthesise — not list — up to 3 insights per section:
-
-        greatMoments: What recurring themes, contexts, or conditions appear across the high-scoring \
-        entries (+1, +2)? Identify the underlying pattern, not individual entries.
-
-        poorMoments: What recurring themes, contexts, or conditions appear across the low-scoring \
-        entries (-1, -2)? Identify the underlying pattern, not individual entries.
-
-        actionableTips: Based on the patterns above, what are up to 3 specific, personalised actions \
-        this person could take to have more great moments and fewer poor ones?
-
-        Each insight must be one sentence that names the pattern and explains why it matters. \
-        Do not simply restate or quote individual entries.
-        """
+        let template = String(localized: "insights.analysisPrompt", bundle: .main)
+        let prompt = String(format: template, formatted)
 
         do {
             let session = LanguageModelSession()
