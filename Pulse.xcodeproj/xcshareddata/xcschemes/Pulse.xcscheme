@@ -41,6 +41,17 @@
                ReferencedContainer = "container:Pulse.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "2D40E6242F73FC3B0001D250"
+               BuildableName = "PulseTests.xctest"
+               BlueprintName = "PulseTests"
+               ReferencedContainer = "container:Pulse.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
