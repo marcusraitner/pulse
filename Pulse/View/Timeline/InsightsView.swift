@@ -22,16 +22,36 @@ struct PatternInsights {
     var actionableTips: [String]
 }
 
+private struct CachedInsights: Codable {
+    var greatMoments: [String]
+    var poorMoments: [String]
+    var actionableTips: [String]
+    var createdAt: Date
+}
+
+private let cachedInsightsKey = "patternInsightsCache"
+
 @available(iOS 26.0, *)
 struct InsightsView: View {
     @Query(sort: \DailyEntry.date) private var allEntries: [DailyEntry]
     @State private var insights: PatternInsights.PartiallyGenerated?
+    @State private var cachedInsights: CachedInsights?
     @State private var isAnalyzing: Bool = false
     @State private var errorMessage: String?
     @Environment(\.dismiss) private var dismiss
 
     private var allLogEntries: [DailyLogEntry] {
         allEntries.flatMap { $0.logEntries ?? [] }.sorted { $0.timestamp < $1.timestamp }
+    }
+
+    private var displayInsights: (greatMoments: [String], poorMoments: [String], actionableTips: [String])? {
+        if let live = insights {
+            return (live.greatMoments ?? [], live.poorMoments ?? [], live.actionableTips ?? [])
+        }
+        if let cached = cachedInsights {
+            return (cached.greatMoments, cached.poorMoments, cached.actionableTips)
+        }
+        return nil
     }
 
     var body: some View {
@@ -41,10 +61,10 @@ struct InsightsView: View {
                     Text(error)
                         .foregroundStyle(.red)
                 }
-            } else if let insights {
-                insightsSection(title: "What makes a great moment", items: insights.greatMoments ?? [], systemImage: "sun.max.fill", tint: .orange)
-                insightsSection(title: "What makes a poor moment", items: insights.poorMoments ?? [], systemImage: "cloud.rain.fill", tint: .blue)
-                insightsSection(title: "Actionable tips", items: insights.actionableTips ?? [], systemImage: "lightbulb.fill", tint: .yellow)
+            } else if let display = displayInsights {
+                insightsSection(title: "What makes a great moment", items: display.greatMoments, systemImage: "sun.max.fill", tint: .orange)
+                insightsSection(title: "What makes a poor moment", items: display.poorMoments, systemImage: "cloud.rain.fill", tint: .blue)
+                insightsSection(title: "Actionable tips", items: display.actionableTips, systemImage: "lightbulb.fill", tint: .yellow)
             } else {
                 Section {
                     HStack {
@@ -70,8 +90,28 @@ struct InsightsView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button(role: .confirm) { dismiss() }
             }
+            if displayInsights != nil, !isAnalyzing {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .destructive) {
+                        clearInsights()
+                    } label: {
+                        Label("Clear", systemImage: "trash")
+                    }
+                }
+            }
         }
-        if insights != nil, !isAnalyzing {
+        .onAppear {
+            if let data = UserDefaults.standard.data(forKey: cachedInsightsKey),
+               let decoded = try? JSONDecoder().decode(CachedInsights.self, from: data) {
+                cachedInsights = decoded
+            }
+        }
+        if let createdAt = cachedInsights?.createdAt, insights == nil, !isAnalyzing {
+            Text("Based on \(allLogEntries.count) entries · Generated \(createdAt.formatted(date: .abbreviated, time: .shortened))")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.bottom, 8)
+        } else if insights != nil, !isAnalyzing {
             Text("Based on \(allLogEntries.count) log entries across \(allEntries.count) days")
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -94,6 +134,12 @@ struct InsightsView: View {
             Label(title, systemImage: systemImage)
                 .foregroundStyle(tint)
         }
+    }
+
+    private func clearInsights() {
+        insights = nil
+        cachedInsights = nil
+        UserDefaults.standard.removeObject(forKey: cachedInsightsKey)
     }
 
     private func analyze() async {
@@ -122,6 +168,18 @@ struct InsightsView: View {
             let stream = session.streamResponse(to: prompt, generating: PatternInsights.self)
             for try await partial in stream {
                 insights = partial.content
+            }
+            if let final = insights {
+                let cached = CachedInsights(
+                    greatMoments: final.greatMoments ?? [],
+                    poorMoments: final.poorMoments ?? [],
+                    actionableTips: final.actionableTips ?? [],
+                    createdAt: Date()
+                )
+                if let data = try? JSONEncoder().encode(cached) {
+                    UserDefaults.standard.set(data, forKey: cachedInsightsKey)
+                }
+                cachedInsights = cached
             }
         } catch {
             errorMessage = "Analysis failed: \(error.localizedDescription)"
