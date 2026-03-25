@@ -27,6 +27,7 @@ private struct CachedInsights: Codable {
     var poorMoments: [String]
     var actionableTips: [String]
     var createdAt: Date
+    var windowDays: Int = 0 // 0 = all time; default preserves backward compatibility
 }
 
 private let cachedInsightsKey = "patternInsightsCache"
@@ -38,10 +39,17 @@ struct InsightsView: View {
     @State private var cachedInsights: CachedInsights?
     @State private var isAnalyzing: Bool = false
     @State private var errorMessage: String?
+    @State private var selectedDays: Int = 30
     @Environment(\.dismiss) private var dismiss
 
     private var allLogEntries: [DailyLogEntry] {
         allEntries.flatMap { $0.logEntries ?? [] }.sorted { $0.timestamp < $1.timestamp }
+    }
+
+    private var filteredLogEntries: [DailyLogEntry] {
+        guard selectedDays > 0 else { return allLogEntries }
+        let cutoff = Calendar.current.date(byAdding: .day, value: -selectedDays, to: .now) ?? .now
+        return allLogEntries.filter { $0.timestamp >= cutoff }
     }
 
     private var displayInsights: (greatMoments: [String], poorMoments: [String], actionableTips: [String])? {
@@ -54,8 +62,39 @@ struct InsightsView: View {
         return nil
     }
 
+    private func windowLabel(_ days: Int) -> String {
+        days > 0 ? String(localized: "Last \(days) days") : String(localized: "All time")
+    }
+
     var body: some View {
         List {
+            Section {
+                Picker("Time range", selection: $selectedDays) {
+                    Text("Last 7 days").tag(7)
+                    Text("Last 14 days").tag(14)
+                    Text("Last 30 days").tag(30)
+                    Text("Last 90 days").tag(90)
+                    Text("All time").tag(0)
+                }
+                .disabled(isAnalyzing)
+
+                HStack {
+                    Spacer()
+                    if isAnalyzing {
+                        ProgressView("Analyzing your entries…")
+                    } else {
+                        Button {
+                            Task { await analyze() }
+                        } label: {
+                            Label("Analyze", systemImage: "sparkles")
+                        }
+                        .disabled(filteredLogEntries.isEmpty)
+                    }
+                    Spacer()
+                }
+                .padding(.vertical, 8)
+            }
+
             if let error = errorMessage {
                 Section {
                     Text(error)
@@ -65,24 +104,6 @@ struct InsightsView: View {
                 insightsSection(title: "What makes a great moment", items: display.greatMoments, systemImage: "sun.max.fill", tint: .orange)
                 insightsSection(title: "What makes a poor moment", items: display.poorMoments, systemImage: "cloud.rain.fill", tint: .blue)
                 insightsSection(title: "Actionable tips", items: display.actionableTips, systemImage: "lightbulb.fill", tint: .yellow)
-            } else {
-                Section {
-                    HStack {
-                        Spacer()
-                        if isAnalyzing {
-                            ProgressView("Analyzing your entries…")
-                        } else {
-                            Button {
-                                Task { await analyze() }
-                            } label: {
-                                Label("Analyze", systemImage: "sparkles")
-                            }
-                            .disabled(allLogEntries.isEmpty)
-                        }
-                        Spacer()
-                    }
-                    .padding(.vertical, 24)
-                }
             }
         }
         .navigationTitle("Insights")
@@ -104,15 +125,16 @@ struct InsightsView: View {
             if let data = UserDefaults.standard.data(forKey: cachedInsightsKey),
                let decoded = try? JSONDecoder().decode(CachedInsights.self, from: data) {
                 cachedInsights = decoded
+                selectedDays = decoded.windowDays
             }
         }
         if let createdAt = cachedInsights?.createdAt, insights == nil, !isAnalyzing {
-            Text("Based on \(allLogEntries.count) entries · Generated \(createdAt.formatted(date: .abbreviated, time: .shortened))")
+            Text("Based on \(filteredLogEntries.count) entries · \(windowLabel(cachedInsights?.windowDays ?? selectedDays)) · Generated \(createdAt.formatted(date: .abbreviated, time: .shortened))")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.bottom, 8)
         } else if insights != nil, !isAnalyzing {
-            Text("Based on \(allLogEntries.count) log entries across \(allEntries.count) days")
+            Text("Based on \(filteredLogEntries.count) entries · \(windowLabel(selectedDays))")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.bottom, 8)
@@ -154,7 +176,7 @@ struct InsightsView: View {
             return
         }
 
-        let formatted = allLogEntries.map { entry in
+        let formatted = filteredLogEntries.map { entry in
             let scoreLabel = entry.score > 0 ? "+\(entry.score)" : "\(entry.score)"
             return "[\(scoreLabel)] \(entry.log)"
         }.joined(separator: "\n")
@@ -174,7 +196,8 @@ struct InsightsView: View {
                     greatMoments: final.greatMoments ?? [],
                     poorMoments: final.poorMoments ?? [],
                     actionableTips: final.actionableTips ?? [],
-                    createdAt: Date()
+                    createdAt: Date(),
+                    windowDays: selectedDays
                 )
                 if let data = try? JSONEncoder().encode(cached) {
                     UserDefaults.standard.set(data, forKey: cachedInsightsKey)
