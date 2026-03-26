@@ -129,12 +129,15 @@ struct InsightsView: View {
             }
         }
         if let createdAt = cachedInsights?.createdAt, insights == nil, !isAnalyzing {
-            Text("Based on \(filteredLogEntries.count) entries · \(windowLabel(cachedInsights?.windowDays ?? selectedDays)) · Generated \(createdAt.formatted(date: .abbreviated, time: .shortened))")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .padding(.bottom, 8)
+            VStack(spacing: 2) {
+                Text("\(filteredLogEntries.count) entries · \(windowLabel(cachedInsights?.windowDays ?? selectedDays))")
+                Text("Generated \(createdAt.formatted(date: .abbreviated, time: .shortened))")
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .padding(.bottom, 8)
         } else if insights != nil, !isAnalyzing {
-            Text("Based on \(filteredLogEntries.count) entries · \(windowLabel(selectedDays))")
+            Text("\(filteredLogEntries.count) entries · \(windowLabel(selectedDays))")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.bottom, 8)
