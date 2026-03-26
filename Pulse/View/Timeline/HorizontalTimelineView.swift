@@ -19,7 +19,8 @@ struct HorizontalTimelineView: View {
     @State private var containerWidth: CGFloat = 0.0
     @AppStorage("theme") var themeName: String = "default"
     @State private var isPresentingInsights: Bool = false
-    
+    @Environment(\.featureFlags) private var featureFlags
+
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "TimeLineView")
 
     var body: some View {
@@ -105,7 +106,8 @@ struct HorizontalTimelineView: View {
             }
         }
         .sheet(isPresented: $isPresentingInsights) {
-            if #available(iOS 26.0, *) {
+            // #available required by compiler: InsightsView is @available(iOS 26, *)
+            if featureFlags.iOS26, #available(iOS 26, *) {
                 NavigationStack {
                     InsightsView()
                 }
@@ -113,7 +115,7 @@ struct HorizontalTimelineView: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                if #available(iOS 26.0, *) {
+                if featureFlags.iOS26 {
                     Button {
                         isPresentingInsights = true
                     } label: {
