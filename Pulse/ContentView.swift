@@ -28,6 +28,8 @@ struct ContentView: View {
     @State private var triggerScrollToToday: Bool = false
     @State private var isPresentingSettings: Bool = false
     @State private var isPresentingNewEntry: Bool = false
+    @State private var isPresentingEditEntry: Bool = false
+    @State private var editingLogEntry = DailyLogEntry(timestamp: .now, log: "", score: 0)
     @State private var isPresentingReflection: Bool = false
     @State private var refreshView: Bool = false
     
@@ -85,10 +87,14 @@ struct ContentView: View {
                         }
 
                         // The log entries for this day
-                        LogEntriesView(day: selectedEntry)
-                            .padding(.horizontal, 5)
+                        LogEntriesView(day: selectedEntry) { entry in
+                            editingLogEntry = entry
+                            isPresentingEditEntry = true
+                        }
+                        .padding(.horizontal, 5)
                     }
                 }
+                .ignoresSafeArea(.all, edges: .bottom)
                 .navigationBarTitleDisplayMode(.inline)
                 .sheet(isPresented: $isPresentingSettings,
                     onDismiss: setNotifications) {
@@ -97,21 +103,22 @@ struct ContentView: View {
                 .sheet(isPresented: $isPresentingNewEntry) {
                     NavigationStack {
                         LogEntrySheet() { editedEntry in
-                                
+
                             if selectedEntry.logEntries == nil {
                                 selectedEntry.logEntries = []
                             }
                             selectedEntry.logEntries?.append(editedEntry)
-                            
+
                             do {
                                 try context.save()
                             } catch {
                                 logger.error("Failed saving edited entry: \(String(describing: error))")
                             }
-                            
+
                             isPresentingNewEntry = false
                         }
                     }
+                    .presentationDetents([.large])
                 }
                 .sheet(isPresented: $isPresentingReflection, onDismiss: { isPresentingReflection = false } ) {
                     NavigationStack {
@@ -172,6 +179,21 @@ struct ContentView: View {
                     .padding(.trailing, 20)
                 }
             }
+            .sheet(isPresented: $isPresentingEditEntry) {
+                NavigationStack {
+                    LogEntrySheet(entry: $editingLogEntry, isEntryNew: .constant(false)) { editedEntry in
+                        editingLogEntry.log = editedEntry.log
+                        editingLogEntry.score = editedEntry.score
+                        do {
+                            try context.save()
+                        } catch {
+                            logger.error("Failed saving edited entry: \(String(describing: error))")
+                        }
+                        isPresentingEditEntry = false
+                    }
+                }
+                .presentationDetents([.large])
+            }
 #if DEBUG
             // Expose an accessibility identifier
             .accessibilityIdentifier("dateView")
@@ -181,6 +203,7 @@ struct ContentView: View {
             )
 #endif  // DEBUG only for UI Tests
         }
+        .ignoresSafeArea(.keyboard)
         .onOpenURL { url in
             switch url.host() {
             case "log":

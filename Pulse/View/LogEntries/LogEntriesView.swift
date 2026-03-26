@@ -11,60 +11,24 @@ import OSLog
 
 struct LogEntriesView: View {
     @Bindable var day: DailyEntry
-    @State private var logEntry = DailyLogEntry(timestamp: .now, log: "", score: 0)
-    @State private var isPresenting: Bool = false
-    @State private var isEntryNew: Bool = true
     @AppStorage("theme") var themeName: String = "default"
-    @Environment(\.featureFlags) private var featureFlags
-    @Environment(\.modelContext) private var context
-    
-    private let logger = Logger(subsystem: "de.raitner.pulse", category: "LogEntriesView")
-    
+
+    var onEntryTapped: (DailyLogEntry) -> Void
+
     var body: some View {
-        NavigationStack {
-            VStack {
-                
-                let logEntries = day.logEntries?.sorted(by: {
-                    $0.timestamp < $1.timestamp
-                }) ?? []
-                    
-                ForEach(logEntries) { entry in
-                    LogEntryText(logEntry: entry)
-                        .padding(.vertical, 15)
-                        .padding(.horizontal)
-                        .glassTintedCard(color: ScoreStyleHelper.color(for: entry.score, themeName: themeName))
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            logEntry = entry
-                            isEntryNew = false
-                            isPresenting = true
-                        }
+        let logEntries = day.logEntries?.sorted(by: {
+            $0.timestamp < $1.timestamp
+        }) ?? []
+        
+        ForEach(logEntries) { entry in
+            LogEntryText(logEntry: entry)
+                .padding(.vertical, 15)
+                .padding(.horizontal)
+                .glassTintedCard(color: ScoreStyleHelper.color(for: entry.score, themeName: themeName))
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    onEntryTapped(entry)
                 }
-            }
-            .sheet(isPresented: $isPresenting) {
-                NavigationStack {
-                    LogEntrySheet(entry: $logEntry, isEntryNew: $isEntryNew) { editedEntry in
-                        // Only commit changes here when the user taps Submit in the sheet
-                        if isEntryNew {
-                            // Append to the day's entries if creating new
-                            if day.logEntries == nil {
-                                day.logEntries = []
-                            }
-                            day.logEntries?.append(editedEntry)
-                        } else {
-                            logEntry.log = editedEntry.log
-                            logEntry.score = editedEntry.score
-                        }
-                        do {
-                            try context.save()
-                        } catch {
-                            logger.error("Failed saving edited entry: \(String(describing: error))")
-                        }
-                        isPresenting = false
-                    }
-                }
-                
-            }
         }
     }
 }
@@ -75,7 +39,7 @@ struct LogEntriesViewPreview: View {
 
     var body: some View {
         if let entry = entries.first {
-            LogEntriesView(day: entry)
+            LogEntriesView(day: entry) { _ in }
         } else {
             Text("No sample data available")
                 .padding()

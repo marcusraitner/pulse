@@ -135,7 +135,7 @@ struct InsightsView: View {
             }
             .font(.caption)
             .foregroundStyle(.secondary)
-            .padding(.bottom, 8)
+            .padding(.vertical, 8)
         } else if insights != nil, !isAnalyzing {
             Text("\(filteredLogEntries.count) entries · \(windowLabel(selectedDays))")
                 .font(.caption)
