@@ -161,27 +161,15 @@ struct ContentView: View {
                
                 // The Add Button
                 if Calendar.current.isDateInToday(selectedEntry.date) || !freezeHistory {
-                    if #available(iOS 26.0, *) {
-                        Button(action: { isPresentingNewEntry = true } ) {
-                            Image(systemName: "plus")
-                                .font(.largeTitle)
-                                .padding()
-                                .glassEffect(.clear, in: Circle())
-                                .foregroundStyle(.white)
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.trailing, 20)
-                    } else {
-                        Button(action: { isPresentingNewEntry = true } ) {
-                            Image(systemName: "plus")
-                                .font(.largeTitle)
-                                .padding()
-                                .background(.regularMaterial, in: Circle())
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.trailing, 20)
-                        .padding(.bottom, 20)
+                    Button(action: { isPresentingNewEntry = true }) {
+                        Image(systemName: "plus")
+                            .font(.largeTitle)
+                            .padding()
+                            .glassCircle()
+                            .foregroundStyle(.white)
                     }
+                    .buttonStyle(.plain)
+                    .padding(.trailing, 20)
                 }
             }
 #if DEBUG
@@ -334,14 +322,8 @@ struct ContentView: View {
             SettingsView()
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
-                        if #available(iOS 26, *) {
-                            Button(role: .confirm) {
-                                isPresentingSettings = false
-                            }
-                        } else {
-                            Button("Close") {
-                                isPresentingSettings = false
-                            }
+                        Compat.confirmButton(String(localized: "Close")) {
+                            isPresentingSettings = false
                         }
                     }
                 }

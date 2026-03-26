@@ -29,30 +29,16 @@ struct LogEntriesView: View {
                 }) ?? []
                     
                 ForEach(logEntries) { entry in
-                    if #available(iOS 26.0, *) {
-                        LogEntryText(logEntry: entry)
-                            .padding(.vertical, 15)
-                            .padding(.horizontal)
-                            .glassEffect(.clear.tint(ScoreStyleHelper.color(for: entry.score, themeName: themeName)).interactive(), in: RoundedRectangle(cornerRadius: 10))
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                logEntry = entry
-                                isEntryNew = false
-                                isPresenting = true
-                            }
-                    } else {
-                        LogEntryText(logEntry: entry)
-                            .padding(.vertical, 15)
-                            .padding(.horizontal)
-                            .background(ScoreStyleHelper.color(for: entry.score, themeName: themeName)
-                                .opacity(0.85), in: RoundedRectangle(cornerRadius: 10))
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                logEntry = entry
-                                isEntryNew = false
-                                isPresenting = true
-                            }
-                    }
+                    LogEntryText(logEntry: entry)
+                        .padding(.vertical, 15)
+                        .padding(.horizontal)
+                        .glassTintedCard(color: ScoreStyleHelper.color(for: entry.score, themeName: themeName))
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            logEntry = entry
+                            isEntryNew = false
+                            isPresenting = true
+                        }
                 }
             }
             .sheet(isPresented: $isPresenting) {

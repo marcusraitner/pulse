@@ -86,29 +86,14 @@ struct DailyReflectionSheet: View {
         }
         .navigationTitle("\(day.date.formatted(.dateTime.weekday(.wide).day().month(.defaultDigits).year()))")
         .toolbar {
-            ToolbarItem (placement: .confirmationAction) {
-                if #available(iOS 26, *) {
-                    Button(role: .confirm) {
-                        day.summary = reflection
-                        dismiss()
-                    }
-                } else {
-                    Button("Save") {
-                        day.summary = reflection
-                        dismiss()
-                    }
+            ToolbarItem(placement: .confirmationAction) {
+                Compat.confirmButton(String(localized: "Save")) {
+                    day.summary = reflection
+                    dismiss()
                 }
             }
-            ToolbarItem (placement: .cancellationAction) {
-                if #available(iOS 26, *) {
-                    Button(role: .close) {
-                        dismiss()
-                    }
-                } else {
-                    Button("Cancel", role: .cancel) {
-                        dismiss()
-                    }
-                }
+            ToolbarItem(placement: .cancellationAction) {
+                Compat.closeButton { dismiss() }
             }
         }
         .task {

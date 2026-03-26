@@ -51,26 +51,18 @@ struct LogEntrySheet: View {
     private func setItem(item: MKMapItem) -> Void {
         var coordinate: CLLocationCoordinate2D = CLLocationCoordinate2D()
         
-        if #available(iOS 26.0, *) {
-            coordinate = item.location.coordinate
-        } else {
-            coordinate = item.placemark.coordinate
-        }
-        
+        coordinate = Compat.coordinate(from: item)
+
         newEntry.latitude = coordinate.latitude
         newEntry.longitude = coordinate.longitude
-        
+
         let region = MKCoordinateRegion(
             center: coordinate,
             span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
         )
         mapPosition = .region(region)
 
-        if #available(iOS 26.0, *) {
-            newEntry.address = item.addressRepresentations?.fullAddress(includingRegion: false, singleLine: true) ?? "Unknown"
-        } else {
-            newEntry.address = item.placemark.name ?? "Unknown"
-        }
+        newEntry.address = Compat.address(from: item)
     }
     
     var body: some View {
@@ -235,33 +227,16 @@ struct LogEntrySheet: View {
         }
         .navigationTitle(isEntryNew ? "New Moment" : isEntryEditable ? "Edit Moment" : "View Moment")
         .toolbar {
-            ToolbarItem (placement: .confirmationAction) {
-                if #available(iOS 26, *) {
-                    Button(role: .confirm) {
-                        saveEntry(newEntry)
-                        dismiss()
-                    }
-                    .disabled(newEntry.log.isEmpty)
-                } else {
-                    Button("Save") {
-                        saveEntry(newEntry)
-                        dismiss()
-                    }
-                    .disabled(newEntry.log.isEmpty)
+            ToolbarItem(placement: .confirmationAction) {
+                Compat.confirmButton(String(localized: "Save")) {
+                    saveEntry(newEntry)
+                    dismiss()
                 }
+                .disabled(newEntry.log.isEmpty)
             }
-            ToolbarItem (placement: .cancellationAction) {
-                if #available(iOS 26, *) {
-                    Button(role: .close) {
-                        dismiss()
-                    }
-                } else {
-                    Button("Cancel", role: .cancel) {
-                        dismiss()
-                    }
-                }
+            ToolbarItem(placement: .cancellationAction) {
+                Compat.closeButton { dismiss() }
             }
-
         }
     }
 }

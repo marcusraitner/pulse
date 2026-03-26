@@ -60,38 +60,13 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         
         guard let location = location else { return }
         
-        if #available(iOS 26.0, *) {
-            // Bridge into async context from delegate callback
-            Task { [weak self] in
-                guard let self else { return }
-                if let request = MKReverseGeocodingRequest(location: location) {
-                    do {
-                        let items = try await request.mapItems
-                        // Publish on main actor to update @Published safely
-                        await MainActor.run {
-                            self.mapItems = items
-                        }
-                    } catch {
-                        print("Error reverse geocoding location: \(error)")
-                    }
-                }
-            }
-        } else {
-            // Fallback on earlier versions: use CLGeocoder
-            let geocoder = CLGeocoder()
-            geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, error in
-                guard let self else { return }
-                if let error = error {
-                    print("Error reverse geocoding location: \(error)")
-                    return
-                }
-                let items: [MKMapItem] = (placemarks ?? []).map { placemark in
-                    let mkPlacemark = MKPlacemark(placemark: placemark)
-                    return MKMapItem(placemark: mkPlacemark)
-                }
-                DispatchQueue.main.async {
-                    self.mapItems = items
-                }
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                let items = try await Compat.reverseGeocode(location: location)
+                await MainActor.run { self.mapItems = items }
+            } catch {
+                print("Error reverse geocoding location: \(error)")
             }
         }
     }
