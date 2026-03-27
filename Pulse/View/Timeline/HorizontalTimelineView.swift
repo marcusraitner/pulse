@@ -101,7 +101,7 @@ struct HorizontalTimelineView: View {
             selectedEntry = newSelected
             logger.trace("New selected date: \(selectedEntry.date)")
         }
-        .onChange(of: allEntries) {
+        .onChange(of: allEntries, initial: true) {
             entriesByDate = Dictionary(uniqueKeysWithValues: allEntries.map { ($0.date, $0 ) } )
         }
         .sheet(isPresented: $isPresentingInsights) {
