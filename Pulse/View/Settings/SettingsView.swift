@@ -43,18 +43,12 @@ struct SettingsView: View {
         return Image(uiImage: uiImage)
     }
     
-    private var countDays: Int {
-        var descriptor = FetchDescriptor<DailyEntry>(predicate: #Predicate { _ in true })
-        descriptor.includePendingChanges = true
-        return (try? context.fetchCount(descriptor)) ?? 0
-    }
+    @Query private var allEntries: [DailyEntry]
+    @Query private var allLogs: [DailyLogEntry]
     
-    private var countLogs: Int {
-        var descriptor = FetchDescriptor<DailyLogEntry>(predicate: #Predicate { _ in true })
-        descriptor.includePendingChanges = true
-        return (try? context.fetchCount(descriptor)) ?? 0
-    }
-    
+    private var countDays: Int { allEntries.count }
+    private var countLogs: Int { allLogs.count }
+
     var body: some View {
         Form {
             //General Section
@@ -317,12 +311,12 @@ struct SettingsView: View {
         }
         .navigationTitle("Settings")
         .onChange(of: notificationTimes) {
-            UserDefaults.standard.set(notificationTimes, forKey: "notificationTimes")
+            UserDefaults.standard.set(notificationTimes, forKey: AppStorageKeys.notificationTimes)
         }
         .task {
             let settings = await UNUserNotificationCenter.current().notificationSettings()
             notificationsAuthorized = settings.authorizationStatus == .authorized
-            notificationTimes = UserDefaults.standard.array(forKey: "notificationTimes") as? [Date] ?? []
+            notificationTimes = UserDefaults.standard.array(forKey: AppStorageKeys.notificationTimes) as? [Date] ?? []
         }
     }
 }
@@ -333,11 +327,11 @@ struct ListLabelIcon: ViewModifier {
     let iconSize: CGFloat
     let cornerRadius: CGFloat
     
-    init(color: Color, iconFrame: CGFloat, iconSize: CGFloat, cornerRaduis: CGFloat) {
+    init(color: Color, iconFrame: CGFloat, iconSize: CGFloat, cornerRadius: CGFloat) {
         self.color = color
         self.iconFrame = iconFrame
         self.iconSize = iconSize
-        self.cornerRadius = cornerRaduis
+        self.cornerRadius = cornerRadius
     }
     
     func body(content: Content) -> some View {
@@ -351,11 +345,11 @@ struct ListLabelIcon: ViewModifier {
 
 extension View {
     func listLabelIcon(_ color: Color) -> some View {
-        modifier(ListLabelIcon(color: color, iconFrame: 30, iconSize: 12, cornerRaduis: 8))
+        modifier(ListLabelIcon(color: color, iconFrame: 30, iconSize: 12, cornerRadius: 8))
     }
     
     func titleLabelIcon(_ color: Color) -> some View {
-        modifier(ListLabelIcon(color: color, iconFrame: 55, iconSize: 32, cornerRaduis: 16))
+        modifier(ListLabelIcon(color: color, iconFrame: 55, iconSize: 32, cornerRadius: 16))
     }
 }
 

@@ -16,6 +16,13 @@ struct ContentView: View {
     @Environment(\.featureFlags) private var featureFlags
     @Environment(\.requestReview) private var requestReview
     
+    @Query private var allEntries: [DailyEntry]
+    @Query private var allLogs: [DailyLogEntry]
+    
+    private var countDays: Int { allEntries.count }
+    private var countLogs: Int { allLogs.count }
+
+    
     @AppStorage(AppStorageKeys.notificationsEnabled) private var notificationsEnabled: Bool = true
     @AppStorage(AppStorageKeys.freezeHistory) private var freezeHistory: Bool = true
     @AppStorage(AppStorageKeys.showStats) private var showStats: Bool = true
@@ -34,17 +41,6 @@ struct ContentView: View {
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
 
-    private var countDays: Int {
-        var descriptor = FetchDescriptor<DailyEntry>(predicate: #Predicate { _ in true })
-        descriptor.includePendingChanges = true
-        return (try? context.fetchCount(descriptor)) ?? 0
-    }
-    
-    private var countLog: Int {
-        var descriptor = FetchDescriptor<DailyLogEntry>(predicate: #Predicate { _ in true })
-        descriptor.includePendingChanges = true
-        return (try? context.fetchCount(descriptor)) ?? 0
-    }
     
     var body: some View {
         NavigationStack {
@@ -126,7 +122,7 @@ struct ContentView: View {
                                 }
                                 VStack {
                                     Image(systemName: "list.bullet.rectangle")
-                                    Text("\(countLog)")
+                                    Text("\(countLogs)")
                                 }
                                 .padding(.leading, 4)
                             }
@@ -145,9 +141,9 @@ struct ContentView: View {
                         updateToday()
                     }
                 }
-                .onChange(of: countLog) { old, new in
+                .onChange(of: countLogs) { old, new in
                     if new > old {
-                        reviewService.considerRequesting(countLog: countLog) { requestReview() }
+                        reviewService.considerRequesting(countLog: countLogs) { requestReview() }
                     }
                 }
                

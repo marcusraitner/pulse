@@ -15,6 +15,7 @@ struct HorizontalTimelineView: View {
     @Binding var selectedEntry: DailyEntry
     @Binding var scrollToToday: Bool
 
+    @State private var entriesByDate: [Date: DailyEntry] = [:]
     @State private var position: ScrollPosition = .init(idType: Date.self)
     @State private var containerWidth: CGFloat = 0.0
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "default"
@@ -78,32 +79,30 @@ struct HorizontalTimelineView: View {
                     .frame(width: 10, height: 10)
                     .rotationEffect(Angle(degrees: 180))
                     .offset(y: -totalHeight * 0.5 - 15)
-
-//                RoundedRectangle(cornerRadius: 4)
-//                    .stroke(style: StrokeStyle(lineWidth: 1))
-//                    .frame(width: barWidth + 3, height: totalHeight + 3)
                 Rectangle()
                     .frame(width: 1, height: totalHeight + 12)
                     .foregroundStyle(.white.opacity(1))
-//                EquilateralTriangle()
-//                    .frame(width: 10, height: 10)
-//                    .offset(y: totalHeight * 0.5 + 10)
             }
             .foregroundStyle(.white.opacity(1))
         }
         .onChange(of: position) { _, new in
             // set selectedEntry on scroll pos change
             
-            if let date: Date = new.viewID(type: Date.self) {
-                if let newSelected = allEntries.first(where: { $0.date == date }) {
-                    selectedEntry = newSelected
-                    logger.trace("New selected date: \(selectedEntry.date)")
-                } else {
-                    logger.warning("Could not find entry for date \(date)")
-                }
-            } else {
+            guard let date = new.viewID(type: Date.self) else {
                 logger.warning("Could not find date in scroll position")
+                return
             }
+            
+            guard let newSelected = entriesByDate[date] else {
+                logger.warning("Could not find entry for date \(date)")
+                return
+            }
+            
+            selectedEntry = newSelected
+            logger.trace("New selected date: \(selectedEntry.date)")
+        }
+        .onChange(of: allEntries) {
+            entriesByDate = Dictionary(uniqueKeysWithValues: allEntries.map { ($0.date, $0 ) } )
         }
         .sheet(isPresented: $isPresentingInsights) {
             // #available required by compiler: InsightsView is @available(iOS 26, *)
