@@ -24,7 +24,7 @@ struct LogEntriesView: View {
             LogEntryText(logEntry: entry)
                 .padding(.vertical, 15)
                 .padding(.horizontal)
-                .glassTintedCard(color: ScoreStyleHelper.color(for: entry.score, themeName: themeName))
+                .glassTintedCard(color: Theme.named(themeName).color(for: entry.score))
                 .contentShape(Rectangle())
                 .onTapGesture {
                     onEntryTapped(entry)

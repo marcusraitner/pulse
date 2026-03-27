@@ -28,7 +28,6 @@ struct ContentView: View {
     @AppStorage(AppStorageKeys.showStats) private var showStats: Bool = true
     @AppStorage(AppStorageKeys.reflectionReminder) private var reflectionReminder: Bool = true
     @AppStorage(AppStorageKeys.reflectionReminderTime) private var reflectionReminderTime: Date?
-    @AppStorage(AppStorageKeys.theme) private var theme: String = "default"
     
     @State private var reviewService = ReviewService()
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)

@@ -18,8 +18,10 @@ struct HorizontalTimelineView: View {
     @State private var entriesByDate: [Date: DailyEntry] = [:]
     @State private var position: ScrollPosition = .init(idType: Date.self)
     @State private var containerWidth: CGFloat = 0.0
-    @AppStorage(AppStorageKeys.theme) private var themeName: String = "default"
     @State private var isPresentingInsights: Bool = false
+
+    @AppStorage(AppStorageKeys.theme) private var themeName: String = "default"
+
     @Environment(\.featureFlags) private var featureFlags
 
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "TimeLineView")
@@ -41,7 +43,7 @@ struct HorizontalTimelineView: View {
                         .frame(width: barWidth, height: totalHeight)
                         .overlay {
                             RoundedRectangle(cornerRadius: 4)
-                                .fill(ScoreStyleHelper.gradient(for: avg, themeName: themeName))
+                                .fill(Theme.named(themeName).gradient(for: avg))
                                 .frame(width: barWidth, height: barHeight)
                                 .offset(y: yOffset)
                         }

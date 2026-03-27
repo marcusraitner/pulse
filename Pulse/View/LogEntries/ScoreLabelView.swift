@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ScoreLabelView: View {
+    @AppStorage(AppStorageKeys.theme) private var themeName: String = "default"
+    
     var score: Int
     var size: CGFloat = 35
     var radius: CGFloat = 4
@@ -16,7 +18,7 @@ struct ScoreLabelView: View {
     var body: some View {
         Text("\(score)")
             .frame(width: size, height: size)
-            .glassScore(color: ScoreStyleHelper.color(for: score), opacity: opacity, cornerRadius: radius)
+            .glassScore(color: Theme.named(themeName).color(for: score), opacity: opacity, cornerRadius: radius)
             .foregroundStyle(.primary)
     }
 }

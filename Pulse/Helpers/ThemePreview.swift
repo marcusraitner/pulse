@@ -8,36 +8,36 @@
 import SwiftUI
 
 struct ThemePreview: View {
-    var theme: String
+    var theme: Theme
     private var size: CGFloat = 20
     
-    init(_ theme: String) {
+    init(_ theme: Theme) {
         self.theme = theme
     }
     
     var body: some View {
         HStack(spacing: 2) {
-            Text("\(theme.capitalized)")
+            Text("\(theme.name)")
             Spacer()
             RoundedRectangle(cornerRadius: 4)
-                .fill(Color("\(theme)/minus2"))
+                .fill(theme.minus2)
                 .frame(width: size, height: size)
             RoundedRectangle(cornerRadius: 4)
-                .fill(Color("\(theme)/minus1"))
+                .fill(theme.minus1)
                 .frame(width: size, height: size)
             RoundedRectangle(cornerRadius: 4)
-                .fill(Color("\(theme)/neutral"))
+                .fill(theme.neutral)
                 .frame(width: size, height: size)
             RoundedRectangle(cornerRadius: 4)
-                .fill(Color("\(theme)/plus1"))
+                .fill(theme.plus1)
                 .frame(width: size, height: size)
             RoundedRectangle(cornerRadius: 4)
-                .fill(Color("\(theme)/plus2"))
+                .fill(theme.plus2)
                 .frame(width: size, height: size)
         }
     }
 }
 
 #Preview {
-    ThemePreview("default")
+    ThemePreview(Theme.default)
 }

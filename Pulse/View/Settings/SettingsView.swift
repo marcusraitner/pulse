@@ -21,7 +21,7 @@ struct SettingsView: View {
     @AppStorage(AppStorageKeys.reflectionReminderTime) private var reflectionReminderTime: Date =
         Calendar.current.date(bySetting: .hour, value: 20, of: .now) ?? Date.now
     @AppStorage(AppStorageKeys.backgroundImageData) private var backgroundImageData: Data?
-    @AppStorage(AppStorageKeys.theme) private var theme: String = "default"
+    @AppStorage(AppStorageKeys.theme) private var themeName: String = "default"
     
     @State private var backgroundImageSelection: PhotosPickerItem?
     @State private var notificationTimes: [Date] = []
@@ -100,13 +100,11 @@ struct SettingsView: View {
                             Text("Customize the overall appearance here.")
                                 .foregroundStyle(.secondary)
                         }
-                        Picker(selection: $theme) {
-                            ThemePreview("default")
-                                .tag("default")
-                            ThemePreview("sea")
-                                .tag("sea")
-                            ThemePreview("tropical")
-                                .tag("tropical")
+                        Picker(selection: $themeName) {
+                            ForEach(Theme.builtIn) { theme in
+                                ThemePreview(theme)
+                                    .tag(theme.id)
+                            }
                         } label: {
                             Text("Theme: ")
                         }
