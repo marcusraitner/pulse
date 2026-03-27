@@ -24,7 +24,7 @@ struct LogEntrySheet: View {
     @State private var isPresentingConfirm = false
     @State private var storeLocations: Bool = false
 
-    @AppStorage("freezeHistory") private var freezeHistory: Bool = true
+    @AppStorage(AppStorageKeys.freezeHistory) private var freezeHistory: Bool = true
 
     private var isEntryEditable: Bool {
         !freezeHistory || Calendar.current.isDateInToday(entry.timestamp)
@@ -203,11 +203,7 @@ struct LogEntrySheet: View {
                                             titleVisibility: .visible) {
                             Button("Delete", role: .destructive) {
                                 context.delete(entry)
-                                do {
-                                    try context.save()
-                                } catch {
-                                    logger.error("Failed saving deleted entry: \(String(describing: error))")
-                                }
+                                context.saveOrLog("Failure saving deleted entry", logger: logger)
                                 dismiss()
                             }
                         } message: {

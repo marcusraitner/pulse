@@ -16,12 +16,12 @@ struct ContentView: View {
     @Environment(\.featureFlags) private var featureFlags
     @Environment(\.requestReview) private var requestReview
     
-    @AppStorage("notificationsEnabled") private var notificationsEnabled: Bool = true
-    @AppStorage("freezeHistory") private var freezeHistory: Bool = true
-    @AppStorage("showStats") private var showStats: Bool = true
-    @AppStorage("reflectionReminder") private var reflectionReminder: Bool = true
-    @AppStorage("reflectionReminderTime") private var reflectionReminderTime: Date?
-    @AppStorage("theme") private var theme: String = "default"
+    @AppStorage(AppStorageKeys.notificationsEnabled) private var notificationsEnabled: Bool = true
+    @AppStorage(AppStorageKeys.freezeHistory) private var freezeHistory: Bool = true
+    @AppStorage(AppStorageKeys.showStats) private var showStats: Bool = true
+    @AppStorage(AppStorageKeys.reflectionReminder) private var reflectionReminder: Bool = true
+    @AppStorage(AppStorageKeys.reflectionReminderTime) private var reflectionReminderTime: Date?
+    @AppStorage(AppStorageKeys.theme) private var theme: String = "default"
     
     @State private var reviewService = ReviewService()
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
@@ -31,7 +31,6 @@ struct ContentView: View {
     @State private var isPresentingEditEntry: Bool = false
     @State private var editingLogEntry = DailyLogEntry(timestamp: .now, log: "", score: 0)
     @State private var isPresentingReflection: Bool = false
-    @State private var refreshView: Bool = false
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
 
@@ -68,11 +67,7 @@ struct ContentView: View {
                         if featureFlags.adminEnabled {
                             Button("Delete Entry", systemImage: "trash") {
                                 context.delete(selectedEntry)
-                                do {
-                                    try context.save()
-                                } catch {
-                                    logger.error("Failed saving deleted entry: \(String(describing: error))")
-                                }
+                                context.saveOrLog("Failure saving deleted entry", logger: logger)
                             }
                             .tint(.white)
                         }
@@ -97,30 +92,20 @@ struct ContentView: View {
                 .ignoresSafeArea(.all, edges: .bottom)
                 .navigationBarTitleDisplayMode(.inline)
                 .sheet(isPresented: $isPresentingSettings,
-                    onDismiss: setNotifications) {
+                       onDismiss: setNotifications) {
                     settingsSheetStack
                 }
                 .sheet(isPresented: $isPresentingNewEntry) {
                     NavigationStack {
                         LogEntrySheet() { editedEntry in
-
-                            if selectedEntry.logEntries == nil {
-                                selectedEntry.logEntries = []
-                            }
-                            selectedEntry.logEntries?.append(editedEntry)
-
-                            do {
-                                try context.save()
-                            } catch {
-                                logger.error("Failed saving edited entry: \(String(describing: error))")
-                            }
-
+                            selectedEntry.logEntries = (selectedEntry.logEntries ?? []) + [editedEntry]
+                            context.saveOrLog("Failure saving edited entry", logger: logger)
                             isPresentingNewEntry = false
                         }
                     }
                     .presentationDetents([.large])
                 }
-                .sheet(isPresented: $isPresentingReflection, onDismiss: { isPresentingReflection = false } ) {
+                .sheet(isPresented: $isPresentingReflection) {
                     NavigationStack {
                         DailyReflectionSheet(day: $selectedEntry)
                     }
@@ -184,11 +169,7 @@ struct ContentView: View {
                     LogEntrySheet(entry: $editingLogEntry, isEntryNew: .constant(false)) { editedEntry in
                         editingLogEntry.log = editedEntry.log
                         editingLogEntry.score = editedEntry.score
-                        do {
-                            try context.save()
-                        } catch {
-                            logger.error("Failed saving edited entry: \(String(describing: error))")
-                        }
+                        context.saveOrLog("Failure saving edited entry", logger: logger)
                         isPresentingEditEntry = false
                     }
                 }
@@ -217,6 +198,14 @@ struct ContentView: View {
             }
         }
     }
+    
+    private func setNotifications() {
+        NotificationScheduler.setNotifications(
+            notificationsEnabled: notificationsEnabled,
+            notificationTimes: UserDefaults.standard.array(forKey: AppStorageKeys.notificationTimes) as? [Date] ?? [],
+            reflectionReminder: reflectionReminder,
+            reflectionReminderTime: reflectionReminderTime)
+    }
 
     private func updateToday() {
         var descriptor = FetchDescriptor<DailyEntry>(sortBy: [SortDescriptor(\.date, order: .reverse)])
@@ -230,13 +219,7 @@ struct ContentView: View {
         let newToday = DailyEntry(date: .now)
         logger.debug("Creating a new day: \(newToday.date)")
         context.insert(newToday)
-
-        do {
-            try context.save()
-        } catch {
-            logger.error("Failed saving new day: \(String(describing: error))")
-        }
-
+        context.saveOrLog("Failure while saving new day", logger: logger)
         selectedEntry = newToday
         triggerScrollToToday = true
     }
@@ -265,80 +248,6 @@ struct ContentView: View {
         }
     }
 
-    private func setNotifications() {
-        Task {
-        // Remove all pending notifications
-        UNUserNotificationCenter.current()
-            .removeAllPendingNotificationRequests()
-
-        // Set new notifications based on user's choice
-            if notificationsEnabled {
-                let defaults = UserDefaults.standard
-                let notificationTimes =
-                defaults.value(forKey: "notificationTimes") as? [Date] ?? []
-                
-                for time in notificationTimes {
-                    let content = UNMutableNotificationContent()
-                    content.title = String(localized: "What's going on?")
-                    content.body = String(
-                        localized: "It's time to log your activities and feelings!"
-                    )
-                    content.sound = .default
-                    content.userInfo = ["url": "pulseapp://log"]
-                    
-                    let components = Calendar.current.dateComponents(
-                        [.hour, .minute],
-                        from: time
-                    )
-                    let dateTrigger = UNCalendarNotificationTrigger(
-                        dateMatching: components,
-                        repeats: true
-                    )
-                    let request = UNNotificationRequest(
-                        identifier: UUID().uuidString,
-                        content: content,
-                        trigger: dateTrigger
-                    )
-                    
-                    do {
-                        try await UNUserNotificationCenter.current().add(request)
-                    } catch {
-                        logger.error("Failed to schedule notification: \(String(describing: error))")
-                    }
-                }
-                
-                if reflectionReminder, let reflectionReminderTime {
-                    let content = UNMutableNotificationContent()
-                    content.title = String(localized: "Reflection Time")
-                    content.body = String(
-                        localized: "It's time to reflect on your day!"
-                    )
-                    content.sound = .default
-                    content.userInfo = ["url": "pulseapp://reflect"]
-                    
-                    let components = Calendar.current.dateComponents(
-                        [.hour, .minute],
-                        from: reflectionReminderTime
-                    )
-                    let dateTrigger = UNCalendarNotificationTrigger(
-                        dateMatching: components,
-                        repeats: true
-                    )
-                    let request = UNNotificationRequest(
-                        identifier: UUID().uuidString,
-                        content: content,
-                        trigger: dateTrigger
-                    )
-                    
-                    do {
-                        try await UNUserNotificationCenter.current().add(request)
-                    } catch {
-                        logger.error("Failed to schedule notification: \(String(describing: error))")
-                    }
-                }
-            }
-        }
-    }
     
     private var settingsSheetStack: some View {
         NavigationStack {

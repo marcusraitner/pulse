@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct BackgroundImageView: View {
-    @AppStorage("backgroundImageData") private var backgroundImageData: Data?
+    @AppStorage(AppStorageKeys.backgroundImageData) private var backgroundImageData: Data?
+    
     @State private var uiImage: UIImage?
     @Environment(\.colorScheme) private var colorScheme
 

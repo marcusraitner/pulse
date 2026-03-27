@@ -14,7 +14,7 @@ struct LogEntryText: View {
         
         HStack(alignment: .top) {
             VStack (alignment: .leading) {
-                Text("\(Text(logEntry.formatedTimestamp).bold()): \(Text("\(logEntry.log)"))")
+                Text("\(Text(logEntry.formattedTimestamp).bold()): \(Text("\(logEntry.log)"))")
                 if let address = logEntry.address {
                     Label("\(address)", systemImage: "location.circle.fill")
                         .labelStyle(.titleAndIcon)

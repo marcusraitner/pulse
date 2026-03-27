@@ -7,16 +7,15 @@
 
 import Foundation
 
+/// Utility for formatting dates as ISO 8601 strings.
+/// Used to expose date values to UI tests via accessibility values.
 struct DateFormatHelper {
+    private static let isoFormatter: ISO8601DateFormatter = ISO8601DateFormatter()
+
+    /// Formats a date as an ISO 8601 string (e.g. `"2026-03-27T10:00:00Z"`).
+    /// Returns an empty string if `date` is `nil`.
     static func formatDate(_ date: Date?) -> String {
-        if let date {
-            let RFC3339DateFormatter = DateFormatter()
-            RFC3339DateFormatter.locale = Locale(identifier: "en_US_POSIX")
-            RFC3339DateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
-            RFC3339DateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-            return RFC3339DateFormatter.string(from: date)
-        } else {
-            return ""
-        }
+        guard let date else { return "" }
+        return isoFormatter.string(from: date)
     }
 }

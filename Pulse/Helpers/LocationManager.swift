@@ -11,18 +11,28 @@ import CoreLocation
 import OSLog
 internal import Combine
 
+/// Wraps CoreLocation permission requests and one-shot coordinate capture.
+/// Once a location fix is obtained it is automatically reverse-geocoded via `Compat.reverseGeocode`.
+/// Consumers react to new locations by assigning a closure to `setItem`.
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private let locationManager = CLLocationManager()
-    private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
+    private let logger = Logger(subsystem: "de.raitner.pulse", category: "LocationManager")
+
+    /// Called with the first `MKMapItem` whenever reverse geocoding produces a result.
     var setItem: (MKMapItem) -> Void = { _ in }
-    
+
+    /// The most recently obtained device location.
     @Published var location: CLLocation?
+
+    /// Reverse-geocoded map items for the current location.
+    /// Setting this property automatically calls `setItem` with the first result.
     @Published var mapItems: [MKMapItem] = [] {
         didSet {
             if let item = mapItems.first { setItem(item) }
         }
     }
-    
+
+    /// The current CoreLocation authorisation status.
     @Published var authorizationStatus: CLAuthorizationStatus
     
     override init() {
@@ -31,8 +41,9 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         locationManager.delegate = self
     }
     
+    /// Requests the user's location, prompting for authorisation if not yet determined.
+    /// If permission is already granted, a one-shot location fix is requested immediately.
     func requestLocation() {
-        print(#function)
         switch locationManager.authorizationStatus {
         case .notDetermined:
             locationManager.requestWhenInUseAuthorization()
@@ -44,7 +55,6 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        print(#function)
         self.authorizationStatus = manager.authorizationStatus
         switch locationManager.authorizationStatus {
         case .authorizedWhenInUse, .authorizedAlways:
@@ -55,7 +65,6 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        print(#function)
         location = locations.first
         
         guard let location = location else { return }
@@ -66,13 +75,12 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
                 let items = try await Compat.reverseGeocode(location: location)
                 await MainActor.run { self.mapItems = items }
             } catch {
-                print("Error reverse geocoding location: \(error)")
+                logger.error("Error reverse geocoding location: \(error.localizedDescription)")
             }
         }
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print(#function)
         logger.error("\(error.localizedDescription)")
     }
 }

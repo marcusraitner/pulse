@@ -9,6 +9,9 @@ import Foundation
 import SwiftData
 import SwiftUI
 
+// MARK: - Schema V1.0.0
+
+/// Initial schema. Contains `DailyEntry` and `DailyLogEntry` without a summary field.
 enum PulseVersionedSchemaV1: VersionedSchema {
     static var models: [any PersistentModel.Type] {
         [DailyEntry.self, DailyLogEntry.self]
@@ -24,16 +27,10 @@ enum PulseVersionedSchemaV1: VersionedSchema {
         
         /// Calcuates the average score of the log entries
         var averageScore: CGFloat {
-            if let logEntries {
-                let sum = logEntries.reduce(into: 0.0, { sum, x in
-                    sum += CGFloat(x.score)
-                })
-                return CGFloat(logEntries.isEmpty ? 0.0 : sum / CGFloat(logEntries.count))
-            } else {
-                return 0
-            }
+            guard let logEntries, !logEntries.isEmpty else { return 0 }
+            return logEntries.reduce(0) { $0 + CGFloat($1.score) } / CGFloat(logEntries.count)
         }
-        
+
         // The summary of the day
         @Relationship(deleteRule: .cascade, inverse: \DailyLogEntry.entry)
         var logEntries: [DailyLogEntry]? = []
@@ -55,7 +52,7 @@ enum PulseVersionedSchemaV1: VersionedSchema {
         var score: Int = 0
         var entry: DailyEntry?
         
-        var formatedTimestamp: String {
+        var formattedTimestamp: String {
             self.timestamp.formatted(.dateTime.hour().minute())
         }
         
@@ -68,6 +65,9 @@ enum PulseVersionedSchemaV1: VersionedSchema {
     }
 }
 
+// MARK: - Schema V1.1.0
+
+/// Adds `summary` to `DailyEntry`. Migration removes orphaned log entries (entries without a parent day).
 enum PulseVersionedSchemaV110: VersionedSchema {
     static var models: [any PersistentModel.Type] {
         [DailyEntry.self, DailyLogEntry.self]
@@ -85,15 +85,10 @@ enum PulseVersionedSchemaV110: VersionedSchema {
         
         /// Calcuates the average score of the log entries
         var averageScore: CGFloat {
-            if let logEntries {
-                let sum = logEntries.reduce(into: 0.0, { sum, x in
-                    sum += CGFloat(x.score)
-                })
-                return CGFloat(logEntries.isEmpty ? 0.0 : sum / CGFloat(logEntries.count))
-            } else {
-                return 0
-            }
+            guard let logEntries, !logEntries.isEmpty else { return 0 }
+            return logEntries.reduce(0) { $0 + CGFloat($1.score) } / CGFloat(logEntries.count)
         }
+
         
         // The summary of the day
         @Relationship(deleteRule: .cascade, inverse: \DailyLogEntry.entry)
@@ -118,7 +113,7 @@ enum PulseVersionedSchemaV110: VersionedSchema {
         var score: Int = 0
         var entry: DailyEntry?
         
-        var formatedTimestamp: String {
+        var formattedTimestamp: String {
             self.timestamp.formatted(.dateTime.hour().minute())
         }
         
@@ -131,6 +126,10 @@ enum PulseVersionedSchemaV110: VersionedSchema {
     }
 }
 
+// MARK: - Schema V1.2.0
+
+/// Adds optional `latitude`, `longitude`, and `address` fields to `DailyLogEntry`.
+/// Migration from V1.1.0 is lightweight (no data transformation needed).
 enum PulseVersionedSchemaV120: VersionedSchema {
     static var models: [any PersistentModel.Type] {
         [DailyEntry.self, DailyLogEntry.self]
@@ -148,16 +147,10 @@ enum PulseVersionedSchemaV120: VersionedSchema {
         
         /// Calcuates the average score of the log entries
         var averageScore: CGFloat {
-            if let logEntries {
-                let sum = logEntries.reduce(into: 0.0, { sum, x in
-                    sum += CGFloat(x.score)
-                })
-                return CGFloat(logEntries.isEmpty ? 0.0 : sum / CGFloat(logEntries.count))
-            } else {
-                return 0
-            }
+            guard let logEntries, !logEntries.isEmpty else { return 0 }
+            return logEntries.reduce(0) { $0 + CGFloat($1.score) } / CGFloat(logEntries.count)
         }
-        
+
         // The summary of the day
         @Relationship(deleteRule: .cascade, inverse: \DailyLogEntry.entry)
         var logEntries: [DailyLogEntry]? = []
@@ -187,7 +180,7 @@ enum PulseVersionedSchemaV120: VersionedSchema {
         var longitude: Double?
         var address: String?
         
-        var formatedTimestamp: String {
+        var formattedTimestamp: String {
             self.timestamp.formatted(.dateTime.hour().minute())
         }
         
@@ -203,6 +196,9 @@ enum PulseVersionedSchemaV120: VersionedSchema {
     }
 }
 
+// MARK: - Migration Plan
+
+/// Defines the ordered migration path across all schema versions.
 enum PulseMigrationPlan: SchemaMigrationPlan {
     static var schemas: [any VersionedSchema.Type] {
         [PulseVersionedSchemaV1.self, PulseVersionedSchemaV110.self, PulseVersionedSchemaV120.self]
@@ -233,5 +229,9 @@ enum PulseMigrationPlan: SchemaMigrationPlan {
         
 }
 
+// MARK: - Current type aliases
+
+/// The current `DailyEntry` model. Always points to the latest schema version.
 typealias DailyEntry = PulseVersionedSchemaV120.DailyEntry
+/// The current `DailyLogEntry` model. Always points to the latest schema version.
 typealias DailyLogEntry = PulseVersionedSchemaV120.DailyLogEntry

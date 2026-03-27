@@ -95,10 +95,7 @@ final class DateChangeUITests: XCTestCase {
     private func extractDate(from text: String?, for identifier: String) -> Date? {
         guard let text = text else { return nil }
         
-        let RFC3339DateFormatter = DateFormatter()
-        RFC3339DateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        RFC3339DateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
-        RFC3339DateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        let RFC3339DateFormatter = ISO8601DateFormatter()
         
         if let range = text.range(of: identifier) {
             let suffix = text[range.upperBound...].dropLast()

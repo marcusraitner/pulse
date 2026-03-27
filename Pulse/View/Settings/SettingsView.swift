@@ -14,15 +14,14 @@ import PhotosUI
 import UIKit
 
 struct SettingsView: View {
-    @AppStorage("freezeHistory") private var freezeHistory: Bool = true
-    @AppStorage("showStats") private var showStats: Bool = true
-    @AppStorage("notificationsEnabled") private var notificationsEnabled: Bool = true
-    @AppStorage("reflectionReminder") private var reflectionReminder: Bool = true
-    @AppStorage("reflectionReminderTime") private var reflectionReminderTime: Date =
+    @AppStorage(AppStorageKeys.freezeHistory) private var freezeHistory: Bool = true
+    @AppStorage(AppStorageKeys.showStats) private var showStats: Bool = true
+    @AppStorage(AppStorageKeys.notificationsEnabled) private var notificationsEnabled: Bool = true
+    @AppStorage(AppStorageKeys.reflectionReminder) private var reflectionReminder: Bool = true
+    @AppStorage(AppStorageKeys.reflectionReminderTime) private var reflectionReminderTime: Date =
         Calendar.current.date(bySetting: .hour, value: 20, of: .now) ?? Date.now
-    @AppStorage("notificationTime") private var notificationTime: Date = .now
-    @AppStorage("backgroundImageData") private var backgroundImageData: Data?
-    @AppStorage("theme") private var theme: String = "default"
+    @AppStorage(AppStorageKeys.backgroundImageData) private var backgroundImageData: Data?
+    @AppStorage(AppStorageKeys.theme) private var theme: String = "default"
     
     @State private var backgroundImageSelection: PhotosPickerItem?
     @State private var notificationTimes: [Date] = []
@@ -302,11 +301,8 @@ struct SettingsView: View {
                         for entry in SampleData.shared.previewSampleData {
                             context.insert(entry)
                         }
-                            do {
-                                try context.save()
-                            } catch {
-                                logger.error("Failed saving mock data: \(String(describing: error))")
-                            }
+                        
+                        context.saveOrLog("Failed to save mock data", logger: logger)
                     }
                 }
             }
@@ -321,15 +317,12 @@ struct SettingsView: View {
         }
         .navigationTitle("Settings")
         .onChange(of: notificationTimes) {
-            // update times in UserDefaults
-            let defaults = UserDefaults.standard
-            defaults.set(notificationTimes, forKey: "notificationTimes")
+            UserDefaults.standard.set(notificationTimes, forKey: "notificationTimes")
         }
         .task {
             let settings = await UNUserNotificationCenter.current().notificationSettings()
             notificationsAuthorized = settings.authorizationStatus == .authorized
-            let defaults = UserDefaults.standard
-            notificationTimes = defaults.array(forKey: "notificationTimes") as? [Date] ?? []
+            notificationTimes = UserDefaults.standard.array(forKey: "notificationTimes") as? [Date] ?? []
         }
     }
 }

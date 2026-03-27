@@ -17,7 +17,7 @@ struct HorizontalTimelineView: View {
 
     @State private var position: ScrollPosition = .init(idType: Date.self)
     @State private var containerWidth: CGFloat = 0.0
-    @AppStorage("theme") var themeName: String = "default"
+    @AppStorage(AppStorageKeys.theme) private var themeName: String = "default"
     @State private var isPresentingInsights: Bool = false
     @Environment(\.featureFlags) private var featureFlags
 

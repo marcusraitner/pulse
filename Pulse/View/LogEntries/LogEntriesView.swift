@@ -11,7 +11,7 @@ import OSLog
 
 struct LogEntriesView: View {
     @Bindable var day: DailyEntry
-    @AppStorage("theme") var themeName: String = "default"
+    @AppStorage(AppStorageKeys.theme) var themeName: String = "default"
 
     var onEntryTapped: (DailyLogEntry) -> Void
 

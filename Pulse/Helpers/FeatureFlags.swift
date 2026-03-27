@@ -8,11 +8,17 @@
 import Foundation
 import SwiftUI
 
+/// Feature flags controlling optional or experimental functionality.
+/// Injected into the SwiftUI environment via `\.featureFlags`.
+/// `iOS26` is derived automatically at runtime from system availability.
 public struct FeatureFlags: Sendable, Decodable {
+    /// Allows editing log entries from previous days.
     public let editHistory: Bool
+    /// Enables admin-only UI controls such as the delete-entry button.
     public let adminEnabled: Bool
+    /// `true` when running on iOS 26 or later; set automatically at init.
     public let iOS26: Bool
-    
+
     init(editHistory: Bool = false, adminEnabled: Bool = false) {
         self.editHistory = editHistory
         self.adminEnabled = adminEnabled
