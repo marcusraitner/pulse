@@ -87,8 +87,7 @@ struct LogEntrySheet: View {
                         }
                         Spacer()
                         VStack {
-                            ScoreLabelView(score: newEntry.score, size: 72, radius: 12)
-                                .font(.title).bold()
+                            ScoreLabelView(score: newEntry.score, style: .outlined)
                             Stepper("", value: $newEntry.score, in: -2...2, step: 1)
                                 .labelsHidden()
                                 .padding(.top, 4)
@@ -99,8 +98,7 @@ struct LogEntrySheet: View {
                     HStack (alignment: .top) {
                         Text("\(entry.log)")
                         Spacer()
-                        ScoreLabelView(score: entry.score, size: 72, radius: 12)
-                            .font(.title).bold()
+                        ScoreLabelView(score: entry.score, style: .outlined)
                     }
                 }
                 

@@ -7,22 +7,51 @@
 
 import SwiftUI
 
+enum ScoreLabelStyle {
+    case badge
+    case outlined
+}
+
 struct ScoreLabelView: View {
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "default"
+
+    let score: Int
+    let style: ScoreLabelStyle
+        
+    private var label: String {
+        score > 0 ? "+\(score)" : "\(score)"
+    }
     
-    var score: Int
-    var size: CGFloat = 35
-    var radius: CGFloat = 4
-    var opacity: CGFloat = 1.0
+    private var color: Color {
+        Theme.named(themeName).color(for: score)
+    }
     
     var body: some View {
-        Text("\(score)")
-            .frame(width: size, height: size)
-            .glassScore(color: Theme.named(themeName).color(for: score), opacity: opacity, cornerRadius: radius)
-            .foregroundStyle(.primary)
+        switch style {
+            case .badge:
+            Text(label)
+                .font(.subheadline.bold())
+                .foregroundStyle(.primary)
+                .frame(width: 38, height: 38)
+                .background(.regularMaterial, in: Circle())
+                .overlay(Circle().stroke(color, lineWidth: 3))
+
+            case .outlined:
+            Text(label)
+                .font(.title.bold())
+                .foregroundStyle(.primary)
+                .frame(width: 72, height: 72)
+                .background(color.opacity(0.2), in: Circle())
+                .overlay(Circle().stroke(color, lineWidth: 5))
+        }
+        
     }
 }
 
-#Preview {
-    ScoreLabelView(score: -1)
+#Preview("badge") {
+    ScoreLabelView(score: -1, style: .badge)
+}
+
+#Preview("outlined") {
+    ScoreLabelView(score: -1, style: .outlined)
 }
