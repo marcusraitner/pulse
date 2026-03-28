@@ -290,7 +290,7 @@ struct SettingsView: View {
                     Text("Danger Zone")
                         .foregroundStyle(Color.red)
                     Button("Seed Samples") {
-                        for entry in SampleData.shared.previewSampleData {
+                        for entry in SampleData.makeSeedEntries() {
                             context.insert(entry)
                         }
                         
