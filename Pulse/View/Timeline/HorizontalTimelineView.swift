@@ -9,10 +9,14 @@ import OSLog
 import SwiftData
 import SwiftUI
 
+/// Horizontally scrollable bar chart of all daily entries.
+/// Each bar's height and color represent the day's average score.
+/// Tapping a bar centers it; scrolling updates `selectedEntry`.
 struct HorizontalTimelineView: View {
     @Query(sort: \DailyEntry.date) private var allEntries: [DailyEntry]
 
     @Binding var selectedEntry: DailyEntry
+    /// Set to `true` to programmatically scroll the timeline to today's entry.
     @Binding var scrollToToday: Bool
 
     @State private var entriesByDate: [Date: DailyEntry] = [:]
@@ -138,6 +142,7 @@ struct HorizontalTimelineView: View {
     }
 }
 
+/// An equilateral triangle `Shape` used as the selection indicator above the timeline bar chart.
 struct EquilateralTriangle: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()

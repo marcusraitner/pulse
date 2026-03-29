@@ -7,8 +7,11 @@
 
 import SwiftUI
 
+/// Displays either a "Reflect Your Day" call-to-action button (when `summary` is empty)
+/// or the saved reflection text in a glass card. Tapping either form invokes `onTap`.
 struct DailyReflectionCard: View {
     let summary: String
+    /// Called when the user taps the card or button to open the reflection sheet.
     let onTap: () -> Void
 
     var body: some View {

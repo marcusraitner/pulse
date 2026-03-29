@@ -9,6 +9,8 @@ import SwiftUI
 import SwiftData
 import OSLog
 
+/// App entry point. Sets up the SwiftData `ModelContainer` with CloudKit sync
+/// and the versioned migration plan, then injects `FeatureFlags` into the environment.
 @main
 struct PulseApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var delegate
@@ -44,6 +46,8 @@ struct PulseApp: App {
     }
 }
 
+/// UIApplicationDelegate that sets this class as the `UNUserNotificationCenter` delegate
+/// so notification tap actions can open deep-link URLs while the app is foregrounded.
 final class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self

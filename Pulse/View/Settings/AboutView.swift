@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// App info screen showing the version, feedback links, App Store review button, and photo credits.
 struct AboutView: View {
     @Environment(\.openURL) private var openURL
     
@@ -72,6 +73,7 @@ struct AboutView: View {
 }
 
 extension UIApplication {
+    /// The app version and build number formatted as `"X.Y.Z (build)"`, or `nil` if either value is missing.
     static var appVersion: String? {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String

@@ -8,6 +8,8 @@
 import Foundation
 import SwiftUI
 
+/// A color theme that maps the five score levels (−2 to +2) to distinct colors.
+/// Built-in presets are available via the static constants on the extension below.
 struct Theme: Identifiable {
     var id: String
     var name: String
@@ -16,7 +18,8 @@ struct Theme: Identifiable {
     var neutral: Color
     var plus1: Color
     var plus2: Color
-    
+
+    /// Returns the theme color for `score`, clamping unknown values to `neutral`.
     func color(for score: Int) -> Color {
         switch score {
         case -2: return minus2
@@ -28,6 +31,7 @@ struct Theme: Identifiable {
         }
     }
     
+    /// Returns a gradient derived from the color mapped to the nearest integer score.
     func gradient(for score: CGFloat) -> AnyGradient {
         return color(for: Int(round(score))).gradient
     }
@@ -61,8 +65,10 @@ extension Theme {
         plus1: Color("tropical/plus1"),
         plus2: Color("tropical/plus2"))
     
+    /// All built-in theme presets shown in Settings.
     static let builtIn: [Theme] = [.default, .sea, .tropical]
-    
+
+    /// Returns the built-in theme whose `id` matches `id`, falling back to `.default`.
     static func named(_ id: String) -> Theme {
         builtIn.first { $0.id == id } ?? .default
     }

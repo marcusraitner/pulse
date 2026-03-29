@@ -7,11 +7,15 @@
 
 import SwiftUI
 
+/// The visual presentation style of a ``ScoreLabelView``.
 enum ScoreLabelStyle {
+    /// Small circular badge (38 pt) suitable for list rows.
     case badge
+    /// Large outlined circle (72 pt) suitable for score entry forms.
     case outlined
 }
 
+/// A circular score indicator that displays the numeric score (−2 to +2) with a theme-matched color ring.
 struct ScoreLabelView: View {
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "default"
 

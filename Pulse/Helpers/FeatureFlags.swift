@@ -19,6 +19,7 @@ public struct FeatureFlags: Sendable, Decodable {
     /// `true` when running on iOS 26 or later; set automatically at init.
     public let iOS26: Bool
 
+    /// Creates feature flags. `iOS26` is derived automatically from system availability.
     init(editHistory: Bool = false, adminEnabled: Bool = false) {
         self.editHistory = editHistory
         self.adminEnabled = adminEnabled

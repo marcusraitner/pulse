@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// Displays the selected date as a large serif weekday name and full date string.
 struct SelectedDateView: View {
     let date: Date
 

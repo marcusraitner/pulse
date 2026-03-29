@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+/// Full-screen background image view. Displays a custom image from `AppStorage` when set,
+/// or falls back to the built-in mountain artwork. Applies a slight brightness adjustment in dark mode.
 struct BackgroundImageView: View {
     @AppStorage(AppStorageKeys.backgroundImageData) private var backgroundImageData: Data?
     

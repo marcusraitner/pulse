@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// A row view that renders a single log entry: bold timestamp, log text, optional location label, and a score badge.
 struct LogEntryText: View {
     var logEntry: DailyLogEntry
     

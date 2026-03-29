@@ -7,10 +7,11 @@
 
 import SwiftUI
 
+/// A list row that displays a theme's name alongside five color swatches representing scores −2 to +2.
 struct ThemePreview: View {
     var theme: Theme
     private var size: CGFloat = 20
-    
+
     init(_ theme: Theme) {
         self.theme = theme
     }

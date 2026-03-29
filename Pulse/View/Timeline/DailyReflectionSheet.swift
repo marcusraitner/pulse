@@ -8,6 +8,9 @@
 import SwiftUI
 import _SwiftData_SwiftUI
 
+/// Modal sheet for composing or editing the day's free-text reflection.
+/// Shows the existing log entries for context and offers a rotating coaching question
+/// when no reflection has been written yet.
 struct DailyReflectionSheet: View {
     @Binding var day: DailyEntry
     @State private var reflection: String = ""
@@ -15,6 +18,7 @@ struct DailyReflectionSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.featureFlags) private var featureFlags
 
+    /// Localization keys for the pool of coaching questions shown below the reflection field.
     private static let questionKeys = [
         "reflection.question.1",
         "reflection.question.2",
@@ -38,6 +42,7 @@ struct DailyReflectionSheet: View {
         "reflection.question.20"
     ]
 
+    /// Replaces the current coaching question with a different randomly selected one.
     private func pickAnotherQuestion() {
         let others = Self.questionKeys.filter { $0 != coachingQuestion }
         coachingQuestion = others.randomElement()

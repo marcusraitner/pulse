@@ -10,6 +10,9 @@ import SwiftData
 import SwiftUI
 import StoreKit
 
+/// Root view that orchestrates the timeline, selected-date display, log entries,
+/// reflection card, and FAB. Also owns sheet presentation for settings, new/edit
+/// entry, and reflection, and handles deep-link URLs (`pulseapp://log`, `pulseapp://reflect`).
 struct ContentView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.scenePhase) private var scenePhase
@@ -194,6 +197,8 @@ struct ContentView: View {
         }
     }
     
+    /// Re-schedules local notifications from current `AppStorage` values.
+    /// Called when the settings sheet is dismissed.
     private func setNotifications() {
         NotificationScheduler.setNotifications(
             notificationsEnabled: notificationsEnabled,
@@ -202,6 +207,8 @@ struct ContentView: View {
             reflectionReminderTime: reflectionReminderTime)
     }
 
+    /// Ensures today's `DailyEntry` exists, creating and inserting one if it is missing.
+    /// Scrolls the timeline to today after creating a new entry.
     private func updateToday() {
         var descriptor = FetchDescriptor<DailyEntry>(sortBy: [SortDescriptor(\.date, order: .reverse)])
         descriptor.fetchLimit = 1
@@ -219,6 +226,8 @@ struct ContentView: View {
         triggerScrollToToday = true
     }
 
+    /// Performs one-time startup work: applies debug launch arguments and requests
+    /// notification authorisation. Called once from `.task` on first appearance.
     private func initApplication() async {
 
         #if DEBUG
@@ -244,6 +253,7 @@ struct ContentView: View {
     }
 
     
+    /// The `NavigationStack`-wrapped settings sheet with a Close toolbar button.
     private var settingsSheetStack: some View {
         NavigationStack {
             SettingsView()

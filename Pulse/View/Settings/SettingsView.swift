@@ -49,9 +49,11 @@ struct SettingsView: View {
     private var countDays: Int { allEntries.count }
     private var countLogs: Int { allLogs.count }
 
+    // MARK: - Body
+
     var body: some View {
         Form {
-            //General Section
+            // MARK: General
             NavigationLink() {
                 Form {
                     Section {
@@ -87,7 +89,7 @@ struct SettingsView: View {
                         .listLabelIcon(.gray)
                 }
             }
-            // Appearance Section
+            // MARK: Appearance
             NavigationLink() {
                 Form {
                     Section {
@@ -164,7 +166,7 @@ struct SettingsView: View {
                         .listLabelIcon(.blue)
                 }
             }
-            // Reminders Section
+            // MARK: Reminders
             NavigationLink() {
                 Form {
                     Section {
@@ -236,6 +238,7 @@ struct SettingsView: View {
 
             }
             
+            // MARK: About & Statistics
             Section {
                 NavigationLink() {
                     AboutView()
@@ -285,6 +288,7 @@ struct SettingsView: View {
                 }
             }
             
+            // MARK: Admin
             if featureFlags.adminEnabled {
                 Section {
                     Text("Danger Zone")
@@ -319,6 +323,8 @@ struct SettingsView: View {
     }
 }
                                     
+// MARK: - ListLabelIcon
+
 struct ListLabelIcon: ViewModifier {
     let color: Color
     let iconFrame: CGFloat

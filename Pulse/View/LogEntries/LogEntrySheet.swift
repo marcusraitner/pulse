@@ -12,6 +12,11 @@ import CoreLocation
 import CoreLocationUI
 import MapKit
 
+/// Modal sheet for creating a new log entry or viewing/editing an existing one.
+///
+/// Pass `entry` and `isEntryNew: false` to open an existing entry for editing.
+/// Omit both to open a blank new-entry form. The `saveEntry` closure is called
+/// with the final `DailyLogEntry` value when the user taps Save.
 struct LogEntrySheet: View {
     // This holds the temporary values of the sheet; initialized in a task to entry
     @State private var newEntry: DailyLogEntry = DailyLogEntry(timestamp: .now, log: "", score: 0)
@@ -48,6 +53,7 @@ struct LogEntrySheet: View {
         self.saveEntry = saveEntry
     }
     
+    /// Updates `newEntry` with the coordinate and reverse-geocoded address from `item`.
     private func setItem(item: MKMapItem) -> Void {
         var coordinate: CLLocationCoordinate2D = CLLocationCoordinate2D()
         
