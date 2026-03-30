@@ -65,8 +65,17 @@ extension Theme {
         plus1: Color("tropical/plus1"),
         plus2: Color("tropical/plus2"))
     
+    static let traffic: Theme = .init(
+        id: "traffic",
+        name: "Traffic",
+        minus2: Color("traffic/minus2"),
+        minus1: Color("traffic/minus1"),
+        neutral: Color("traffic/neutral"),
+        plus1: Color("traffic/plus1"),
+        plus2: Color("traffic/plus2"))
+
     /// All built-in theme presets shown in Settings.
-    static let builtIn: [Theme] = [.default, .sea, .tropical]
+    static let builtIn: [Theme] = [.default, .sea, .tropical, .traffic]
 
     /// Returns the built-in theme whose `id` matches `id`, falling back to `.default`.
     static func named(_ id: String) -> Theme {

@@ -58,7 +58,7 @@ struct AboutView: View {
                 Text("Credits")
                     .font(Font.title3)
                     .padding(.top, 20)
-                Text("Background images by \(Text("Kseniia Lobko").bold()) published on [Unsplash](https://unsplash.com/de/@hello_kseniia)")
+                Text("Background images by \(Text("").bold()) published on [Unsplash](https://unsplash.com/de/@hello_kseniia)")
                 
                 Spacer()
                 HStack {

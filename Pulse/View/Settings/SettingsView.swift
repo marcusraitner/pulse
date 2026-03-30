@@ -21,6 +21,7 @@ struct SettingsView: View {
     @AppStorage(AppStorageKeys.reflectionReminderTime) private var reflectionReminderTime: Date =
         Calendar.current.date(bySetting: .hour, value: 20, of: .now) ?? Date.now
     @AppStorage(AppStorageKeys.backgroundImageData) private var backgroundImageData: Data?
+    @AppStorage(AppStorageKeys.backgroundImageName) private var backgroundImageName: String = "mountain"
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "default"
     
     @State private var backgroundImageSelection: PhotosPickerItem?
@@ -31,12 +32,7 @@ struct SettingsView: View {
     @Environment(\.featureFlags) private var featureFlags
     @Environment(\.modelContext) private var context
     
-    private let localLocationManager = CLLocationManager()
-    
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "SettingsView")
-
-    private let imageFrame: CGFloat = 55
-    private let imageSize: CGFloat = 32
 
     private var backgroundImage: Image? {
         guard let data = backgroundImageData, let uiImage = UIImage(data: data) else { return nil }
@@ -111,6 +107,12 @@ struct SettingsView: View {
                             Text("Theme: ")
                         }
                         .pickerStyle(.navigationLink)
+                        
+                        let columns: [GridItem] = [
+                            GridItem(.flexible()),
+                            GridItem(.flexible())
+                        ]
+
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Background Image")
                                 .font(.headline)
@@ -118,40 +120,62 @@ struct SettingsView: View {
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
 
-                            PhotosPicker(selection: $backgroundImageSelection, matching: .images, photoLibrary: .shared()) {
-                                if let backgroundImage {
-                                    backgroundImage
+                        
+                            LazyVGrid(columns: columns, spacing: 8) {
+                                let presets = ["mountain", "mountain-dark", "clouds", "moon", "stars"]
+                                
+                                ForEach(presets, id: \.self) { imageName in
+                                    Image("\(imageName)-thumb")
                                         .resizable()
                                         .scaledToFill()
                                         .frame(height: 120)
                                         .clipped()
+                                        .contentShape(Rectangle())
                                         .cornerRadius(12)
-                                        .overlay(alignment: .topTrailing) {
-                                            Button(role: .destructive) {
-                                                backgroundImageData = nil
-                                            } label: {
-                                                Image(systemName: "xmark.circle.fill")
-                                                    .imageScale(.large)
-                                                    .symbolRenderingMode(.hierarchical)
-                                                    .foregroundStyle(.white, .blue)
-                                                    .shadow(radius: 2)
-                                            }
-                                            .padding(8)
+                                        .onTapGesture {
+                                            backgroundImageName = imageName
+                                            backgroundImageData = nil
                                         }
-                                } else {
-                                    Image("mountain")
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(height: 120)
-                                        .clipped()
-                                        .cornerRadius(12)
-                                        .overlay {
+                                        .overlay(alignment: .bottomTrailing) {
+                                            if imageName == backgroundImageName && backgroundImageData == nil {
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .foregroundStyle(.white, .blue)
+                                                    .padding(8)
+                                            }
+                                        }
+                                }
+                                
+                                PhotosPicker(selection: $backgroundImageSelection, matching: .images, photoLibrary: .shared()) {
+                                    if let backgroundImage {
+                                        backgroundImage
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(height: 120)
+                                            .clipped()
+                                            .contentShape(Rectangle())
+                                            .cornerRadius(12)
+                                            .overlay(alignment: .bottomTrailing) {
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .foregroundStyle(.white, .blue)
+                                                    .padding(8)
+                                            }
+                                    } else {
+                                        Image("mountain")
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(height: 120)
+                                            .clipped()
+                                            .contentShape(Rectangle())
+                                            .cornerRadius(12)
+                                            .saturation(0.2)
+                                            .overlay {
                                                 Image(systemName: "photo")
                                                     .imageScale(.large)
                                                     .symbolRenderingMode(.hierarchical)
                                                     .foregroundStyle(.white)
                                                     .shadow(radius: 2)
-                                        }
+                                            }
+                                    }
                                 }
                             }
                         }

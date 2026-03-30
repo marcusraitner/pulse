@@ -41,6 +41,7 @@ struct PulseApp: App {
         WindowGroup {
             ContentView()
                 .environment(\.featureFlags, FeatureFlags(editHistory: true, adminEnabled: false))
+                .preferredColorScheme(.dark)
         }
         .modelContainer(modelContainer)
     }

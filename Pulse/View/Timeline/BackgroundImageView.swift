@@ -11,36 +11,35 @@ import SwiftUI
 /// or falls back to the built-in mountain artwork. Applies a slight brightness adjustment in dark mode.
 struct BackgroundImageView: View {
     @AppStorage(AppStorageKeys.backgroundImageData) private var backgroundImageData: Data?
+    @AppStorage(AppStorageKeys.backgroundImageName) private var backgroundImageName: String = "mountain"
     
     @State private var uiImage: UIImage?
-    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         Group {
             if let uiImage = self.uiImage {
+                // use the user's image
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFill()
                     .frame(minWidth: 0, maxWidth: .infinity)
-                    .brightness(colorScheme == .dark ? -0.2 : 0.0)
                     .ignoresSafeArea()
             } else {
-                Image(colorScheme == .dark ? "mountain-dark" : "mountain")
+                // load the image from assets
+                Image(backgroundImageName)
                     .resizable()
                     .scaledToFill()
                     .frame(minWidth: 0, maxWidth: .infinity)
-                    .brightness(colorScheme == .dark ? 0.0 : -0.1)
                     .ignoresSafeArea()
             }
         }
         .onChange(of: backgroundImageData, initial: true) {
-            if let data = backgroundImageData {
-                if let uiImage = UIImage(data: data) {
-                    self.uiImage = uiImage
-                }
-            } else {
-                self.uiImage = nil
+            guard let data = backgroundImageData, let uiImage = UIImage(data: data) else {
+                uiImage = nil
+                return
             }
+            
+            self.uiImage = uiImage
         }
 
     }

@@ -555,6 +555,7 @@
       }
     },
     "Kseniia Lobko" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

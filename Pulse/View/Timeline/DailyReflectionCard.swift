@@ -18,7 +18,6 @@ struct DailyReflectionCard: View {
         if summary.isEmpty {
             Button(action: onTap) {
                 Text("Reflect Your Day")
-                    .foregroundStyle(.white)
                     .font(.title3)
                     .padding()
                     .glassCapsule()
@@ -33,7 +32,6 @@ struct DailyReflectionCard: View {
                         .padding(.bottom, 5)
                     Text(summary)
                 }
-                .foregroundStyle(.white)
                 .padding()
                 Spacer()
             }

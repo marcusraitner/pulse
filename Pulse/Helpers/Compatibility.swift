@@ -33,32 +33,28 @@ extension View {
         }
     }
 
-    /// Glass circle for floating action buttons. Falls back to regularMaterial.
+    /// Glass circle for floating action buttons. Falls back to regularMaterial with a white glow shadow.
     func glassCircle() -> some View {
         if #available(iOS 26, *) {
-            AnyView(self.glassEffect(.clear, in: Circle()))
+            AnyView(self.glassEffect(.regular, in: Circle()).shadow(color: .white.opacity(0.4), radius: 12))
         } else {
-            AnyView(self.background(.regularMaterial, in: Circle()))
+            AnyView(self.background(.regularMaterial, in: Circle()).shadow(color: .white.opacity(0.4), radius: 12))
         }
     }
 
-    /// Tinted score badge. Falls back to solid color or thinMaterial when opacity < 1.
-    func glassScore(color: Color, opacity: CGFloat = 1.0, cornerRadius: CGFloat = 4) -> some View {
-        if #available(iOS 26, *) {
-            AnyView(self.glassEffect(.regular.tint(color.opacity(opacity)), in: RoundedRectangle(cornerRadius: cornerRadius)))
-        } else if opacity < 1.0 {
-            AnyView(self.background(.thinMaterial, in: RoundedRectangle(cornerRadius: cornerRadius)))
-        } else {
-            AnyView(self.background(color, in: RoundedRectangle(cornerRadius: cornerRadius)))
-        }
-    }
-
-    /// Tinted interactive glass card keyed to a score color. Falls back to colored background.
+    /// Tinted interactive glass card keyed to a score color. Falls back to light ultraThinMaterial with a semi-transparent color overlay.
     func glassTintedCard(color: Color, cornerRadius: CGFloat = 10) -> some View {
         if #available(iOS 26, *) {
-            AnyView(self.glassEffect(.clear.tint(color).interactive(), in: RoundedRectangle(cornerRadius: cornerRadius)))
+            AnyView(self.glassEffect(.regular.tint(color.opacity(0.45)).interactive(), in: RoundedRectangle(cornerRadius: cornerRadius)))
         } else {
-            AnyView(self.background(color.opacity(0.85), in: RoundedRectangle(cornerRadius: cornerRadius)))
+            AnyView(self.background {
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .fill(.ultraThinMaterial)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .fill(color.opacity(0.45))
+                    }
+            })
         }
     }
 }

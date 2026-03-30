@@ -37,8 +37,7 @@ struct ScoreLabelView: View {
                 .font(.subheadline.bold())
                 .foregroundStyle(.primary)
                 .frame(width: 38, height: 38)
-                .background(.regularMaterial, in: Circle())
-                .overlay(Circle().stroke(color, lineWidth: 3))
+                .overlay(Circle().stroke(color, lineWidth: 4).shadow(color: .white, radius: 1))
 
             case .outlined:
             Text(label)
@@ -46,7 +45,7 @@ struct ScoreLabelView: View {
                 .foregroundStyle(.primary)
                 .frame(width: 72, height: 72)
                 .background(color.opacity(0.2), in: Circle())
-                .overlay(Circle().stroke(color, lineWidth: 5))
+                .overlay(Circle().stroke(color, lineWidth: 7))
         }
         
     }

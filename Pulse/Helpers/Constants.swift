@@ -21,6 +21,7 @@ enum AppStorageKeys {
     static let showStats = "showStats"
     static let theme = "theme"
     static let backgroundImageData = "backgroundImageData"
+    static let backgroundImageName = "backgroundImageName"
 
     // MARK: - Review
     static let lastReviewRequest = "lastReviewRequest"
