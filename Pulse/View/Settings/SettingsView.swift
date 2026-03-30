@@ -22,7 +22,7 @@ struct SettingsView: View {
         Calendar.current.date(bySetting: .hour, value: 20, of: .now) ?? Date.now
     @AppStorage(AppStorageKeys.backgroundImageData) private var backgroundImageData: Data?
     @AppStorage(AppStorageKeys.backgroundImageName) private var backgroundImageName: String = "mountain"
-    @AppStorage(AppStorageKeys.theme) private var themeName: String = "default"
+    @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
     
     @State private var backgroundImageSelection: PhotosPickerItem?
     @State private var notificationTimes: [Date] = []

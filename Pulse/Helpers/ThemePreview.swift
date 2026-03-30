@@ -40,5 +40,5 @@ struct ThemePreview: View {
 }
 
 #Preview {
-    ThemePreview(Theme.default)
+    ThemePreview(Theme.traffic)
 }

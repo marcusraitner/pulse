@@ -38,7 +38,7 @@ struct Theme: Identifiable {
 }
 
 extension Theme {
-    static let `default`: Theme = .init(
+    static let pastel: Theme = .init(
         id: "default",
         name: "Default",
         minus2: Color("default/minus2"),
@@ -75,10 +75,10 @@ extension Theme {
         plus2: Color("traffic/plus2"))
 
     /// All built-in theme presets shown in Settings.
-    static let builtIn: [Theme] = [.default, .sea, .tropical, .traffic]
+    static let builtIn: [Theme] = [.pastel, .sea, .tropical, .traffic]
 
     /// Returns the built-in theme whose `id` matches `id`, falling back to `.default`.
     static func named(_ id: String) -> Theme {
-        builtIn.first { $0.id == id } ?? .default
+        builtIn.first { $0.id == id } ?? .pastel
     }
 }

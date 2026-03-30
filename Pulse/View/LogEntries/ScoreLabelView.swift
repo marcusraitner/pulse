@@ -17,7 +17,7 @@ enum ScoreLabelStyle {
 
 /// A circular score indicator that displays the numeric score (−2 to +2) with a theme-matched color ring.
 struct ScoreLabelView: View {
-    @AppStorage(AppStorageKeys.theme) private var themeName: String = "default"
+    @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
 
     let score: Int
     let style: ScoreLabelStyle

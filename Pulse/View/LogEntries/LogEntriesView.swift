@@ -12,7 +12,7 @@ import OSLog
 /// Displays all log entries for a single day as a vertical list of theme-tinted glass cards.
 struct LogEntriesView: View {
     @Bindable var day: DailyEntry
-    @AppStorage(AppStorageKeys.theme) var themeName: String = "default"
+    @AppStorage(AppStorageKeys.theme) var themeName: String = "traffic"
 
     /// Called with the tapped entry so the parent can present an edit sheet.
     var onEntryTapped: (DailyLogEntry) -> Void

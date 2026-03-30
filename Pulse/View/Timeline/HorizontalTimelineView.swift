@@ -24,7 +24,7 @@ struct HorizontalTimelineView: View {
     @State private var containerWidth: CGFloat = 0.0
     @State private var isPresentingInsights: Bool = false
 
-    @AppStorage(AppStorageKeys.theme) private var themeName: String = "default"
+    @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
 
     @Environment(\.featureFlags) private var featureFlags
 
