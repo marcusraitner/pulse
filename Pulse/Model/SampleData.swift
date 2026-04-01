@@ -177,6 +177,9 @@ class SampleData {
     private init() {
         let schema = Schema([
             DailyEntry.self,
+            DailyLogEntry.self,
+            DailyKPIValue.self,
+            KPITemplate.self,
         ])
 
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
@@ -188,10 +191,23 @@ class SampleData {
                 modelContainer.mainContext.insert(entry)
             }
 
+            for template in SampleData.makeSeedTemplates() {
+                modelContainer.mainContext.insert(template)
+            }
+
             try modelContainer.mainContext.save()
 
         } catch {
             fatalError("Unable to initialize ModelContainer: \(error)")
         }
+    }
+
+    /// Creates fresh `KPITemplate` objects for previews and seeding.
+    static func makeSeedTemplates() -> [KPITemplate] {
+        [
+            KPITemplate(title: "Deep Work", note: "How many minutes of focused, uninterrupted work?", unit: "min"),
+            KPITemplate(title: "Sleep", note: "How many hours did you sleep last night?", unit: "h"),
+            KPITemplate(title: "Exercise", note: "How many minutes of exercise today?", unit: "min"),
+        ]
     }
 }

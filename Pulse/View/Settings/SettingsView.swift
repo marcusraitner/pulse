@@ -190,6 +190,18 @@ struct SettingsView: View {
                         .listLabelIcon(.blue)
                 }
             }
+            // MARK: Metrics
+            NavigationLink() {
+                KPITemplatesSettingsView()
+            } label: {
+                Label {
+                    Text("Metrics")
+                } icon: {
+                    Image(systemName: "chart.line.uptrend.xyaxis.circle.fill")
+                        .listLabelIcon(.orange)
+                }
+            }
+            
             // MARK: Reminders
             NavigationLink() {
                 Form {

@@ -19,7 +19,7 @@ struct PulseApp: App {
     let modelContainer: ModelContainer
     
     init() {
-        let schema = Schema([DailyEntry.self, DailyLogEntry.self])
+        let schema = Schema([DailyEntry.self, DailyLogEntry.self, DailyKPIValue.self, KPITemplate.self])
         let modelconfiguration = ModelConfiguration(
             schema: schema,
             cloudKitDatabase: .automatic
