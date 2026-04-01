@@ -105,7 +105,7 @@ struct ContentView: View {
                 }
                 .sheet(isPresented: $isPresentingReflection) {
                     NavigationStack {
-                        DailyReflectionSheet(day: $selectedEntry)
+                        DailyReflectionSheet(day: selectedEntry)
                     }
                 }
                 .toolbar {

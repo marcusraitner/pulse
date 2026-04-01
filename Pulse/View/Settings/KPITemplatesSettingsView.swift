@@ -75,11 +75,9 @@ struct KPITemplatesSettingsView: View {
                     context.delete(template)
                     context.saveOrLog("Failed to delete KPI template: \(template)", logger: logger)
                 }
-                templateToDelete = nil
                 isPresentingConfirmDelete = false
             }
             Button("Cancel", role: .cancel) {
-                templateToDelete = nil
                 isPresentingConfirmDelete = false
             }
         } message: {
@@ -92,7 +90,9 @@ struct KPITemplatesSettingsView: View {
                 }
             }
         }
-        
+        .onChange(of: isPresentingConfirmDelete) { _, isPresenting in
+            if !isPresenting { templateToDelete = nil }
+        }
     }
 }
 

@@ -207,7 +207,7 @@ class SampleData {
         [
             KPITemplate(title: "Deep Work", note: "How many minutes of focused, uninterrupted work?", unit: "min"),
             KPITemplate(title: "Sleep", note: "How many hours did you sleep last night?", unit: "h"),
-            KPITemplate(title: "Exercise", note: "How many minutes of exercise today?", unit: "min"),
+            KPITemplate(title: "Exercise", note: "How many minutes of exercise today?", unit: nil),
         ]
     }
 }

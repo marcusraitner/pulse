@@ -26,6 +26,7 @@ struct LogEntryText: View {
             }
             Spacer()
             ScoreLabelView(score: logEntry.score, style: .badge)
+                .padding(.leading, 2)
         }
     }
 }
