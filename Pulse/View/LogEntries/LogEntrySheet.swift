@@ -1,5 +1,5 @@
 //
-//  NewLogEntrySheet.swift
+//  LogEntrySheet.swift
 //  Pulse
 //
 //  Created by Marcus Raitner on 21.02.26.
@@ -14,16 +14,31 @@ import MapKit
 
 /// Modal sheet for creating a new log entry or viewing/editing an existing one.
 ///
-/// Pass `entry` and `isEntryNew: false` to open an existing entry for editing.
-/// Omit both to open a blank new-entry form. The `saveEntry` closure is called
-/// with the final `DailyLogEntry` value when the user taps Save.
+/// Pass `entry` to open an existing entry for editing. Omit it (or pass `nil`)
+/// to open a blank new-entry form. Saves directly to the SwiftData context on confirm.
 struct LogEntrySheet: View {
-    // This holds the temporary values of the sheet; initialized in a task to entry
-    @State private var newEntry: DailyLogEntry = DailyLogEntry(timestamp: .now, log: "", score: 0)
-    // The entry to edit (if passed at all; otherwise defaults to the above values (see init)
-    @Binding var entry: DailyLogEntry
-    // Determines whether sheet is shown for a new entry or an existing
-    @Binding var isEntryNew: Bool
+    
+    let day: DailyEntry
+    let entry: DailyLogEntry?
+    
+    init(day: DailyEntry, entry: DailyLogEntry? = nil) {
+        self.day = day
+        self.entry = entry
+        _log = State(initialValue: entry?.log ?? "")
+        _score = State(initialValue: entry?.score ?? 0)
+        _latitude = State(initialValue: entry?.latitude)
+        _longitude = State(initialValue: entry?.longitude)
+        _address = State(initialValue: entry?.address)
+    }
+
+    private var isEntryNew: Bool { entry == nil }
+
+    @State private var log: String
+    @State private var score: Int
+    @State private var latitude: Double?
+    @State private var longitude: Double?
+    @State private var address: String?
+    
     // used to manage validation; showing the validation message only if stepper was touched
     @State private var isNew = true
     @State private var isPresentingConfirm = false
@@ -32,11 +47,8 @@ struct LogEntrySheet: View {
     @AppStorage(AppStorageKeys.freezeHistory) private var freezeHistory: Bool = true
 
     private var isEntryEditable: Bool {
-        !freezeHistory || Calendar.current.isDateInToday(entry.timestamp)
+        !freezeHistory || Calendar.current.isDateInToday(entry?.timestamp ?? .now)
     }
-    
-    // closure gets called on save with the values in newEntry
-    var saveEntry: (DailyLogEntry) -> Void
     
     @StateObject var locationManager = LocationManager()
     @State private var mapPosition: MapCameraPosition = .automatic
@@ -44,23 +56,16 @@ struct LogEntrySheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
 
-    private let logger = Logger(subsystem: "de.raitner.pulse", category: "NewLogEntrySheet")
+    private let logger = Logger(subsystem: "de.raitner.pulse", category: "LogEntrySheet")
 
-    init(entry: Binding<DailyLogEntry> = .constant(DailyLogEntry(timestamp: .now, log: "", score: 0)),
-         isEntryNew: Binding<Bool> = .constant(true), saveEntry: @escaping (DailyLogEntry) -> Void) {
-        self._entry = entry
-        self._isEntryNew = isEntryNew
-        self.saveEntry = saveEntry
-    }
-    
-    /// Updates `newEntry` with the coordinate and reverse-geocoded address from `item`.
+    /// Updates the location state with the coordinate and reverse-geocoded address from `item`.
     private func setItem(item: MKMapItem) -> Void {
         var coordinate: CLLocationCoordinate2D = CLLocationCoordinate2D()
         
         coordinate = Compat.coordinate(from: item)
 
-        newEntry.latitude = coordinate.latitude
-        newEntry.longitude = coordinate.longitude
+        latitude = coordinate.latitude
+        longitude = coordinate.longitude
 
         let region = MKCoordinateRegion(
             center: coordinate,
@@ -68,7 +73,28 @@ struct LogEntrySheet: View {
         )
         mapPosition = .region(region)
 
-        newEntry.address = Compat.address(from: item)
+        address = Compat.address(from: item)
+    }
+    
+    private func save() {
+        if let entry {
+            entry.log = log
+            entry.score = score
+            context.saveOrLog("Failure while saving entry", logger: logger)
+        } else {
+            // new entry
+            let newEntry = DailyLogEntry(
+                timestamp: .now,
+                log: log,
+                score: score,
+                entry: day,
+                latitude: storeLocations ? latitude : nil,
+                longitude: storeLocations ? longitude : nil,
+                address: storeLocations ? address : nil
+            )
+            context.insert(newEntry)
+            context.saveOrLog("Failure saving new entry", logger: logger)
+        }
     }
     
     var body: some View {
@@ -76,13 +102,13 @@ struct LogEntrySheet: View {
             Section {
                 if isEntryEditable {
                     VStack(alignment: .leading) {
-                        TextField("What's going on?", text: $newEntry.log, axis: .vertical)
+                        TextField("What's going on?", text: $log, axis: .vertical)
                             .multilineTextAlignment(.leading)
                             .lineLimit(5...Int.max)
                         
                         Text("Please capture your moment here.")
                             .font(.caption)
-                            .foregroundStyle(!isNew && newEntry.log.isEmpty ? .red : .clear)
+                            .foregroundStyle(!isNew && log.isEmpty ? .red : .clear)
                     }
                     HStack(alignment: .top) {
                         VStack(alignment: .leading) {
@@ -93,8 +119,8 @@ struct LogEntrySheet: View {
                         }
                         Spacer()
                         VStack {
-                            ScoreLabelView(score: newEntry.score, style: .outlined)
-                            Stepper("", value: $newEntry.score, in: -2...2, step: 1)
+                            ScoreLabelView(score: score, style: .outlined)
+                            Stepper("", value: $score, in: -2...2, step: 1)
                                 .labelsHidden()
                                 .padding(.top, 4)
                         }
@@ -102,16 +128,16 @@ struct LogEntrySheet: View {
                     }
                 } else {
                     HStack (alignment: .top) {
-                        Text("\(entry.log)")
+                        Text(log)
                         Spacer()
-                        ScoreLabelView(score: entry.score, style: .outlined)
+                        ScoreLabelView(score: score, style: .outlined)
                     }
                 }
                 
                 HStack {
                     Text("Recorded at")
                     Spacer()
-                    Text("\(entry.timestamp.formatted(date: .numeric, time: .shortened))")
+                    Text((entry?.timestamp ?? .now).formatted(date: .numeric, time: .shortened))
                 }
                 
                 VStack(alignment: .leading) {
@@ -132,7 +158,7 @@ struct LogEntrySheet: View {
                                 }
                             } else {
                                 if let item = locationManager.mapItems.first {
-                                    Text("\(newEntry.address ?? "Unknown")")
+                                    Text(address ?? "Unknown")
                                     
                                     Map(position: $mapPosition) {
                                         Marker(item: item)
@@ -158,11 +184,11 @@ struct LogEntrySheet: View {
                         }
                         
                     } else {
-                        if let address = entry.address {
-                            Label("\(address)", systemImage: "location.circle.fill")
+                        if let address {
+                            Label(address, systemImage: "location.circle.fill")
                                 .labelStyle(.titleAndIcon)
                             
-                            if let latitude = entry.latitude, let longitude = entry.longitude {
+                            if let latitude, let longitude {
                                 let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
                                 let region = MKCoordinateRegion(
                                     center: coordinate,
@@ -170,7 +196,7 @@ struct LogEntrySheet: View {
                                 )
                                 
                                 Map(position: .constant(.region(region))) {
-                                    Marker("\(address)", coordinate: CLLocationCoordinate2D(latitude: entry.latitude ?? 0, longitude: entry.longitude ?? 0))
+                                    Marker(address, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
                                 }
                                 .mapControls {
                                     MapScaleView()
@@ -193,7 +219,7 @@ struct LogEntrySheet: View {
             Section {
                 HStack {
                     Spacer()
-                    if !isEntryNew && isEntryEditable {
+                    if let entry, isEntryEditable {
                         Button(role: .destructive) {
                             isPresentingConfirm = true
                         } label: {
@@ -219,20 +245,17 @@ struct LogEntrySheet: View {
             }
             .listRowBackground(Color.clear)
         }
-        .task {
-            newEntry = DailyLogEntry(timestamp: .now, log: entry.log, score: entry.score)
-        }
-        .onChange(of: newEntry.score) {
+        .onChange(of: score) {
             isNew = false
         }
         .navigationTitle(isEntryNew ? "New Moment" : isEntryEditable ? "Edit Moment" : "View Moment")
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Compat.confirmButton(String(localized: "Save")) {
-                    saveEntry(newEntry)
+                    save()
                     dismiss()
                 }
-                .disabled(newEntry.log.isEmpty)
+                .disabled(log.isEmpty)
             }
             ToolbarItem(placement: .cancellationAction) {
                 Compat.closeButton { dismiss() }
@@ -243,6 +266,7 @@ struct LogEntrySheet: View {
 
 #Preview {
     NavigationStack {
-        LogEntrySheet() { entry in }
+        LogEntrySheet(day: .init(date: .now))
+            .modelContainer(SampleData.shared.modelContainer)
     }
 }

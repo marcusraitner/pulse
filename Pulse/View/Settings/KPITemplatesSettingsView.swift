@@ -52,9 +52,13 @@ struct KPITemplatesSettingsView: View {
                             Label("Delete", systemImage: "trash")
                         }
                     }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        templateToEdit = template
+                    .swipeActions(edge: .leading) {
+                        Button {
+                            templateToEdit = template
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                        .tint(.orange)
                     }
                 }
                 
@@ -75,10 +79,12 @@ struct KPITemplatesSettingsView: View {
                     context.delete(template)
                     context.saveOrLog("Failed to delete KPI template: \(template)", logger: logger)
                 }
+                templateToDelete = nil
                 isPresentingConfirmDelete = false
             }
-            Button("Cancel", role: .cancel) {
+            Button("Cancel") {
                 isPresentingConfirmDelete = false
+                templateToDelete = nil
             }
         } message: {
             if let template = templateToDelete {
@@ -89,9 +95,6 @@ struct KPITemplatesSettingsView: View {
                     Text("You currently have \(count) values recorded for the metric \"\(template.title)\". Deleting it will also delete all the values. Are you sure?")
                 }
             }
-        }
-        .onChange(of: isPresentingConfirmDelete) { _, isPresenting in
-            if !isPresenting { templateToDelete = nil }
         }
     }
 }

@@ -95,11 +95,7 @@ struct ContentView: View {
                 }
                 .sheet(isPresented: $isPresentingNewEntry) {
                     NavigationStack {
-                        LogEntrySheet() { editedEntry in
-                            selectedEntry.logEntries = (selectedEntry.logEntries ?? []) + [editedEntry]
-                            context.saveOrLog("Failure saving edited entry", logger: logger)
-                            isPresentingNewEntry = false
-                        }
+                        LogEntrySheet(day: selectedEntry)
                     }
                     .presentationDetents([.large])
                 }
@@ -164,12 +160,7 @@ struct ContentView: View {
             }
             .sheet(isPresented: $isPresentingEditEntry) {
                 NavigationStack {
-                    LogEntrySheet(entry: $editingLogEntry, isEntryNew: .constant(false)) { editedEntry in
-                        editingLogEntry.log = editedEntry.log
-                        editingLogEntry.score = editedEntry.score
-                        context.saveOrLog("Failure saving edited entry", logger: logger)
-                        isPresentingEditEntry = false
-                    }
+                    LogEntrySheet(day: selectedEntry, entry: editingLogEntry)
                 }
                 .presentationDetents([.large])
             }
