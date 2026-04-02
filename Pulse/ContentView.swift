@@ -37,8 +37,6 @@ struct ContentView: View {
     @State private var triggerScrollToToday: Bool = false
     @State private var isPresentingSettings: Bool = false
     @State private var isPresentingNewEntry: Bool = false
-    @State private var isPresentingEditEntry: Bool = false
-    @State private var editingLogEntry = DailyLogEntry(timestamp: .now, log: "", score: 0)
     @State private var isPresentingReflection: Bool = false
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
@@ -80,11 +78,8 @@ struct ContentView: View {
                         }
 
                         // The log entries for this day
-                        LogEntriesView(day: selectedEntry) { entry in
-                            editingLogEntry = entry
-                            isPresentingEditEntry = true
-                        }
-                        .padding(.horizontal, 5)
+                        LogEntriesView(day: selectedEntry)
+                            .padding(.horizontal, 5)
                     }
                 }
                 .ignoresSafeArea(.all, edges: .bottom)
@@ -157,12 +152,6 @@ struct ContentView: View {
                     .buttonStyle(.plain)
                     .padding(.trailing, 20)
                 }
-            }
-            .sheet(isPresented: $isPresentingEditEntry) {
-                NavigationStack {
-                    LogEntrySheet(day: selectedEntry, entry: editingLogEntry)
-                }
-                .presentationDetents([.large])
             }
 #if DEBUG
             // Expose an accessibility identifier

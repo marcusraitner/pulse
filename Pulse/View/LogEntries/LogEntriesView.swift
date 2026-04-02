@@ -7,15 +7,13 @@
 
 import SwiftData
 import SwiftUI
-import OSLog
 
 /// Displays all log entries for a single day as a vertical list of theme-tinted glass cards.
 struct LogEntriesView: View {
-    @Bindable var day: DailyEntry
-    @AppStorage(AppStorageKeys.theme) var themeName: String = "traffic"
+    let day: DailyEntry
+    @State private var entryToEdit: DailyLogEntry? = nil
 
-    /// Called with the tapped entry so the parent can present an edit sheet.
-    var onEntryTapped: (DailyLogEntry) -> Void
+    @AppStorage(AppStorageKeys.theme) var themeName: String = "traffic"
 
     var body: some View {
         let logEntries = day.logEntries?.sorted(by: {
@@ -29,8 +27,14 @@ struct LogEntriesView: View {
                 .glassTintedCard(color: Theme.named(themeName).color(for: entry.score))
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    onEntryTapped(entry)
+                    entryToEdit = entry
                 }
+        }
+        .sheet(item: $entryToEdit) { entry in
+            NavigationStack {
+                LogEntrySheet(day: day, entry: entry)
+            }
+            .presentationDetents([.large])
         }
     }
 }
@@ -41,7 +45,7 @@ struct LogEntriesViewPreview: View {
 
     var body: some View {
         if let entry = entries.first {
-            LogEntriesView(day: entry) { _ in }
+            LogEntriesView(day: entry)
         } else {
             Text("No sample data available")
                 .padding()
