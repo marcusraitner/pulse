@@ -68,7 +68,9 @@ struct DailyReflectionCard: View {
                 .frame(maxWidth: .infinity)
 
                 if template.id != topTemplates.last?.id {
-                    Divider().frame(height: 30)
+                    Rectangle()
+                        .fill(.secondary.opacity(1))
+                        .frame(width: 1, height: 30)
                 }
             }
         }
