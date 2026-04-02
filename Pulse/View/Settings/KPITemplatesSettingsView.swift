@@ -11,7 +11,7 @@ import OSLog
 
 struct KPITemplatesSettingsView: View {
     @Environment(\.modelContext) private var context
-    @Query private var templates: [KPITemplate]
+    @Query(sort: \KPITemplate.sortOrder) private var templates: [KPITemplate]
     @State private var isPresentingAddTemplate: Bool = false
     @State private var templateToDelete: KPITemplate? = nil
     @State private var templateToEdit: KPITemplate? = nil
@@ -31,9 +31,21 @@ struct KPITemplatesSettingsView: View {
                     Text("Define your core metrics and add them to your daily reflection.")
                         .foregroundStyle(.secondary)
                 }
-                ForEach(templates, id: \.id) { template in
+            }
+            
+            Section {
+                ForEach(Array(templates.enumerated()), id: \.element.id) { index, template in
                     VStack(alignment: .leading) {
-                        Text(template.title).font(.headline)
+                        HStack {
+                            if index < 3 {
+                                Image(systemName: "circle.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(.orange)
+                            }
+                            Text(template.title)
+                                .font(.headline)
+                        }
+                        
                         if let note = template.note, !note.isEmpty {
                             Text(note)
                                 .font(.subheadline)
@@ -61,7 +73,18 @@ struct KPITemplatesSettingsView: View {
                         .tint(.orange)
                     }
                 }
-                
+                .onMove { indices, newOffsets in
+                    var reordered = templates
+                    reordered.move(fromOffsets: indices, toOffset: newOffsets)
+                    for (index, template) in reordered.enumerated() {
+                        template.sortOrder = index
+                    }
+                }
+            } footer: {
+                Text(" The first 3 metrics appear on your daily reflection card.")
+            }
+            
+            Section {
                 Button("Add Metric") {
                     isPresentingAddTemplate = true
                 }
@@ -72,6 +95,12 @@ struct KPITemplatesSettingsView: View {
         }
         .sheet(item: $templateToEdit) { template in
             KPIEntrySheet(template)
+        }
+        .toolbar {
+            EditButton()
+        }
+        .onDisappear {
+            context.saveOrLog("Failed to reorder KPI templates", logger: logger)
         }
         .confirmationDialog("Delete \(templateToDelete?.title ?? "")", isPresented: $isPresentingConfirmDelete) {
             Button("Delete", role: .destructive) {

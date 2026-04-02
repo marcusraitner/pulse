@@ -294,12 +294,112 @@ enum PulseVersionedSchemaV130: VersionedSchema {
     }
 }
 
+// MARK: - Schema V1.4.0
+
+/// Adds `sortOrder` to `KPITemplate` to support stable, user-defined ordering.
+/// Migration from V1.3.0 is lightweight (additive field with a default value).
+enum PulseVersionedSchemaV140: VersionedSchema {
+    static var models: [any PersistentModel.Type] {
+        [DailyEntry.self, DailyLogEntry.self, DailyKPIValue.self, KPITemplate.self]
+    }
+
+    static var versionIdentifier = Schema.Version(1, 4, 0)
+
+    @Model
+    final class DailyEntry {
+        var date: Date = Date.now
+        var summary: String = ""
+
+        var averageScore: CGFloat {
+            guard let logEntries, !logEntries.isEmpty else { return 0 }
+            return logEntries.reduce(0) { $0 + CGFloat($1.score) } / CGFloat(logEntries.count)
+        }
+
+        @Relationship(deleteRule: .cascade, inverse: \DailyLogEntry.entry)
+        var logEntries: [DailyLogEntry]? = []
+
+        @Relationship(deleteRule: .cascade, inverse: \DailyKPIValue.entry)
+        var kpiValues: [DailyKPIValue]? = []
+
+        init(date: Date, summary: String = "", logEntries: [DailyLogEntry] = []) {
+            self.date = date
+            self.summary = summary
+            self.logEntries = logEntries
+        }
+    }
+
+    @Model
+    class DailyLogEntry: Identifiable {
+        var id = UUID()
+        var timestamp: Date = Date.now
+        var log: String = ""
+        var score: Int = 0
+        var entry: DailyEntry?
+
+        var latitude: Double?
+        var longitude: Double?
+        var address: String?
+
+        var formattedTimestamp: String {
+            self.timestamp.formatted(.dateTime.hour().minute())
+        }
+
+        init(timestamp: Date, log: String, score: Int, entry: DailyEntry? = nil, latitude: Double? = nil, longitude: Double? = nil, address: String? = nil) {
+            self.timestamp = timestamp
+            self.log = log
+            self.score = score
+            self.entry = entry
+            self.latitude = latitude
+            self.longitude = longitude
+            self.address = address
+        }
+    }
+
+    /// A KPI value recorded for a specific day's entry.
+    /// Title, note, and unit are looked up via the `template` relationship.
+    @Model
+    final class DailyKPIValue {
+        var value: Int = 0
+        var template: KPITemplate?
+        var entry: DailyEntry?
+
+        init(value: Int, template: KPITemplate? = nil, entry: DailyEntry? = nil) {
+            self.value = value
+            self.template = template
+            self.entry = entry
+        }
+    }
+
+    /// A reusable KPI definition configured by the user in Settings.
+    /// Synced via CloudKit so templates are available on all devices.
+    /// Cascade delete automatically removes all associated `DailyKPIValue` records.
+    /// `sortOrder` controls display order; the top 3 appear on the ReflectionCard.
+    @Model
+    final class KPITemplate {
+        var id: UUID = UUID()
+        var title: String = ""
+        var note: String?
+        var unit: String?
+        var sortOrder: Int = 0
+
+        @Relationship(deleteRule: .cascade, inverse: \DailyKPIValue.template)
+        var values: [DailyKPIValue]? = []
+
+        init(title: String, note: String? = nil, unit: String? = nil, sortOrder: Int = 0) {
+            self.title = title
+            self.note = note
+            self.unit = unit
+            self.sortOrder = sortOrder
+        }
+    }
+}
+
 // MARK: - Migration Plan
 
 /// Defines the ordered migration path across all schema versions.
 enum PulseMigrationPlan: SchemaMigrationPlan {
     static var schemas: [any VersionedSchema.Type] {
-        [PulseVersionedSchemaV1.self, PulseVersionedSchemaV110.self, PulseVersionedSchemaV120.self, PulseVersionedSchemaV130.self]
+        [PulseVersionedSchemaV1.self, PulseVersionedSchemaV110.self, PulseVersionedSchemaV120.self, PulseVersionedSchemaV130.self, PulseVersionedSchemaV140.self]
     }
 
     static let migrateV1toV110 = MigrationStage.custom(
@@ -324,18 +424,21 @@ enum PulseMigrationPlan: SchemaMigrationPlan {
     static let migrateV120toV130: MigrationStage =
         .lightweight(fromVersion: PulseVersionedSchemaV120.self, toVersion: PulseVersionedSchemaV130.self)
 
+    static let migrateV130toV140: MigrationStage =
+        .lightweight(fromVersion: PulseVersionedSchemaV130.self, toVersion: PulseVersionedSchemaV140.self)
+
     static var stages: [MigrationStage] {
-        [migrateV1toV110, migrateV110toV120, migrateV120toV130]
+        [migrateV1toV110, migrateV110toV120, migrateV120toV130, migrateV130toV140]
     }
 }
 
 // MARK: - Current type aliases
 
 /// The current `DailyEntry` model. Always points to the latest schema version.
-typealias DailyEntry = PulseVersionedSchemaV130.DailyEntry
+typealias DailyEntry = PulseVersionedSchemaV140.DailyEntry
 /// The current `DailyLogEntry` model. Always points to the latest schema version.
-typealias DailyLogEntry = PulseVersionedSchemaV130.DailyLogEntry
+typealias DailyLogEntry = PulseVersionedSchemaV140.DailyLogEntry
 /// A KPI value recorded for a specific day's entry.
-typealias DailyKPIValue = PulseVersionedSchemaV130.DailyKPIValue
+typealias DailyKPIValue = PulseVersionedSchemaV140.DailyKPIValue
 /// A reusable KPI definition configured by the user in Settings.
-typealias KPITemplate = PulseVersionedSchemaV130.KPITemplate
+typealias KPITemplate = PulseVersionedSchemaV140.KPITemplate

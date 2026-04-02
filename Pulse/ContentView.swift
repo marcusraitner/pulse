@@ -73,7 +73,7 @@ struct ContentView: View {
                             .padding(.vertical)
                         
                         // The daily reflection
-                        DailyReflectionCard(summary: selectedEntry.summary) {
+                        DailyReflectionCard(day: selectedEntry) {
                             isPresentingReflection = true
                         }
 

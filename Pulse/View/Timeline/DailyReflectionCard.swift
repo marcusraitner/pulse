@@ -6,49 +6,84 @@
 //
 
 import SwiftUI
+import SwiftData
 
-/// Displays either a "Reflect Your Day" call-to-action button (when `summary` is empty)
-/// or the saved reflection text in a glass card. Tapping either form invokes `onTap`.
+/// Displays a glass card with the day's reflection summary and top metrics. Tapping invokes `onTap`.
 struct DailyReflectionCard: View {
-    let summary: String
-    /// Called when the user taps the card or button to open the reflection sheet.
+    let day: DailyEntry
+    /// Called when the user taps the card to open the reflection sheet.
     let onTap: () -> Void
 
+    @Query(sort: \KPITemplate.sortOrder) private var allTemplates: [KPITemplate]
+    private var topTemplates: [KPITemplate] { Array(allTemplates.prefix(3)) }
+
+    private func recordedValue(for template: KPITemplate) -> Int? {
+        day.kpiValues?.first { $0.template?.id == template.id }?.value
+    }
+
     var body: some View {
-        if summary.isEmpty {
-            Button(action: onTap) {
-                Text("Reflect Your Day")
+        HStack {
+            VStack(alignment: .leading) {
+                Text("Reflection")
                     .font(.title3)
-                    .padding()
-                    .glassCapsule()
-            }
-            .buttonStyle(.plain)
-            .padding(.vertical)
-        } else {
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("Reflection")
-                        .font(.title3)
-                        .padding(.bottom, 5)
-                    Text(summary)
+                    .padding(.bottom, 5)
+                
+                Text(day.summary)
+                
+                if !topTemplates.isEmpty {
+                    metricsRow
                 }
-                .padding()
-                Spacer()
             }
-            .glassCard()
-            .padding(.horizontal, 5)
-            .contentShape(Rectangle())
-            .onTapGesture(perform: onTap)
+            .padding()
+            Spacer()
         }
+        .glassCard()
+        .padding(.horizontal, 5)
+        .contentShape(Rectangle())
+        .onTapGesture(perform: onTap)
+    }
+
+    private var metricsRow: some View {
+        HStack(spacing: 0) {
+            ForEach(topTemplates) { template in
+                VStack(spacing: 2) {
+                    if let val = recordedValue(for: template) {
+                        Text("\(val)")
+                            .font(.headline)
+                        if let unit = template.unit, !unit.isEmpty {
+                            Text(unit)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    } else {
+                        Text("—")
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Text(template.title)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+                .frame(maxWidth: .infinity)
+
+                if template.id != topTemplates.last?.id {
+                    Divider().frame(height: 30)
+                }
+            }
+        }
+        .padding(.top, 8)
     }
 }
 
 #Preview("Empty") {
-    DailyReflectionCard(summary: "", onTap: {})
+    DailyReflectionCard(day: DailyEntry(date: .now), onTap: {})
+        .modelContainer(SampleData.shared.modelContainer)
         .background(.black)
 }
 
 #Preview("With summary") {
-    DailyReflectionCard(summary: "Had a great day overall. Felt productive and calm.", onTap: {})
+    DailyReflectionCard(day: DailyEntry(date: .now, summary: "Had a great day overall. Felt productive and calm."), onTap: {})
+        .modelContainer(SampleData.shared.modelContainer)
         .background(.black)
 }

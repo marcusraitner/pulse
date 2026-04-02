@@ -10,6 +10,7 @@ import SwiftData
 import OSLog
 
 struct KPIEntrySheet: View {
+    @Query private var templates: [KPITemplate]
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
     @State private var title = ""
@@ -38,7 +39,8 @@ struct KPIEntrySheet: View {
             let template = KPITemplate(
                 title: title,
                 note: note.isEmpty ? nil : note,
-                unit: unit.isEmpty ? nil : unit)
+                unit: unit.isEmpty ? nil : unit,
+                sortOrder: templates.count)
             context.insert(template)
             context.saveOrLog("Failure while saving new template", logger: logger)
         }

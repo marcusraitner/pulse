@@ -205,9 +205,10 @@ class SampleData {
     /// Creates fresh `KPITemplate` objects for previews and seeding.
     static func makeSeedTemplates() -> [KPITemplate] {
         [
-            KPITemplate(title: "Deep Work", note: "How many minutes of focused, uninterrupted work?", unit: "min"),
-            KPITemplate(title: "Sleep", note: "How many hours did you sleep last night?", unit: "h"),
-            KPITemplate(title: "Exercise", note: "How many minutes of exercise today?", unit: nil),
+            KPITemplate(title: "Deep Work", note: "How many minutes of focused, uninterrupted work?", unit: "min", sortOrder: 0),
+            KPITemplate(title: "Sleep", note: "How many hours did you sleep last night?", unit: "h", sortOrder: 1),
+            KPITemplate(title: "Exercise", note: "How many minutes of exercise today?", unit: nil, sortOrder: 2),
+            KPITemplate(title: "Running", note: "How many kms today?", unit: "km", sortOrder: 3),
         ]
     }
 }
