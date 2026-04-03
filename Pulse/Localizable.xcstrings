@@ -31,6 +31,9 @@
         }
       }
     },
+    "—" : {
+
+    },
     "%@" : {
       "localizations" : {
         "de" : {
@@ -295,6 +298,7 @@
       }
     },
     "Background images by %@ published on [Unsplash](https://unsplash.com/de/@hello_kseniia)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -347,6 +351,7 @@
       }
     },
     "Credits" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

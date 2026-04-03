@@ -48,6 +48,11 @@
 			path = Pulse;
 			sourceTree = "<group>";
 		};
+		2C92C5EA2F7FDBDB0048B14D /* landing */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = landing;
+			sourceTree = "<group>";
+		};
 		2C9CCF152F44350000CDAA15 /* PulseUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = PulseUITests;
@@ -82,6 +87,7 @@
 		2C37497F2F4308270079D893 = {
 			isa = PBXGroup;
 			children = (
+				2C92C5EA2F7FDBDB0048B14D /* landing */,
 				2C37498A2F4308270079D893 /* Pulse */,
 				2C9CCF152F44350000CDAA15 /* PulseUITests */,
 				2D40E6262F73FC3B0001D250 /* PulseTests */,
@@ -114,6 +120,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				2C37498A2F4308270079D893 /* Pulse */,
+				2C92C5EA2F7FDBDB0048B14D /* landing */,
 			);
 			name = Pulse;
 			productName = Pulse;
