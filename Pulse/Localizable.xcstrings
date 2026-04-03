@@ -297,17 +297,6 @@
         }
       }
     },
-    "Background images by %@ published on [Unsplash](https://unsplash.com/de/@hello_kseniia)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hintergrundbilder von %@ veröffentlicht auf [Unsplash](https://unsplash.com/de/@hello_kseniia)"
-          }
-        }
-      }
-    },
     "Cancel" : {
       "localizations" : {
         "de" : {
@@ -346,17 +335,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Schließen"
-          }
-        }
-      }
-    },
-    "Credits" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quellenangaben"
           }
         }
       }
