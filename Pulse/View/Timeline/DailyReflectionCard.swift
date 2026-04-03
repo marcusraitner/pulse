@@ -69,7 +69,7 @@ struct DailyReflectionCard: View {
 
                 if template.id != topTemplates.last?.id {
                     Rectangle()
-                        .fill(.secondary.opacity(1))
+                        .fill(.secondary)
                         .frame(width: 1, height: 30)
                 }
             }

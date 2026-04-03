@@ -18,7 +18,7 @@ extension View {
     /// Interactive glass card (rounded rect). Falls back to ultraThinMaterial.
     func glassCard(cornerRadius: CGFloat = 10) -> some View {
         if #available(iOS 26, *) {
-            AnyView(self.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: cornerRadius)))
+            AnyView(self.glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: cornerRadius)))
         } else {
             AnyView(self.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: cornerRadius)))
         }

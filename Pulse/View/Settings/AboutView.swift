@@ -55,12 +55,10 @@ struct AboutView: View {
                     .padding(.vertical)
                     Spacer()
                 }
-                Text("Credits")
-                    .font(Font.title3)
-                    .padding(.top, 20)
-                Text("Background images by \(Text("").bold()) published on [Unsplash](https://unsplash.com/de/@hello_kseniia)")
                 
-                Spacer()
+                Text("Background images by [Louis Gaudiau](https://unsplash.com/@louisgaudiau), [Kseniia Lobko](https://unsplash.com/@hello_kseniia), [Klara Kulikova](https://unsplash.com/@kkalerry), and [Martin Baron](https://unsplash.com/@elmartinbaron) found on [Unsplash](https://unsplash.com/).")
+                    .foregroundStyle(.secondary)
+                
                 HStack {
                     Spacer()
                     Text("© 2026 Marcus Raitner")
