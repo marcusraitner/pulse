@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pulse — Your Micro-Journal</title>
+  <meta name="description" content="A quick check-in for your mind. Capture your moments, understand your patterns." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0c0c0e;
+      --surface: #1c1c1e;
+      --card: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.1);
+      --accent: #ff9f0a;
+      --accent2: #30d158;
+      --text: #f2f2f7;
+      --text2: #aeaeb2;
+      --radius: 18px;
+      --max: 960px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 24px;
+      background: rgba(12,12,14,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-brand {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-right {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .nav-right a {
+      color: var(--text2);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color .2s;
+    }
+
+    .nav-right a:hover { color: var(--text); }
+
+    .lang-switcher {
+      display: flex;
+      gap: 4px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+    }
+
+    .lang-btn {
+      background: none;
+      border: none;
+      color: var(--text2);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .lang-btn.active {
+      background: var(--accent);
+      color: #000;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 80px 24px 60px;
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+
+    .app-icon {
+      width: 120px;
+      height: 120px;
+      border-radius: 26px;
+      margin-bottom: 28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 6vw, 3.8rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 span { color: var(--accent); }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--text2);
+      max-width: 520px;
+      margin: 0 auto 36px;
+    }
+
+    .appstore-btn,
+    a.appstore-btn[data-lang].visible {
+      display: inline-block;
+      transition: transform .15s, opacity .15s;
+    }
+
+    .appstore-btn:hover { transform: translateY(-2px); opacity: 0.85; }
+
+    .appstore-btn img { height: 52px; width: auto; display: block; }
+
+    /* ── Screenshots ── */
+    .screenshots {
+      padding: 20px 24px 80px;
+      max-width: var(--max);
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .screenshots-grid {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .phone-frame {
+      width: 200px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 34px;
+      overflow: hidden;
+      aspect-ratio: 9 / 19.5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      color: var(--text2);
+      font-size: 0.75rem;
+      text-align: center;
+      padding: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    .phone-frame .ph-icon { font-size: 2rem; opacity: 0.4; }
+    .phone-frame .ph-label { opacity: 0.5; }
+
+    /* ── Section heading ── */
+    .section-heading {
+      text-align: center;
+      max-width: var(--max);
+      margin: 0 auto 48px;
+      padding: 0 24px;
+    }
+
+    .section-heading .eyebrow {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .section-heading p {
+      color: var(--text2);
+      margin-top: 10px;
+      font-size: 1rem;
+    }
+
+    /* ── Features ── */
+    .features {
+      padding: 0 24px 80px;
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: border-color .2s;
+    }
+
+    .feature-card:hover { border-color: rgba(255,255,255,0.2); }
+
+    .feature-card.highlight {
+      background: linear-gradient(135deg, rgba(255,159,10,0.12), rgba(255,159,10,0.04));
+      border-color: rgba(255,159,10,0.3);
+    }
+
+    .feature-icon {
+      font-size: 1.8rem;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .feature-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .feature-card p {
+      font-size: 0.875rem;
+      color: var(--text2);
+      line-height: 1.5;
+    }
+
+    /* ── Privacy highlight banner ── */
+    .privacy-banner {
+      max-width: var(--max);
+      margin: 0 auto 80px;
+      padding: 0 24px;
+    }
+
+    .privacy-banner-inner {
+      background: linear-gradient(135deg, rgba(48,209,88,0.12), rgba(48,209,88,0.04));
+      border: 1px solid rgba(48,209,88,0.3);
+      border-radius: var(--radius);
+      padding: 36px 40px;
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    .privacy-banner-icon { font-size: 2.5rem; flex-shrink: 0; }
+
+    .privacy-banner-inner h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--accent2);
+    }
+
+    .privacy-banner-inner p {
+      color: var(--text2);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* ── Feedback ── */
+    .feedback {
+      max-width: var(--max);
+      margin: 0 auto 80px;
+      padding: 0 24px;
+    }
+
+    .feedback-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 500px) {
+      .feedback-cards { grid-template-columns: 1fr; }
+    }
+
+    .feedback-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      text-decoration: none;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      transition: border-color .2s, transform .15s;
+    }
+
+    .feedback-card:hover {
+      border-color: rgba(255,255,255,0.25);
+      transform: translateY(-2px);
+    }
+
+    .feedback-card-icon { font-size: 2rem; flex-shrink: 0; }
+
+    .feedback-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .feedback-card p {
+      font-size: 0.85rem;
+      color: var(--text2);
+      line-height: 1.4;
+    }
+
+    /* ── Privacy Policy ── */
+    .privacy-policy {
+      max-width: var(--max);
+      margin: 0 auto 80px;
+      padding: 0 24px;
+    }
+
+    .policy-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+    }
+
+    .policy-box h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .policy-date {
+      color: var(--text2);
+      font-size: 0.85rem;
+      margin-bottom: 28px;
+    }
+
+    .policy-box h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 24px 0 8px;
+      color: var(--text);
+    }
+
+    .policy-box p, .policy-box li {
+      font-size: 0.9rem;
+      color: var(--text2);
+      line-height: 1.7;
+    }
+
+    .policy-box ul {
+      padding-left: 20px;
+      margin-top: 6px;
+    }
+
+    .policy-box li { margin-bottom: 4px; }
+
+    .policy-box a { color: var(--accent); }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--text2);
+      font-size: 0.85rem;
+    }
+
+    footer a { color: var(--text2); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* ── Language toggle ── */
+    [data-lang] { display: none; }
+    [data-lang].visible { display: block; }
+    [data-lang-inline] { display: none; }
+    [data-lang-inline].visible { display: inline; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .privacy-banner-inner { flex-direction: column; padding: 24px; }
+      .policy-box { padding: 24px; }
+      .phone-frame { width: 150px; }
+      nav { padding: 12px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav>
+  <span class="nav-brand">Pulse</span>
+  <div class="nav-right">
+    <a href="#features" data-lang="en">Features</a>
+    <a href="#features" data-lang="de">Funktionen</a>
+    <a href="#feedback" data-lang="en">Feedback</a>
+    <a href="#feedback" data-lang="de">Feedback</a>
+    <a href="#privacy-policy" data-lang="en">Privacy Policy</a>
+    <a href="#privacy-policy" data-lang="de">Datenschutz</a>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('de')">DE</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <img class="app-icon" src="AppIcon.png" alt="Pulse App Icon" />
+
+  <h1 data-lang="en">Your <span>Micro-Journal.</span><br>Your Patterns.</h1>
+  <h1 data-lang="de">Dein <span>Micro-Journal.</span><br>Deine Muster.</h1>
+
+  <p class="hero-sub" data-lang="en">A quick check-in for your mind. Capture your moments, reflect on your day, and understand what drives your wellbeing.</p>
+  <p class="hero-sub" data-lang="de">Ein kurzer Check-in für deinen Geist. Halte deine Momente fest, reflektiere deinen Tag und verstehe, was dein Wohlbefinden beeinflusst.</p>
+
+  <a href="https://apps.apple.com/app/pulse-your-micro-journal/id6759242390" class="appstore-btn" data-lang="en">
+    <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us"
+         alt="Download on the App Store" />
+  </a>
+  <a href="https://apps.apple.com/app/pulse-your-micro-journal/id6759242390" class="appstore-btn" data-lang="de">
+    <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/de-de"
+         alt="Laden im App Store" />
+  </a>
+</section>
+
+<!-- ── Screenshots ── -->
+<section class="screenshots">
+  <div class="screenshots-grid">
+    <div class="phone-frame">
+      <span class="ph-icon">📋</span>
+      <span class="ph-label" data-lang="en">Timeline</span>
+      <span class="ph-label" data-lang="de">Zeitleiste</span>
+    </div>
+    <div class="phone-frame">
+      <span class="ph-icon">✍️</span>
+      <span class="ph-label" data-lang="en">Log a Moment</span>
+      <span class="ph-label" data-lang="de">Moment erfassen</span>
+    </div>
+    <div class="phone-frame">
+      <span class="ph-icon">🌅</span>
+      <span class="ph-label" data-lang="en">Daily Reflection</span>
+      <span class="ph-label" data-lang="de">Tagesreflexion</span>
+    </div>
+    <div class="phone-frame">
+      <span class="ph-icon">📊</span>
+      <span class="ph-label" data-lang="en">Metrics</span>
+      <span class="ph-label" data-lang="de">Messgrößen</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ── -->
+<section id="features">
+  <div class="section-heading">
+    <p class="eyebrow" data-lang="en">Features</p>
+    <p class="eyebrow" data-lang="de">Funktionen</p>
+    <h2 data-lang="en">Everything you need.<br>Nothing you don't.</h2>
+    <h2 data-lang="de">Alles was du brauchst.<br>Nichts was du nicht brauchst.</h2>
+  </div>
+
+  <div class="features">
+    <div class="features-grid">
+
+      <div class="feature-card">
+        <span class="feature-icon">✍️</span>
+        <h3 data-lang="en">Capture Moments</h3>
+        <h3 data-lang="de">Momente festhalten</h3>
+        <p data-lang="en">Log what's happening throughout your day — from a single sentence to a detailed note. Fast, frictionless, always at hand.</p>
+        <p data-lang="de">Halte fest, was passiert — von einem kurzen Satz bis zur ausführlichen Notiz. Schnell, unkompliziert, immer dabei.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">😊</span>
+        <h3 data-lang="en">Track Your Mood</h3>
+        <h3 data-lang="de">Stimmung verfolgen</h3>
+        <p data-lang="en">Score each moment on a simple −2 to +2 scale. See your emotional patterns emerge over days and weeks.</p>
+        <p data-lang="de">Bewerte jeden Moment auf einer einfachen Skala von −2 bis +2. Erkenne deine emotionalen Muster im Verlauf.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">🌅</span>
+        <h3 data-lang="en">Daily Reflection</h3>
+        <h3 data-lang="de">Tägliche Reflexion</h3>
+        <p data-lang="en">End each day with a brief reflection. Review your moments, write a summary, and track what mattered most.</p>
+        <p data-lang="de">Beende jeden Tag mit einer kurzen Reflexion. Überblicke deine Momente, schreibe eine Zusammenfassung.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">📊</span>
+        <h3 data-lang="en">Personal Metrics</h3>
+        <h3 data-lang="de">Persönliche Metriken</h3>
+        <p data-lang="en">Define your own KPIs — deep work hours, sleep, exercise — and track them alongside your daily reflection.</p>
+        <p data-lang="de">Definiere eigene Metriken — Tiefarbeitszeit, Schlaf, Sport — und verfolge sie gemeinsam mit deiner Tagesreflexion.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">📍</span>
+        <h3 data-lang="en">Location Tagging</h3>
+        <h3 data-lang="de">Ortsmarkierung</h3>
+        <p data-lang="en">Optionally tag your location when logging a moment. Discover how places affect your mood over time.</p>
+        <p data-lang="de">Füge optional einen Ort hinzu. Entdecke, wie Orte deine Stimmung beeinflussen.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">☁️</span>
+        <h3 data-lang="en">iCloud Sync</h3>
+        <h3 data-lang="de">iCloud-Synchronisation</h3>
+        <p data-lang="en">Your journal syncs seamlessly across all your Apple devices via iCloud — always up to date, everywhere.</p>
+        <p data-lang="de">Dein Journal synchronisiert nahtlos über alle deine Apple-Geräte per iCloud — immer aktuell, überall verfügbar.</p>
+      </div>
+
+      <div class="feature-card highlight">
+        <span class="feature-icon">🔒</span>
+        <h3 data-lang="en">Privacy by Design</h3>
+        <h3 data-lang="de">Datenschutz by Design</h3>
+        <p data-lang="en">No accounts. No tracking. No ads. Your data lives on your device and in your personal iCloud — nowhere else. We never see it.</p>
+        <p data-lang="de">Keine Konten. Kein Tracking. Keine Werbung. Deine Daten bleiben auf deinem Gerät und in deiner persönlichen iCloud — nirgendwo sonst. Wir sehen sie nie.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Privacy banner ── -->
+<div class="privacy-banner">
+  <div class="privacy-banner-inner">
+    <span class="privacy-banner-icon">🛡️</span>
+    <div>
+      <h3 data-lang="en">Your data. Your device. Full stop.</h3>
+      <h3 data-lang="de">Deine Daten. Dein Gerät. Punkt.</h3>
+      <p data-lang="en">Pulse stores everything exclusively on your iPhone and in your personal iCloud account — using Apple's CloudKit. We operate no servers, collect no analytics, and have no access to your journal whatsoever. Your reflections are yours alone.</p>
+      <p data-lang="de">Pulse speichert alles ausschließlich auf deinem iPhone und in deinem persönlichen iCloud-Account — mit Apples CloudKit. Wir betreiben keine Server, erfassen keine Analysen und haben keinerlei Zugriff auf dein Journal. Deine Reflexionen gehören allein dir.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Feedback ── -->
+<section id="feedback">
+  <div class="section-heading">
+    <p class="eyebrow">Feedback</p>
+    <h2 data-lang="en">We'd love to hear from you.</h2>
+    <h2 data-lang="de">Wir freuen uns über dein Feedback.</h2>
+    <p data-lang="en">Report a bug, suggest a feature, or just say hi.</p>
+    <p data-lang="de">Fehler melden, eine Funktion vorschlagen oder einfach Hallo sagen.</p>
+  </div>
+
+  <div class="feedback">
+    <div class="feedback-cards">
+      <a href="https://github.com/marcusraitner/pulse" target="_blank" rel="noopener" class="feedback-card">
+        <span class="feedback-card-icon">🐙</span>
+        <div>
+          <h3 data-lang="en">Open an Issue on GitHub</h3>
+          <h3 data-lang="de">Issue auf GitHub öffnen</h3>
+          <p data-lang="en">Bug reports, feature requests, and discussions — all tracked publicly on GitHub.</p>
+          <p data-lang="de">Fehlerberichte, Funktionswünsche und Diskussionen — alles öffentlich auf GitHub.</p>
+        </div>
+      </a>
+
+      <a href="mailto:pulse@raitner.de" class="feedback-card">
+        <span class="feedback-card-icon">✉️</span>
+        <div>
+          <h3 data-lang="en">Send an Email</h3>
+          <h3 data-lang="de">E-Mail senden</h3>
+          <p data-lang="en">Prefer to write directly? Reach us at pulse@raitner.de — we read every message.</p>
+          <p data-lang="de">Lieber direkt schreiben? Erreichbar unter pulse@raitner.de — wir lesen jede Nachricht.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Privacy Policy ── -->
+<section id="privacy-policy" class="privacy-policy">
+
+  <!-- English -->
+  <div class="policy-box" data-lang="en">
+    <h2>Privacy Policy</h2>
+    <p class="policy-date">Last updated: April 2026</p>
+
+    <h3>1. Overview</h3>
+    <p>Pulse ("the app") is designed with privacy as a core principle. We do not collect, transmit, or have access to any personal data you enter into the app. All data is stored locally on your device and, if you choose to enable iCloud sync, in your personal Apple iCloud account via Apple's CloudKit technology.</p>
+
+    <h3>2. Data We Do Not Collect</h3>
+    <p>We do not collect, store, or process any of the following on our own servers:</p>
+    <ul>
+      <li>Journal entries, reflections, or mood scores</li>
+      <li>Location data</li>
+      <li>Usage analytics or crash reports</li>
+      <li>Device identifiers</li>
+      <li>Any personally identifiable information</li>
+    </ul>
+
+    <h3>3. Data Stored on Your Device</h3>
+    <p>All data you create in Pulse — including moments, reflections, mood scores, metrics, and optional location information — is stored exclusively in your app's local SwiftData database on your device.</p>
+
+    <h3>4. iCloud Sync (CloudKit)</h3>
+    <p>If you have iCloud enabled on your device, Pulse uses Apple's CloudKit to sync your data across your personal Apple devices. This data is stored in your private iCloud account and is governed by <a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener">Apple's Privacy Policy</a>. We have no access to your iCloud data.</p>
+
+    <h3>5. Location Data</h3>
+    <p>Pulse can optionally tag a location to a journal entry. This requires your permission and is entirely opt-in per entry. Location data is stored only on your device and in your personal iCloud — never on our servers.</p>
+
+    <h3>6. No Third-Party Analytics or Advertising</h3>
+    <p>Pulse contains no third-party analytics SDKs, advertising networks, or tracking libraries. We do not share any data with third parties.</p>
+
+    <h3>7. App Store</h3>
+    <p>Downloading Pulse through the App Store is subject to <a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener">Apple's Privacy Policy</a>.</p>
+
+    <h3>8. Children's Privacy</h3>
+    <p>Pulse does not knowingly collect data from children under 13. Since we collect no data at all, the app is safe for all ages.</p>
+
+    <h3>9. Changes to This Policy</h3>
+    <p>We may update this privacy policy from time to time. Changes will be posted on this page with an updated date.</p>
+
+    <h3>10. Contact</h3>
+    <p>If you have questions about this privacy policy, please contact us at <a href="mailto:pulse@raitner.de">pulse@raitner.de</a>.</p>
+  </div>
+
+  <!-- German -->
+  <div class="policy-box" data-lang="de">
+    <h2>Datenschutzerklärung</h2>
+    <p class="policy-date">Zuletzt aktualisiert: April 2026</p>
+
+    <h3>1. Überblick</h3>
+    <p>Pulse wurde mit Datenschutz als zentralem Prinzip entwickelt. Wir erfassen, übermitteln oder haben keinen Zugriff auf persönliche Daten, die du in die App eingibst. Alle Daten werden lokal auf deinem Gerät gespeichert und — wenn du iCloud-Sync aktivierst — in deinem persönlichen Apple-iCloud-Account über Apples CloudKit-Technologie.</p>
+
+    <h3>2. Daten, die wir nicht erfassen</h3>
+    <p>Wir erfassen, speichern oder verarbeiten Folgendes nicht auf unseren eigenen Servern:</p>
+    <ul>
+      <li>Tagebucheinträge, Reflexionen oder Stimmungsbewertungen</li>
+      <li>Standortdaten</li>
+      <li>Nutzungsanalysen oder Absturzberichte</li>
+      <li>Gerätekennungen</li>
+      <li>Persönlich identifizierbare Informationen jeglicher Art</li>
+    </ul>
+
+    <h3>3. Auf deinem Gerät gespeicherte Daten</h3>
+    <p>Alle Daten, die du in Pulse erstellst — einschließlich Momenten, Reflexionen, Stimmungsbewertungen, Metriken und optionalen Standortinformationen — werden ausschließlich in der lokalen SwiftData-Datenbank der App auf deinem Gerät gespeichert.</p>
+
+    <h3>4. iCloud-Synchronisation (CloudKit)</h3>
+    <p>Wenn du iCloud auf deinem Gerät aktiviert hast, verwendet Pulse Apples CloudKit, um deine Daten zwischen deinen persönlichen Apple-Geräten zu synchronisieren. Diese Daten werden in deinem privaten iCloud-Account gespeichert und unterliegen der <a href="https://www.apple.com/de/legal/privacy/" target="_blank" rel="noopener">Datenschutzrichtlinie von Apple</a>. Wir haben keinen Zugriff auf deine iCloud-Daten.</p>
+
+    <h3>5. Standortdaten</h3>
+    <p>Pulse kann optional einen Standort zu einem Tagebucheintrag hinzufügen. Dies erfordert deine Genehmigung und ist vollständig opt-in pro Eintrag. Standortdaten werden nur auf deinem Gerät und in deiner persönlichen iCloud gespeichert — niemals auf unseren Servern.</p>
+
+    <h3>6. Keine Drittanbieter-Analysen oder Werbung</h3>
+    <p>Pulse enthält keine Analyse-SDKs von Drittanbietern, Werbenetzwerke oder Tracking-Bibliotheken. Wir geben keine Daten an Dritte weiter.</p>
+
+    <h3>7. App Store</h3>
+    <p>Das Herunterladen von Pulse über den App Store unterliegt der <a href="https://www.apple.com/de/legal/privacy/" target="_blank" rel="noopener">Datenschutzrichtlinie von Apple</a>.</p>
+
+    <h3>8. Datenschutz für Kinder</h3>
+    <p>Pulse erfasst wissentlich keine Daten von Kindern unter 13 Jahren. Da wir überhaupt keine Daten erfassen, ist die App für alle Altersgruppen geeignet.</p>
+
+    <h3>9. Änderungen dieser Richtlinie</h3>
+    <p>Wir können diese Datenschutzrichtlinie von Zeit zu Zeit aktualisieren. Änderungen werden auf dieser Seite mit einem aktualisierten Datum veröffentlicht.</p>
+
+    <h3>10. Kontakt</h3>
+    <p>Bei Fragen zu dieser Datenschutzerklärung kontaktiere uns bitte unter <a href="mailto:pulse@raitner.de">pulse@raitner.de</a>.</p>
+  </div>
+
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="footer-links">
+    <a href="#privacy-policy" data-lang="en">Privacy Policy</a>
+    <a href="#privacy-policy" data-lang="de">Datenschutz</a>
+    <a href="https://apps.apple.com/app/pulse-your-micro-journal/id6759242390" target="_blank" rel="noopener">App Store</a>
+    <a href="mailto:pulse@raitner.de">pulse@raitner.de</a>
+  </div>
+  <p>© 2026 Marcus Raitner · <a href="https://raitner.de" target="_blank" rel="noopener">raitner.de</a></p>
+</footer>
+
+<script>
+  function setLang(lang) {
+    document.querySelectorAll('[data-lang]').forEach(el => {
+      el.classList.toggle('visible', el.dataset.lang === lang);
+    });
+    document.querySelectorAll('[data-lang-inline]').forEach(el => {
+      el.classList.toggle('visible', el.dataset.langInline === lang);
+    });
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent.toLowerCase() === lang);
+    });
+    document.documentElement.lang = lang;
+    localStorage.setItem('pulse-lang', lang);
+  }
+
+  // Init: detect browser language or saved preference
+  const saved = localStorage.getItem('pulse-lang');
+  const browser = navigator.language.startsWith('de') ? 'de' : 'en';
+  setLang(saved || browser);
+</script>
+
+</body>
+</html>
