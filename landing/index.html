@@ -48,6 +48,8 @@
       font-size: 1.1rem;
       font-weight: 700;
       letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
     }
 
     .nav-right {
@@ -174,6 +176,8 @@
 
     .phone-frame .ph-icon { font-size: 2rem; opacity: 0.4; }
     .phone-frame .ph-label { opacity: 0.5; }
+    .phone-frame:has(img) { padding: 0; }
+    .phone-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     /* ── Section heading ── */
     .section-heading {
@@ -420,7 +424,7 @@
 
 <!-- ── Navigation ── -->
 <nav>
-  <span class="nav-brand">Pulse</span>
+  <a href="#" class="nav-brand">Pulse</a>
   <div class="nav-right">
     <a href="#features" data-lang="en">Features</a>
     <a href="#features" data-lang="de">Funktionen</a>
@@ -459,24 +463,16 @@
 <section class="screenshots">
   <div class="screenshots-grid">
     <div class="phone-frame">
-      <span class="ph-icon">📋</span>
-      <span class="ph-label" data-lang="en">Timeline</span>
-      <span class="ph-label" data-lang="de">Zeitleiste</span>
+        <img src="screenshot-timeline.png" alt="Timeline" />
     </div>
     <div class="phone-frame">
-      <span class="ph-icon">✍️</span>
-      <span class="ph-label" data-lang="en">Log a Moment</span>
-      <span class="ph-label" data-lang="de">Moment erfassen</span>
+        <img src="screenshot-moment.png" alt="Moment" />
     </div>
     <div class="phone-frame">
-      <span class="ph-icon">🌅</span>
-      <span class="ph-label" data-lang="en">Daily Reflection</span>
-      <span class="ph-label" data-lang="de">Tagesreflexion</span>
+      <img src="screenshot-metrics.png" alt="Metrics" />
     </div>
     <div class="phone-frame">
-      <span class="ph-icon">📊</span>
-      <span class="ph-label" data-lang="en">Metrics</span>
-      <span class="ph-label" data-lang="de">Messgrößen</span>
+        <img src="screenshot-aicoach.png" alt="AI Coach" />
     </div>
   </div>
 </section>
@@ -539,6 +535,14 @@
         <h3 data-lang="de">iCloud-Synchronisation</h3>
         <p data-lang="en">Your journal syncs seamlessly across all your Apple devices via iCloud — always up to date, everywhere.</p>
         <p data-lang="de">Dein Journal synchronisiert nahtlos über alle deine Apple-Geräte per iCloud — immer aktuell, überall verfügbar.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">🧠</span>
+        <h3 data-lang="en">AI Coach — On Device</h3>
+        <h3 data-lang="de">KI-Coach — auf dem Gerät</h3>
+        <p data-lang="en">Your personal AI coach analyses your moments and reflects patterns back to you — running entirely on your device. No data leaves.</p>
+        <p data-lang="de">Dein persönlicher KI-Coach analysiert deine Momente und spiegelt Muster zurück — läuft vollständig auf deinem Gerät. Keine Daten verlassen es.</p>
       </div>
 
       <div class="feature-card highlight">
