@@ -56,3 +56,19 @@ Unit tests use Swift's `Testing` framework (not XCTest). UI tests use XCTest wit
 ### Deep Links
 
 `pulseapp://log` and `pulseapp://reflect` are handled in `ContentView` via `.onOpenURL`.
+
+## Code Changes
+
+After any refactoring or deletion, always verify there are no dangling references to removed functions, closures, or variables before committing.
+
+## Git Operations
+
+When asked to commit and push, do so immediately without running extra build verification steps unless explicitly requested.
+
+## Content Generation
+
+Never hallucinate or assume features exist in the app. Only reference features you have verified in the codebase when writing marketing copy, App Store descriptions, or release notes.
+
+## Data Analysis
+
+When working with Excel/data files, always inspect the actual column layout of each file before applying transformations. Never assume two files share the same column structure.
