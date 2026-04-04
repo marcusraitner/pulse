@@ -82,7 +82,7 @@ struct ContentView: View {
                             .padding(.horizontal, 5)
                     }
                 }
-                .ignoresSafeArea(.all, edges: .bottom)
+//                .ignoresSafeArea(.all, edges: .bottom)
                 .navigationBarTitleDisplayMode(.inline)
                 .sheet(isPresented: $isPresentingSettings,
                        onDismiss: setNotifications) {
@@ -162,7 +162,7 @@ struct ContentView: View {
             )
 #endif  // DEBUG only for UI Tests
         }
-        .ignoresSafeArea(.keyboard)
+//        .ignoresSafeArea(.keyboard)
         .onOpenURL { url in
             switch url.host() {
             case "log":

@@ -13,6 +13,11 @@ import OSLog
 /// Shows the existing log entries for context and offers a rotating coaching question
 /// when no reflection has been written yet.
 struct DailyReflectionSheet: View {
+    enum FocusField: Hashable {
+        case summary
+        case kpi(UUID)
+    }
+    
     let day: DailyEntry
     
     @Query private var kpiTemplates: [KPITemplate]
@@ -20,6 +25,7 @@ struct DailyReflectionSheet: View {
     @State private var kpiValues: [UUID : String] = [:]
     @State private var reflection: String = ""
     @State private var coachingQuestion: String? = nil
+    @FocusState private var focusedField: FocusField?
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.featureFlags) private var featureFlags
@@ -97,6 +103,7 @@ struct DailyReflectionSheet: View {
                 TextField("Your reflection of this day", text: $reflection, axis: .vertical)
                     .multilineTextAlignment(.leading)
                     .lineLimit(5...Int.max)
+                    .focused($focusedField, equals: .summary)
             } header: {
                 Text("Reflect Your Day")
             } footer: {
@@ -137,6 +144,7 @@ struct DailyReflectionSheet: View {
                                 TextField("-", text: kpiBinding(for: template))
                                     .multilineTextAlignment(.trailing)
                                     .keyboardType(.numberPad)
+                                    .focused($focusedField, equals: .kpi(template.id))
                                     .frame(width: 70)
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 4)
@@ -178,6 +186,13 @@ struct DailyReflectionSheet: View {
             }
             ToolbarItem(placement: .cancellationAction) {
                 Compat.closeButton { dismiss() }
+            }
+            ToolbarItemGroup(placement: .keyboard) {
+                Button {
+                    focusedField = nil
+                } label: {
+                    Label("Done", systemImage: "keyboard.chevron.compact.down")
+                }
             }
         }
         .task {
