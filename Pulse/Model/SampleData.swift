@@ -27,7 +27,7 @@ class SampleData {
                 logEntries: [
                     DailyLogEntry(
                         timestamp: Date(timeIntervalSinceNow: -5000),
-                        log: "Good start; got distracted after an hour",
+                        log: "Good start; got distracted after an hour. Then the day went totally bogus.",
                         score: 2,
                         latitude: 37.3349,
                         longitude: -122.0090,

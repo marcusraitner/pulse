@@ -22,6 +22,7 @@ enum AppStorageKeys {
     static let theme = "theme"
     static let backgroundImageData = "backgroundImageData"
     static let backgroundImageName = "backgroundImageName"
+    static let viewMode = "viewMode"
 
     // MARK: - KPI
     static let pinnedKPITemplateIDs = "pinnedKPITemplateIDs"

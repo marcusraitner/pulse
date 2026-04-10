@@ -23,6 +23,14 @@ extension View {
             AnyView(self.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: cornerRadius)))
         }
     }
+    
+    func glassBackground(cornerRadius: CGFloat = 10) -> some View {
+        if #available(iOS 26, *) {
+            AnyView(self.glassEffect(.clear, in: RoundedRectangle(cornerRadius: cornerRadius)))
+        } else {
+            AnyView(self.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: cornerRadius)))
+        }
+    }
 
     /// Glass capsule for pill-shaped buttons. Falls back to ultraThinMaterial in a Capsule.
     func glassCapsule() -> some View {

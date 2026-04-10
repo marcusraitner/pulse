@@ -22,7 +22,6 @@ struct HorizontalTimelineView: View {
     @State private var entriesByDate: [Date: DailyEntry] = [:]
     @State private var position: ScrollPosition = .init(idType: Date.self)
     @State private var containerWidth: CGFloat = 0.0
-    @State private var isPresentingInsights: Bool = false
 
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
 
@@ -62,9 +61,9 @@ struct HorizontalTimelineView: View {
                     }
                 }
             }
+            .frame(height: totalHeight)
             .scrollTargetLayout()
         }
-        .frame(idealHeight: totalHeight)
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition($position, anchor: .center)
         .contentMargins(.horizontal, (containerWidth - barWidth) * 0.5, for: .scrollContent)
@@ -109,25 +108,6 @@ struct HorizontalTimelineView: View {
         }
         .onChange(of: allEntries, initial: true) {
             entriesByDate = Dictionary(uniqueKeysWithValues: allEntries.map { ($0.date, $0 ) } )
-        }
-        .sheet(isPresented: $isPresentingInsights) {
-            // #available required by compiler: InsightsView is @available(iOS 26, *)
-            if featureFlags.iOS26, #available(iOS 26, *) {
-                NavigationStack {
-                    InsightsView()
-                }
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                if featureFlags.iOS26 {
-                    Button {
-                        isPresentingInsights = true
-                    } label: {
-                        Image(systemName: "sparkles")
-                    }
-                }
-            }
         }
         .sensoryFeedback(.impact, trigger: selectedEntry)
         .onChange(of: scrollToToday) { _, new in

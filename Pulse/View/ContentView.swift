@@ -10,6 +10,18 @@ import SwiftData
 import SwiftUI
 import StoreKit
 
+enum ViewMode: String, CaseIterable {
+    case day, week, month
+
+    var systemImage: String {
+        switch self {
+        case .day:   return "calendar.day.timeline.left"
+        case .week:  return "rectangle.grid.1x2"
+        case .month: return "square.grid.3x3"
+        }
+    }
+}
+
 /// Root view that orchestrates the timeline, selected-date display, log entries,
 /// reflection card, and FAB. Also owns sheet presentation for settings, new/edit
 /// entry, and reflection, and handles deep-link URLs (`pulseapp://log`, `pulseapp://reflect`).
@@ -22,15 +34,13 @@ struct ContentView: View {
     @Query private var allEntries: [DailyEntry]
     @Query private var allLogs: [DailyLogEntry]
     
-    private var countDays: Int { allEntries.count }
     private var countLogs: Int { allLogs.count }
-
     
     @AppStorage(AppStorageKeys.notificationsEnabled) private var notificationsEnabled: Bool = true
     @AppStorage(AppStorageKeys.freezeHistory) private var freezeHistory: Bool = true
-    @AppStorage(AppStorageKeys.showStats) private var showStats: Bool = true
     @AppStorage(AppStorageKeys.reflectionReminder) private var reflectionReminder: Bool = true
     @AppStorage(AppStorageKeys.reflectionReminderTime) private var reflectionReminderTime: Date?
+    @AppStorage(AppStorageKeys.viewMode) private var viewMode: ViewMode = .day
     
     @State private var reviewService = ReviewService()
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
@@ -38,6 +48,7 @@ struct ContentView: View {
     @State private var isPresentingSettings: Bool = false
     @State private var isPresentingNewEntry: Bool = false
     @State private var isPresentingReflection: Bool = false
+    @State private var isPresentingInsights: Bool = false
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
 
@@ -50,36 +61,36 @@ struct ContentView: View {
 
                 ScrollView {
                     LazyVStack {
-                        // The currently selected date
-                        SelectedDateView(date: selectedEntry.date)
-                            .padding(.horizontal)
-                            .background(alignment: .bottom) {
-                                Rectangle()
-                                    .frame(height: 1)
-                                    .foregroundStyle(.white)
-                            }
-                        
-                        // Delete Button (only admin mode)
-                        if featureFlags.adminEnabled {
-                            Button("Delete Entry", systemImage: "trash") {
-                                context.delete(selectedEntry)
-                                context.saveOrLog("Failure saving deleted entry", logger: logger)
-                            }
-                            .tint(.white)
-                        }
-                        
-                        // The timeline scroll view
-                        HorizontalTimelineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
-                            .padding(.vertical)
-                        
-                        // The daily reflection
-                        DailyReflectionCard(day: selectedEntry) {
-                            isPresentingReflection = true
-                        }
+                        if viewMode == .day {
+                            // The currently selected date
+                            SelectedDateView(date: selectedEntry.date)
+                                .padding(.vertical)
+                                .padding(.horizontal)
 
-                        // The log entries for this day
-                        LogEntriesView(day: selectedEntry)
-                            .padding(.horizontal, 5)
+                            // Delete Button (only admin mode)
+                            if featureFlags.adminEnabled {
+                                Button("Delete Entry", systemImage: "trash") {
+                                    context.delete(selectedEntry)
+                                    context.saveOrLog("Failure saving deleted entry", logger: logger)
+                                }
+                                .tint(.white)
+                            }
+
+                            // The timeline scroll view
+                            HorizontalTimelineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
+                                .padding(.vertical)
+
+                            // The daily reflection
+                            DailyReflectionCard(day: selectedEntry) {
+                                isPresentingReflection = true
+                            }
+
+                            // The log entries for this day
+                            LogEntriesView(day: selectedEntry)
+                                .padding(.horizontal, 5)
+                        } else {
+                            AggregatedTimelineView(aggregationLevel: viewMode == .week ? .week : .month)
+                        }
                     }
                 }
 //                .ignoresSafeArea(.all, edges: .bottom)
@@ -99,7 +110,24 @@ struct ContentView: View {
                         DailyReflectionSheet(day: selectedEntry)
                     }
                 }
+                .sheet(isPresented: $isPresentingInsights) {
+                    // #available required by compiler: InsightsView is @available(iOS 26, *)
+                    if featureFlags.iOS26, #available(iOS 26, *) {
+                        NavigationStack {
+                            InsightsView()
+                        }
+                    }
+                }
                 .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        if featureFlags.iOS26 {
+                            Button {
+                                isPresentingInsights = true
+                            } label: {
+                                Image(systemName: "sparkles")
+                            }
+                        }
+                    }
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("Settings", systemImage: "gearshape.fill") {
                             isPresentingSettings = true
@@ -107,21 +135,13 @@ struct ContentView: View {
                         .tint(.white)
                     }
                     ToolbarItem(placement: .principal) {
-                        if showStats {
-                            HStack {
-                                VStack {
-                                    Image(systemName: "calendar")
-                                    Text("\(countDays)")
-                                }
-                                VStack {
-                                    Image(systemName: "list.bullet.rectangle")
-                                    Text("\(countLogs)")
-                                }
-                                .padding(.leading, 4)
+                        Picker("View Mode", selection: $viewMode) {
+                            ForEach(ViewMode.allCases, id: \.self) { mode in
+                                Image(systemName: mode.systemImage).tag(mode)
                             }
-                            .font(.footnote)
-                            .foregroundStyle(.white)
                         }
+                        .pickerStyle(.segmented)
+                        .frame(maxWidth: 160)
                     }
                 }
                 .task {
@@ -140,8 +160,8 @@ struct ContentView: View {
                     }
                 }
                
-                // The Add Button
-                if Calendar.current.isDateInToday(selectedEntry.date) || !freezeHistory {
+                // The Add Button (day mode only)
+                if viewMode == .day && (Calendar.current.isDateInToday(selectedEntry.date) || !freezeHistory) {
                     Button(action: { isPresentingNewEntry = true }) {
                         Image(systemName: "plus")
                             .font(.largeTitle)
