@@ -32,11 +32,9 @@ struct DaysListView: View {
     }
     
     var body: some View {
-        ScrollView {
-            LazyVStack {
-                ForEach(allEntries) { entry in
-                    DayCardView(date: entry.date, entry: entry)
-                }
+        LazyVStack {
+            ForEach(allEntries) { entry in
+                DayCardView(entry: entry, aggregationLevel: aggregationLevel)
             }
         }
     }

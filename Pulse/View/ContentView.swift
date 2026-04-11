@@ -84,10 +84,11 @@ struct ContentView: View {
                             DailyReflectionCard(day: selectedEntry) {
                                 isPresentingReflection = true
                             }
+                            .padding(.horizontal, 8)
 
                             // The log entries for this day
                             LogEntriesView(day: selectedEntry)
-                                .padding(.horizontal, 5)
+                                .padding(.horizontal, 8)
                         } else {
                             AggregatedTimelineView(aggregationLevel: viewMode == .week ? .week : .month)
                                 .id(viewMode)

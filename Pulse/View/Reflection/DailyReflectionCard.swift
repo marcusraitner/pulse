@@ -38,7 +38,6 @@ struct DailyReflectionCard: View {
             Spacer()
         }
         .glassCard()
-        .padding(.horizontal, 5)
         .contentShape(Rectangle())
         .onTapGesture(perform: onTap)
     }

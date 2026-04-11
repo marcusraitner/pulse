@@ -11,11 +11,10 @@ import SwiftUI
 /// A compact glass card representing a single day: a date header and its log moments.
 /// Designed to be reused as a building block inside the week view.
 ///
-/// - `date` is always required (so the card can be shown even for days with no entry).
-/// - `entry` is optional; when `nil` the card shows only the date header.
+/// - `entry` The entry to display in this card.
 struct DayCardView: View {
-    let date: Date
     let entry: DailyEntry
+    let aggregationLevel: AggregationLevel
 
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
     @State private var isPresentingDay: Bool = false
@@ -32,25 +31,31 @@ struct DayCardView: View {
         VStack(alignment: .leading, spacing: 6) {
             // Day header
             HStack(spacing: 6) {
-                Text(date.formatted(.dateTime.weekday(.abbreviated)))
+                Text(entry.date.formatted(.dateTime.weekday(.abbreviated)))
                     .bold()
-                Text(date.formatted(.dateTime.day().month()))
+                Text(entry.date.formatted(.dateTime.day().month()))
                 Spacer()
+                if aggregationLevel == .month {
+                    ForEach(sortedMoments) { moment in
+                        Circle()
+                            .fill(Theme.named(themeName).color(for: moment.score))
+                            .frame(width: 10, height: 10)
+                    }
+                }
             }
-            .font(.footnote)
             
             if !entry.summary.isEmpty {
                 Text(entry.summary)
-                    .italic()
-                    .font(.footnote)
                     .lineLimit(2)
                     .padding(.vertical, 4)
             }
 
-            // Compact moment rows
-            ForEach(sortedMoments) { moment in
-                CompactMomentRow(logEntry: moment)
-                    .contentShape(Rectangle())
+            if aggregationLevel == .week {
+                // Compact moment rows
+                ForEach(sortedMoments) { moment in
+                    CompactMomentRow(logEntry: moment)
+                        .contentShape(Rectangle())
+                }
             }
         }
         .padding(10)
@@ -78,17 +83,17 @@ private struct CompactMomentRow: View {
         HStack(spacing: 5) {
             Circle()
                 .fill(Theme.named(themeName).color(for: logEntry.score))
-                .frame(width: 8, height: 8)
+                .frame(width: 10, height: 10)
 
             Text(logEntry.log)
-                .font(.caption)
+                .font(.footnote)
                 .lineLimit(1)
                 .foregroundStyle(.primary)
 
             Spacer(minLength: 4)
 
             Text(logEntry.formattedTimestamp)
-                .font(.caption)
+                .font(.footnote)
                 .foregroundStyle(.primary.opacity(0.5))
                 .fixedSize()
         }
@@ -98,11 +103,12 @@ private struct CompactMomentRow: View {
 // MARK: - Previews
 
 private struct DayCardPreviewContainer: View {
+    let aggregationLevel: AggregationLevel
     @Query(sort: \DailyEntry.date, order: .reverse) private var entries: [DailyEntry]
 
     var body: some View {
         if let entry = entries.first {
-            DayCardView(date: entry.date, entry: entry)
+            DayCardView(entry: entry, aggregationLevel: aggregationLevel)
                 .padding()
                 .background(.black)
         } else {
@@ -111,13 +117,12 @@ private struct DayCardPreviewContainer: View {
     }
 }
 
-#Preview("With moments") {
-    DayCardPreviewContainer()
+#Preview("Week Level") {
+    DayCardPreviewContainer(aggregationLevel: .week)
         .modelContainer(SampleData.shared.modelContainer)
 }
 
-#Preview("Entry, no moments") {
-    DayCardView(date: .now, entry: DailyEntry(date: .now))
-        .padding()
-        .background(.black)
+#Preview("Month Level") {
+    DayCardPreviewContainer(aggregationLevel: .month)
+        .modelContainer(SampleData.shared.modelContainer)
 }
