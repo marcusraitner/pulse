@@ -54,7 +54,8 @@ struct AggregatedTimelineView: View {
         
         while current < end {
             days.updateValue(nil, forKey: current)
-            current = cal.date(byAdding: .day, value: 1, to: current)!
+            guard let next = cal.date(byAdding: .day, value: 1, to: current) else { break }
+            current = next
         }
         
         for entry in entries(for: periodStart) {
@@ -117,7 +118,7 @@ struct AggregatedTimelineView: View {
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition($position, anchor: .center)
         .contentMargins(.horizontal, (containerWidth - cardWidth - 20) * 0.5, for: .scrollContent)
-        .onChange(of: periodStarts) { _, newPeriods in
+        .onChange(of: periodStarts, initial: true) { _, newPeriods in
             guard let last = newPeriods.last else { return }
             position.scrollTo(id: last, anchor: .center)
             selectedStartDate = last
@@ -141,6 +142,7 @@ struct AggregatedTimelineView: View {
 
         DaysListView(aggregationLevel: aggregationLevel, date: selectedStartDate)
             .padding(.top, 10)
+            .padding(.horizontal, 8)
     }
 }
 

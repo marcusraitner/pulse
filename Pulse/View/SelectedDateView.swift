@@ -18,8 +18,8 @@ struct SelectedDateView: View {
                 switch level {
                 case .week:
                     let cal = Calendar.current
-                    let start = cal.dateInterval(of: .weekOfYear, for: date)!.start
-                    let end = cal.date(byAdding: .day, value: 6, to: start)!
+                    let start = cal.dateInterval(of: .weekOfYear, for: date)?.start ?? date
+                    let end = cal.date(byAdding: .day, value: 6, to: start) ?? start
                     
                     Text("Week \(date.formatted(.dateTime.week()))")
                     Text("\(start.formatted(.dateTime.day().month(.defaultDigits).year())) – \(end.formatted(.dateTime.day().month(.defaultDigits).year()))")
