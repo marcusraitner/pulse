@@ -141,7 +141,7 @@ struct DailyReflectionSheet: View {
                             .padding(.trailing, 4)
                             Spacer()
                             VStack(alignment: .trailing) {
-                                TextField("-", text: kpiBinding(for: template))
+                                TextField("—", text: kpiBinding(for: template))
                                     .multilineTextAlignment(.trailing)
                                     .keyboardType(.numberPad)
                                     .focused($focusedField, equals: .kpi(template.id))

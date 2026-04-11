@@ -67,11 +67,6 @@ struct HorizontalTimelineView: View {
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition($position, anchor: .center)
         .contentMargins(.horizontal, (containerWidth - barWidth) * 0.5, for: .scrollContent)
-        .task {
-            if let last = allEntries.last {
-                position.scrollTo(id: last.date, anchor: .center)
-            }
-        }
         .onGeometryChange(for: CGSize.self) { proxy in
             proxy.size
         } action: { old, new in
@@ -108,6 +103,10 @@ struct HorizontalTimelineView: View {
         }
         .onChange(of: allEntries, initial: true) {
             entriesByDate = Dictionary(uniqueKeysWithValues: allEntries.map { ($0.date, $0 ) } )
+            
+            if let last = allEntries.last {
+                position.scrollTo(id: last.date, anchor: .center)
+            }
         }
         .sensoryFeedback(.impact, trigger: selectedEntry)
         .onChange(of: scrollToToday) { _, new in

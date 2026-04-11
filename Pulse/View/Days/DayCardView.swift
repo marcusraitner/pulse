@@ -37,7 +37,15 @@ struct DayCardView: View {
                 Text(date.formatted(.dateTime.day().month()))
                 Spacer()
             }
-            .font(.caption)
+            .font(.footnote)
+            
+            if !entry.summary.isEmpty {
+                Text(entry.summary)
+                    .italic()
+                    .font(.footnote)
+                    .lineLimit(2)
+                    .padding(.vertical, 4)
+            }
 
             // Compact moment rows
             ForEach(sortedMoments) { moment in
@@ -75,13 +83,13 @@ private struct CompactMomentRow: View {
             Text(logEntry.log)
                 .font(.caption)
                 .lineLimit(1)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.primary)
 
             Spacer(minLength: 4)
 
             Text(logEntry.formattedTimestamp)
-                .font(.caption2)
-                .foregroundStyle(.white.opacity(0.5))
+                .font(.caption)
+                .foregroundStyle(.primary.opacity(0.5))
                 .fixedSize()
         }
     }

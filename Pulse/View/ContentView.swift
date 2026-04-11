@@ -90,10 +90,10 @@ struct ContentView: View {
                                 .padding(.horizontal, 5)
                         } else {
                             AggregatedTimelineView(aggregationLevel: viewMode == .week ? .week : .month)
+                                .id(viewMode)
                         }
                     }
                 }
-//                .ignoresSafeArea(.all, edges: .bottom)
                 .navigationBarTitleDisplayMode(.inline)
                 .sheet(isPresented: $isPresentingSettings,
                        onDismiss: setNotifications) {

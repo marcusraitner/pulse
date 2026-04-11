@@ -117,10 +117,10 @@ struct AggregatedTimelineView: View {
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition($position, anchor: .center)
         .contentMargins(.horizontal, (containerWidth - cardWidth - 20) * 0.5, for: .scrollContent)
-        .task {
-            if let last = periodStarts.last {
-                position.scrollTo(id: last, anchor: .center)
-            }
+        .onChange(of: periodStarts) { _, newPeriods in
+            guard let last = newPeriods.last else { return }
+            position.scrollTo(id: last, anchor: .center)
+            selectedStartDate = last
         }
         .onGeometryChange(for: CGSize.self) { proxy in
             proxy.size
