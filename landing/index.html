@@ -150,15 +150,20 @@
     }
 
     .screenshots-grid {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 540px) {
+      .screenshots-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
     }
 
     .phone-frame {
-      width: 200px;
-      flex-shrink: 0;
+      width: 100%;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 34px;
@@ -438,7 +443,6 @@
     @media (max-width: 600px) {
       .privacy-banner-inner { flex-direction: column; padding: 24px; }
       .policy-box { padding: 24px; }
-      .phone-frame { width: 150px; }
       nav { padding: 12px 16px; }
     }
   </style>
@@ -485,6 +489,12 @@
   <div class="screenshots-grid">
     <div class="phone-frame">
         <img src="screenshot-timeline.png" alt="Timeline" />
+    </div>
+    <div class="phone-frame">
+        <img src="screenshot-week.png" alt="Week View" />
+    </div>
+    <div class="phone-frame">
+        <img src="screenshot-month.png" alt="Month View" />
     </div>
     <div class="phone-frame">
         <img src="screenshot-moment.png" alt="Moment" />

@@ -63,6 +63,11 @@
 			path = PulseTests;
 			sourceTree = "<group>";
 		};
+		2D5025282F8BF571006623FE /* App-Store */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "App-Store";
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +92,7 @@
 		2C37497F2F4308270079D893 = {
 			isa = PBXGroup;
 			children = (
+				2D5025282F8BF571006623FE /* App-Store */,
 				2C92C5EA2F7FDBDB0048B14D /* landing */,
 				2C37498A2F4308270079D893 /* Pulse */,
 				2C9CCF152F44350000CDAA15 /* PulseUITests */,
