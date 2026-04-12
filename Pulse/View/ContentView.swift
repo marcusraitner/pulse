@@ -274,5 +274,7 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .modelContainer(SampleData.shared.modelContainer)
+        .environment(\.featureFlags, FeatureFlags(editHistory: true, adminEnabled: false))
+        .preferredColorScheme(.dark)
 }
 

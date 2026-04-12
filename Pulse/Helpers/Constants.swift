@@ -18,7 +18,6 @@ enum AppStorageKeys {
 
     // MARK: - Display
     static let freezeHistory = "freezeHistory"
-    static let showStats = "showStats"
     static let theme = "theme"
     static let backgroundImageData = "backgroundImageData"
     static let backgroundImageName = "backgroundImageName"

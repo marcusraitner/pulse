@@ -15,7 +15,6 @@ import UIKit
 
 struct SettingsView: View {
     @AppStorage(AppStorageKeys.freezeHistory) private var freezeHistory: Bool = true
-    @AppStorage(AppStorageKeys.showStats) private var showStats: Bool = true
     @AppStorage(AppStorageKeys.notificationsEnabled) private var notificationsEnabled: Bool = true
     @AppStorage(AppStorageKeys.reflectionReminder) private var reflectionReminder: Bool = true
     @AppStorage(AppStorageKeys.reflectionReminderTime) private var reflectionReminderTime: Date =
@@ -49,42 +48,42 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-//            // MARK: General
-//            NavigationLink() {
-//                Form {
-//                    Section {
-//                        VStack(alignment: .leading) {
-//                            Image(systemName: "gear")
-//                                .titleLabelIcon(.gray)
-//                            Text("General")
-//                                .font(.title2.bold())
-//                                .padding(.top, 4)
-//                            Text("Adjust general settings here.")
-//                                .foregroundStyle(.secondary)
-//                            
-//                        }
+            // MARK: General
+            NavigationLink() {
+                Form {
+                    Section {
+                        VStack(alignment: .leading) {
+                            Image(systemName: "gear")
+                                .titleLabelIcon(.gray)
+                            Text("General")
+                                .font(.title2.bold())
+                                .padding(.top, 4)
+                            Text("Adjust general settings here.")
+                                .foregroundStyle(.secondary)
+                            
+                        }
 //                        Toggle(isOn: $showStats) {
 //                            Text("Show Statistics")
 //                                .font(.headline)
 //                            Text("Show number of days and entries")
 //                        }
-//                        
-//                        if featureFlags.editHistory {
-//                            Toggle(isOn: $freezeHistory) {
-//                                Text("Freeze History")
-//                                Text("If enabled, entries in the past cannot be modified")
-//                            }
-//                        }
-//                    }
-//                }
-//            } label: {
-//                Label {
-//                    Text("General")
-//                } icon: {
-//                    Image(systemName: "gear")
-//                        .listLabelIcon(.gray)
-//                }
-//            }
+                        
+                        if featureFlags.editHistory {
+                            Toggle(isOn: $freezeHistory) {
+                                Text("Freeze History")
+                                Text("If enabled, entries in the past cannot be modified")
+                            }
+                        }
+                    }
+                }
+            } label: {
+                Label {
+                    Text("General")
+                } icon: {
+                    Image(systemName: "gear")
+                        .listLabelIcon(.gray)
+                }
+            }
             // MARK: Appearance
             NavigationLink() {
                 Form {
