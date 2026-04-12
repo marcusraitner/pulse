@@ -36,10 +36,16 @@ struct DayCardView: View {
                 Text(entry.date.formatted(.dateTime.day().month()))
                 Spacer()
                 if aggregationLevel == .month {
-                    ForEach(sortedMoments) { moment in
+                    let maxDots = 8
+                    ForEach(Array(sortedMoments.prefix(maxDots))) { moment in
                         Circle()
                             .fill(Theme.named(themeName).color(for: moment.score))
                             .frame(width: 10, height: 10)
+                    }
+                    if sortedMoments.count > maxDots {
+                        Text("+\(sortedMoments.count - maxDots)")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
                     }
                 }
             }

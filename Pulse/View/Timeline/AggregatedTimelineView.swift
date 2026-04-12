@@ -73,76 +73,80 @@ struct AggregatedTimelineView: View {
         let width = aggregationLevel == .week ? 8.0 : 6.0
         let cardWidth: CGFloat = aggregationLevel == .week ? 7 * (width + 2) : 31 * (width + 2)
         
-        SelectedDateView(date: selectedStartDate, level: aggregationLevel)
-            .padding(.vertical)
-        
-        ScrollView(.horizontal, showsIndicators: false) {
-            LazyHStack(spacing: 8) {
-                ForEach(periodStarts, id: \.self) { periodStart in
-                    HStack(spacing: 2) {
-                        ForEach(days(for: periodStart).sorted(by: { $0.key < $1.key }), id: \.key) { (day, entry) in
-                            if let entry {
-                                let avg: CGFloat = entry.averageScore
-                                let barHeight: CGFloat = max(2, heightScale * avg.magnitude)
-                                let yOffset: CGFloat = -0.5 * heightScale * avg
-                                
-                                RoundedRectangle(cornerRadius: 2)
-                                    .fill(Theme.named(themeName).gradient(for: entry.averageScore))
-                                    .frame(width: width, height: barHeight)
-                                    .offset(y: yOffset)
-                            } else {
-                                RoundedRectangle(cornerRadius: 2)
-                                    .fill(.clear)
-                                    .frame(width: width, height: totalHeight)
+        ScrollView(.vertical) {
+            VStack(spacing: 0) {
+                SelectedDateView(date: selectedStartDate, level: aggregationLevel)
+                    .padding(.vertical)
+                
+                ScrollView(.horizontal, showsIndicators: false) {
+                    LazyHStack(spacing: 8) {
+                        ForEach(periodStarts, id: \.self) { periodStart in
+                            HStack(spacing: 2) {
+                                ForEach(days(for: periodStart).sorted(by: { $0.key < $1.key }), id: \.key) { (day, entry) in
+                                    if let entry {
+                                        let avg: CGFloat = entry.averageScore
+                                        let barHeight: CGFloat = max(2, heightScale * avg.magnitude)
+                                        let yOffset: CGFloat = -0.5 * heightScale * avg
+                                        
+                                        RoundedRectangle(cornerRadius: 2)
+                                            .fill(Theme.named(themeName).gradient(for: entry.averageScore))
+                                            .frame(width: width, height: barHeight)
+                                            .offset(y: yOffset)
+                                    } else {
+                                        RoundedRectangle(cornerRadius: 2)
+                                            .fill(.clear)
+                                            .frame(width: width, height: totalHeight)
+                                    }
+                                }
+                            }
+                            .frame(width: cardWidth, height: totalHeight)
+                            .padding(10)
+                            .glassBackground()
+                            .contentShape(RoundedRectangle(cornerRadius: 10))
+                            .id(periodStart)
+                            .onTapGesture {
+                                withAnimation(.default) {
+                                    position.scrollTo(
+                                        id: periodStart,
+                                        anchor: .center
+                                    )
+                                }
                             }
                         }
                     }
-                    .frame(width: cardWidth, height: totalHeight)
-                    .padding(10)
-                    .glassBackground()
-                    .contentShape(RoundedRectangle(cornerRadius: 10))
-                    .id(periodStart)
-                    .onTapGesture {
-                        withAnimation(.default) {
-                            position.scrollTo(
-                                id: periodStart,
-                                anchor: .center
-                            )
-                        }
-                    }
+                    .scrollTargetLayout()
+                    .frame(height: totalHeight + 20)
                 }
-            }
-            .scrollTargetLayout()
-            .frame(height: totalHeight + 20)
-       }
-        .scrollTargetBehavior(.viewAligned)
-        .scrollPosition($position, anchor: .center)
-        .contentMargins(.horizontal, (containerWidth - cardWidth - 20) * 0.5, for: .scrollContent)
-        .onChange(of: periodStarts, initial: true) { _, newPeriods in
-            guard let last = newPeriods.last else { return }
-            position.scrollTo(id: last, anchor: .center)
-            selectedStartDate = last
+                .scrollTargetBehavior(.viewAligned)
+                .scrollPosition($position, anchor: .center)
+                .contentMargins(.horizontal, (containerWidth - cardWidth - 20) * 0.5, for: .scrollContent)
+                .onChange(of: periodStarts, initial: true) { _, newPeriods in
+                    guard let last = newPeriods.last else { return }
+                    position.scrollTo(id: last, anchor: .center)
+                    selectedStartDate = last
+                }
+                .onGeometryChange(for: CGSize.self) { proxy in
+                    proxy.size
+                } action: { old, new in
+                    containerWidth = new.width
+                }
+                .onChange(of: position) { _, new in
+                    guard let date = new.viewID(type: Date.self) else {
+                        logger.warning("Could not find date in scroll position")
+                        return
+                    }
+                    
+                    selectedStartDate = date
+                    logger.trace("New selected date: \(selectedStartDate)")
+                }
+                .sensoryFeedback(.impact, trigger: selectedStartDate)
+                .padding(.vertical, 20)
+                
+                DaysListView(aggregationLevel: aggregationLevel, date: selectedStartDate)
+                    .padding(.top, 10)
+                    .padding(.horizontal, 8)
+            } // VStack
         }
-        .onGeometryChange(for: CGSize.self) { proxy in
-            proxy.size
-        } action: { old, new in
-            containerWidth = new.width
-        }
-        .onChange(of: position) { _, new in
-            guard let date = new.viewID(type: Date.self) else {
-                logger.warning("Could not find date in scroll position")
-                return
-            }
-
-            selectedStartDate = date
-            logger.trace("New selected date: \(selectedStartDate)")
-        }
-        .sensoryFeedback(.impact, trigger: selectedStartDate)
-        .padding(.vertical, 20)
-
-        DaysListView(aggregationLevel: aggregationLevel, date: selectedStartDate)
-            .padding(.top, 10)
-            .padding(.horizontal, 8)
     }
 }
 

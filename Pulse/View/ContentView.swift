@@ -59,9 +59,9 @@ struct ContentView: View {
 
                 BackgroundImageView()
 
-                ScrollView {
-                    LazyVStack {
-                        if viewMode == .day {
+                if viewMode == .day {
+                    ScrollView {
+                        LazyVStack {
                             // The currently selected date
                             SelectedDateView(date: selectedEntry.date)
                                 .padding(.vertical)
@@ -89,78 +89,13 @@ struct ContentView: View {
                             // The log entries for this day
                             LogEntriesView(day: selectedEntry)
                                 .padding(.horizontal, 8)
-                        } else {
-                            AggregatedTimelineView(aggregationLevel: viewMode == .week ? .week : .month)
-                                .id(viewMode)
                         }
                     }
+                } else {
+                    AggregatedTimelineView(aggregationLevel: viewMode == .week ? .week : .month)
+                        .id(viewMode)
                 }
-                .navigationBarTitleDisplayMode(.inline)
-                .sheet(isPresented: $isPresentingSettings,
-                       onDismiss: setNotifications) {
-                    settingsSheetStack
-                }
-                .sheet(isPresented: $isPresentingNewEntry) {
-                    NavigationStack {
-                        LogEntrySheet(day: selectedEntry)
-                    }
-                    .presentationDetents([.large])
-                }
-                .sheet(isPresented: $isPresentingReflection) {
-                    NavigationStack {
-                        DailyReflectionSheet(day: selectedEntry)
-                    }
-                }
-                .sheet(isPresented: $isPresentingInsights) {
-                    // #available required by compiler: InsightsView is @available(iOS 26, *)
-                    if featureFlags.iOS26, #available(iOS 26, *) {
-                        NavigationStack {
-                            InsightsView()
-                        }
-                    }
-                }
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        if featureFlags.iOS26 {
-                            Button {
-                                isPresentingInsights = true
-                            } label: {
-                                Image(systemName: "sparkles")
-                            }
-                        }
-                    }
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Settings", systemImage: "gearshape.fill") {
-                            isPresentingSettings = true
-                        }
-                        .tint(.white)
-                    }
-                    ToolbarItem(placement: .principal) {
-                        Picker("View Mode", selection: $viewMode) {
-                            ForEach(ViewMode.allCases, id: \.self) { mode in
-                                Image(systemName: mode.systemImage).tag(mode)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                        .frame(maxWidth: 160)
-                    }
-                }
-                .task {
-                    await initApplication()
-                    updateToday()
-                }
-                .onChange(of: scenePhase) { _, newPhase in
-                    if newPhase == .active {
-                        logger.trace("scene is now active. Updating today.")
-                        updateToday()
-                    }
-                }
-                .onChange(of: countLogs) { old, new in
-                    if new > old {
-                        reviewService.considerRequesting(countLog: countLogs) { requestReview() }
-                    }
-                }
-               
+
                 // The Add Button (day mode only)
                 if viewMode == .day && (Calendar.current.isDateInToday(selectedEntry.date) || !freezeHistory) {
                     Button(action: { isPresentingNewEntry = true }) {
@@ -172,6 +107,71 @@ struct ContentView: View {
                     }
                     .buttonStyle(.plain)
                     .padding(.trailing, 20)
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $isPresentingSettings,
+                   onDismiss: setNotifications) {
+                settingsSheetStack
+            }
+            .sheet(isPresented: $isPresentingNewEntry) {
+                NavigationStack {
+                    LogEntrySheet(day: selectedEntry)
+                }
+                .presentationDetents([.large])
+            }
+            .sheet(isPresented: $isPresentingReflection) {
+                NavigationStack {
+                    DailyReflectionSheet(day: selectedEntry)
+                }
+            }
+            .sheet(isPresented: $isPresentingInsights) {
+                // #available required by compiler: InsightsView is @available(iOS 26, *)
+                if featureFlags.iOS26, #available(iOS 26, *) {
+                    NavigationStack {
+                        InsightsView()
+                    }
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    if featureFlags.iOS26 {
+                        Button {
+                            isPresentingInsights = true
+                        } label: {
+                            Image(systemName: "sparkles")
+                        }
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Settings", systemImage: "gearshape.fill") {
+                        isPresentingSettings = true
+                    }
+                    .tint(.white)
+                }
+                ToolbarItem(placement: .principal) {
+                    Picker("View Mode", selection: $viewMode) {
+                        ForEach(ViewMode.allCases, id: \.self) { mode in
+                            Image(systemName: mode.systemImage).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(maxWidth: 160)
+                }
+            }
+            .task {
+                await initApplication()
+                updateToday()
+            }
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .active {
+                    logger.trace("scene is now active. Updating today.")
+                    updateToday()
+                }
+            }
+            .onChange(of: countLogs) { old, new in
+                if new > old {
+                    reviewService.considerRequesting(countLog: countLogs) { requestReview() }
                 }
             }
 #if DEBUG
