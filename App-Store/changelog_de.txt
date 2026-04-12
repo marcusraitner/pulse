@@ -1,0 +1,17 @@
+Version 2.0
+
+Pulse zeigt dir jetzt das große Ganze.
+
+Zwei neue Ansichten geben dir eine breitere Perspektive auf deine Tage — ohne den Detailreichtum zu verlieren, der das Journaling bedeutsam macht.
+
+WOCHENANSICHT
+Blättere durch dein Journal Woche für Woche. Ein Mini-Balkendiagramm zeigt deine Scores auf einen Blick, und jede Tageskarte darunter zeigt deine Momente kompakt und übersichtlich.
+
+MONATSANSICHT
+Zoome weiter heraus und sieh deinen gesamten Monat auf einmal. Tageskarten zeigen einen farbcodierten Punkt für jeden erfassten Moment — so erkennst du Muster über Wochen hinweg in Sekunden.
+
+Wechsle jederzeit zwischen Tag, Woche und Monat über die neue Auswahl oben — Pulse merkt sich deine bevorzugte Ansicht.
+
+Außerdem in diesem Update:
+- Tippe auf eine Tageskarte, um die Reflexion für diesen Tag zu öffnen
+- Verschiedene Scroll- und Layout-Verbesserungen

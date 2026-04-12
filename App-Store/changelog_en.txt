@@ -1,0 +1,17 @@
+Version 2.0
+
+Pulse now lets you see the bigger picture.
+
+Two new views give you a broader perspective on your days — without losing the detail that makes journaling meaningful.
+
+WEEK VIEW
+Browse your journal week by week. A mini bar chart shows your scores at a glance, and each day card beneath it reveals your moments at a compact but readable level of detail.
+
+MONTH VIEW
+Zoom out further and see your entire month at once. Day cards show a color-coded dot for each logged moment, so you can spot patterns across weeks in seconds.
+
+Switch between Day, Week, and Month anytime using the new segmented control at the top — Pulse remembers your preference.
+
+Also in this update:
+- Tap any day card to open the reflection for that day
+- Various scroll and layout improvements
