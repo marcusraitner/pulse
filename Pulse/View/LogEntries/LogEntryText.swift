@@ -16,9 +16,11 @@ struct LogEntryText: View {
         HStack(alignment: .top) {
             VStack (alignment: .leading) {
                 Text("\(Text(logEntry.formattedTimestamp).bold()): \(Text("\(logEntry.log)"))")
-                FlowLayout {
-                    ForEach(logEntry.tags, id: \.self) { tag in
-                        TagChipView(label: tag, style: .display)
+                if !logEntry.tags.isEmpty {
+                    FlowLayout {
+                        ForEach(logEntry.tags, id: \.self) { tag in
+                            TagChipView(label: tag, style: .display)
+                        }
                     }
                 }
                 if let address = logEntry.address {

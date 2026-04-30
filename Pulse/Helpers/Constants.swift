@@ -30,13 +30,3 @@ enum AppStorageKeys {
     static let lastReviewRequest = "lastReviewRequest"
     static let numberOfRequests = "numberOfRequests"
 }
-
-enum BuiltInTags: String, CaseIterable {
-    case exercise = "exercise"
-    case nutrition = "nutrition"
-    case sleep = "sleep"
-    case stress = "work stress"
-    case family = "family"
-    case outdoor = "outdoor"
-    case deepWork = "deep work"
-}

@@ -100,7 +100,7 @@ struct DailyReflectionSheet: View {
     var body: some View {
         List {
             Section {
-                TextField("Your reflection of this day", text: $reflection, axis: .vertical)
+                TextField("", text: $reflection, axis: .vertical)
                     .multilineTextAlignment(.leading)
                     .lineLimit(5...Int.max)
                     .focused($focusedField, equals: .summary)

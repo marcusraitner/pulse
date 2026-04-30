@@ -9,7 +9,6 @@ import SwiftUI
 import OSLog
 import SwiftData
 import CoreLocation
-import CoreLocationUI
 import MapKit
 
 /// Modal sheet for creating a new log entry or viewing/editing an existing one.
@@ -62,7 +61,7 @@ struct LogEntrySheet: View {
     @Environment(\.modelContext) private var context
 
     private var allTags: [String] {
-        BuiltInTags.allCases.map(\.rawValue) + tags.map(\.name)
+       tags.map(\.name)
     }
     
     private var rawTags: String {
@@ -74,17 +73,17 @@ struct LogEntrySheet: View {
     }
 
     private var isNewTagValid: Bool {
-        !sanitizedNewTag.isEmpty &&
-        !allTags.contains(where: { $0.caseInsensitiveCompare(sanitizedNewTag) == .orderedSame })
-    }
-
-    private func addCustomTag() {
         let name = sanitizedNewTag
+        guard !name.isEmpty else { return false }
+        return !tags.contains(where: { $0.name.caseInsensitiveCompare(name) == .orderedSame })
+    }
+    
+    private func addCustomTag() {
+        // Button calling this is checking isNewTagValid before, but let's make it explicit
         guard isNewTagValid else { return }
-        if !tags.contains(where: { $0.name.caseInsensitiveCompare(name) == .orderedSame }) {
-            context.insert(Tag(name: name))
-            context.saveOrLog("Failed to save tag", logger: logger)
-        }
+        let name = sanitizedNewTag
+        context.insert(Tag(name: name))
+        context.saveOrLog("Failed to save tag", logger: logger)
         entryTags.insert(name)
         newTag = ""
     }
@@ -172,12 +171,20 @@ struct LogEntrySheet: View {
                 // MARK: - Tags
                 VStack {
                     FlowLayout {
-                        ForEach(allTags, id: \.self) { tag in
-                            TagChipView(label: tag, style: .selectable(isSelected: entryTags.contains(tag), onTap: { if entryTags.contains(tag) { entryTags.remove(tag) } else { entryTags.insert(tag) } } ))
+                        ForEach(isEntryEditable ? allTags : entry?.tags ?? [], id: \.self) { tag in
+                            if isEntryEditable {
+                                TagChipView(label: tag, style: .selectable(isSelected: entryTags.contains(tag), onTap: { if entryTags.contains(tag) { entryTags.remove(tag) } else { entryTags.insert(tag) } } ))
+                            } else {
+                                TagChipView(label: tag, style: .display)
+                            }
                         }
                     }
                     HStack {
                         TextField("Add a tag", text: $newTag)
+                            .submitLabel(.done)
+                            .onSubmit {
+                                addCustomTag()
+                            }
                         Button {
                             addCustomTag()
                         } label: {

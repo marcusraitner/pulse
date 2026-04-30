@@ -201,6 +201,17 @@ struct SettingsView: View {
                 }
             }
             
+            // --- MARK: Tags
+            NavigationLink() {
+                TagSettingsView()
+            } label: {
+                Label {
+                    Text("Tags")
+                } icon: {
+                    Image(systemName: "tag.circle.fill")
+                        .listLabelIcon(.teal)
+                }
+            }            
             // MARK: Reminders
             NavigationLink() {
                 Form {
@@ -395,6 +406,7 @@ extension View {
 #Preview {
     NavigationStack {
         SettingsView()
+            .modelContainer(SampleData.shared.modelContainer)
             .preferredColorScheme(.dark)
     }
 }

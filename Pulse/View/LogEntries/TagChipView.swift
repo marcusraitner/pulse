@@ -16,10 +16,6 @@ struct TagChipView: View {
     var label: String
     var style: TagChipStyle
 
-    private var displayLabel: String {
-        NSLocalizedString("tag.\(label)", value: label, comment: "")
-    }
-
     var body: some View {
         switch style {
         case .display:
@@ -33,7 +29,7 @@ struct TagChipView: View {
     }
 
     private func chip(isSelected: Bool, color: Color) -> some View {
-        Text(displayLabel)
+        Text(label)
             .font(.caption2)
             .padding(.horizontal, 10)
             .padding(.vertical, 5)

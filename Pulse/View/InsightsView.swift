@@ -193,7 +193,8 @@ struct InsightsView: View {
 
         let formatted = filteredLogEntries.map { entry in
             let scoreLabel = entry.score > 0 ? "+\(entry.score)" : "\(entry.score)"
-            return "[\(scoreLabel)] \(entry.log)"
+            let tags = " {\(entry.tags.joined(separator: ", "))}"
+            return "[\(scoreLabel)] \(entry.log)" + tags
         }.joined(separator: "\n")
 
         let template = String(localized: "insights.analysisPrompt", bundle: .main)
