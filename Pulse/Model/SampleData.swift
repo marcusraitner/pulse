@@ -31,7 +31,8 @@ class SampleData {
                         score: 2,
                         latitude: 37.3349,
                         longitude: -122.0090,
-                        address: "Apple Park, Cupertino, CA"
+                        address: "Apple Park, Cupertino, CA",
+                        tagsRaw: "Deep Work,Focus"
                     ),
                     DailyLogEntry(
                         timestamp: Date(timeIntervalSinceNow: -5000),
@@ -180,6 +181,7 @@ class SampleData {
             DailyLogEntry.self,
             DailyKPIValue.self,
             KPITemplate.self,
+            Tag.self,
         ])
 
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)

@@ -127,7 +127,7 @@ struct ContentView: View {
             }
             .sheet(isPresented: $isPresentingInsights) {
                 // #available required by compiler: InsightsView is @available(iOS 26, *)
-                if featureFlags.iOS26, #available(iOS 26, *) {
+                if #available(iOS 26, *) {
                     NavigationStack {
                         InsightsView()
                     }
@@ -135,7 +135,7 @@ struct ContentView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    if featureFlags.iOS26 {
+                    if featureFlags.foundationModelsAvailable {
                         Button {
                             isPresentingInsights = true
                         } label: {

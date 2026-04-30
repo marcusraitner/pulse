@@ -29,15 +29,20 @@ struct LogEntrySheet: View {
         _latitude = State(initialValue: entry?.latitude)
         _longitude = State(initialValue: entry?.longitude)
         _address = State(initialValue: entry?.address)
+        _entryTags = State(initialValue: .init(entry?.tags ?? []) )
     }
 
     private var isEntryNew: Bool { entry == nil }
 
+    @Query private var tags: [Tag]
+    
     @State private var log: String
     @State private var score: Int
     @State private var latitude: Double?
     @State private var longitude: Double?
     @State private var address: String?
+    @State private var entryTags: Set = Set<String>()
+    @State private var newTag: String = ""
     
     // used to manage validation; showing the validation message only if stepper was touched
     @State private var isNew = true
@@ -56,6 +61,34 @@ struct LogEntrySheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
 
+    private var allTags: [String] {
+        BuiltInTags.allCases.map(\.rawValue) + tags.map(\.name)
+    }
+    
+    private var rawTags: String {
+        entryTags.joined(separator: ",")
+    }
+
+    private var sanitizedNewTag: String {
+        newTag.replacingOccurrences(of: ",", with: "").trimmingCharacters(in: .whitespaces)
+    }
+
+    private var isNewTagValid: Bool {
+        !sanitizedNewTag.isEmpty &&
+        !allTags.contains(where: { $0.caseInsensitiveCompare(sanitizedNewTag) == .orderedSame })
+    }
+
+    private func addCustomTag() {
+        let name = sanitizedNewTag
+        guard isNewTagValid else { return }
+        if !tags.contains(where: { $0.name.caseInsensitiveCompare(name) == .orderedSame }) {
+            context.insert(Tag(name: name))
+            context.saveOrLog("Failed to save tag", logger: logger)
+        }
+        entryTags.insert(name)
+        newTag = ""
+    }
+    
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "LogEntrySheet")
 
     /// Updates the location state with the coordinate and reverse-geocoded address from `item`.
@@ -80,6 +113,7 @@ struct LogEntrySheet: View {
         if let entry {
             entry.log = log
             entry.score = score
+            entry.tagsRaw = rawTags
             context.saveOrLog("Failure while saving entry", logger: logger)
         } else {
             // new entry
@@ -90,7 +124,8 @@ struct LogEntrySheet: View {
                 entry: day,
                 latitude: storeLocations ? latitude : nil,
                 longitude: storeLocations ? longitude : nil,
-                address: storeLocations ? address : nil
+                address: storeLocations ? address : nil,
+                tagsRaw: rawTags
             )
             context.insert(newEntry)
             context.saveOrLog("Failure saving new entry", logger: logger)
@@ -133,6 +168,27 @@ struct LogEntrySheet: View {
                         ScoreLabelView(score: score, style: .outlined)
                     }
                 }
+                
+                // MARK: - Tags
+                VStack {
+                    FlowLayout {
+                        ForEach(allTags, id: \.self) { tag in
+                            TagChipView(label: tag, style: .selectable(isSelected: entryTags.contains(tag), onTap: { if entryTags.contains(tag) { entryTags.remove(tag) } else { entryTags.insert(tag) } } ))
+                        }
+                    }
+                    HStack {
+                        TextField("Add a tag", text: $newTag)
+                        Button {
+                            addCustomTag()
+                        } label: {
+                            Label("Add", systemImage: "plus.circle")
+                                .labelStyle(.iconOnly)
+                        }
+                        .disabled(!isNewTagValid)
+                    }
+                    .padding(.top, 4)
+                }
+                
                 
                 HStack {
                     Text("Recorded at")
@@ -268,5 +324,6 @@ struct LogEntrySheet: View {
     NavigationStack {
         LogEntrySheet(day: .init(date: .now))
             .modelContainer(SampleData.shared.modelContainer)
+            .preferredColorScheme(.dark)
     }
 }

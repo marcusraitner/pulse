@@ -395,6 +395,7 @@ extension View {
 #Preview {
     NavigationStack {
         SettingsView()
+            .preferredColorScheme(.dark)
     }
 }
 

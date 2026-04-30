@@ -16,6 +16,11 @@ struct LogEntryText: View {
         HStack(alignment: .top) {
             VStack (alignment: .leading) {
                 Text("\(Text(logEntry.formattedTimestamp).bold()): \(Text("\(logEntry.log)"))")
+                FlowLayout {
+                    ForEach(logEntry.tags, id: \.self) { tag in
+                        TagChipView(label: tag, style: .display)
+                    }
+                }
                 if let address = logEntry.address {
                     Label("\(address)", systemImage: "location.circle.fill")
                         .labelStyle(.titleAndIcon)
@@ -31,5 +36,6 @@ struct LogEntryText: View {
     }
 }
 #Preview {
-    LogEntryText(logEntry: DailyLogEntry(timestamp: Date.now, log: "Something", score: 2))
+    LogEntryText(logEntry: DailyLogEntry(timestamp: Date.now, log: "Something", score: 2, latitude: nil, longitude: nil, address: nil, tagsRaw: "Deep Work, Focus"))
+        .preferredColorScheme(.dark)
 }
