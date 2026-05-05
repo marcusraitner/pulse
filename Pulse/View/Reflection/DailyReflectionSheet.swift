@@ -98,85 +98,96 @@ struct DailyReflectionSheet: View {
     }
     
     var body: some View {
-        List {
-            Section {
-                TextField("", text: $reflection, axis: .vertical)
-                    .multilineTextAlignment(.leading)
-                    .lineLimit(5...Int.max)
-                    .focused($focusedField, equals: .summary)
-            } header: {
-                Text("Reflect Your Day")
-            } footer: {
-                if let question = coachingQuestion {
-                    VStack(alignment: .leading) {
-                        Text(LocalizedStringKey(question))
-                        HStack {
-                            Spacer()
-                            Button(action: pickAnotherQuestion) {
-                                Label("New question", systemImage: "arrow.clockwise")
-                                    .font(.footnote)
-                            }
-                            .buttonStyle(.plain)
-                            .foregroundStyle(.tint)
-                            .padding(.top, 2)
+        VStack(alignment: .leading) {
+            HStack {
+                Text("\(day.date.formatted(.dateTime.weekday(.wide)))")
+                    .font(.system(.title, design: .serif).bold())
+                Spacer()
+                Text("\(day.date.formatted(.dateTime.day().month(.defaultDigits).year()))")
+                    .font(.system(.title, design: .serif).bold())
+            }
+            .padding(.horizontal)
+            .padding(.top, 10)
+            List {
+                Section {
+                    TextField("", text: $reflection, axis: .vertical)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(5...Int.max)
+                        .focused($focusedField, equals: .summary)
+                } header: {
+                    Text("Reflect Your Day")
+                } footer: {
+                    if let question = coachingQuestion {
+                        VStack(alignment: .leading) {
+                            Text(LocalizedStringKey(question))
+                            HStack {
+                                Spacer()
+                                Button(action: pickAnotherQuestion) {
+                                    Label("New question", systemImage: "arrow.clockwise")
+                                        .font(.footnote)
+                                }
+                                .buttonStyle(.plain)
+                                .foregroundStyle(.tint)
+                                .padding(.top, 2)
 
+                            }
                         }
                     }
                 }
-            }
-            
-            if !kpiTemplates.isEmpty {
+                
+                if !kpiTemplates.isEmpty {
+                    Section {
+                        ForEach(kpiTemplates) { template in
+                            HStack(alignment: .top) {
+                                VStack (alignment: .leading) {
+                                    Text(template.title)
+                                        .font(.body)
+                                        .foregroundStyle(.primary)
+                                        .padding(.vertical, 4)
+                                    Text(template.note ?? "")
+                                        .font(.footnote)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .padding(.trailing, 4)
+                                Spacer()
+                                VStack(alignment: .trailing) {
+                                    TextField("—", text: kpiBinding(for: template))
+                                        .multilineTextAlignment(.trailing)
+                                        .keyboardType(.numberPad)
+                                        .focused($focusedField, equals: .kpi(template.id))
+                                        .frame(width: 70)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+                                    
+                                    Text(template.unit ?? "(no unit)")
+                                        .foregroundStyle(.secondary)
+                                        .font(.caption)
+                                        .padding(.trailing, 4)
+                                }
+                            }
+                        }
+                    } header: {
+                        Text("Metrics")
+                    }
+                }
                 Section {
-                    ForEach(kpiTemplates) { template in
-                        HStack(alignment: .top) {
-                            VStack (alignment: .leading) {
-                                Text(template.title)
-                                    .font(.body)
-                                    .foregroundStyle(.primary)
-                                    .padding(.vertical, 4)
-                                Text(template.note ?? "")
-                                    .font(.footnote)
-                                    .foregroundStyle(.secondary)
-                            }
-                            .padding(.trailing, 4)
-                            Spacer()
-                            VStack(alignment: .trailing) {
-                                TextField("—", text: kpiBinding(for: template))
-                                    .multilineTextAlignment(.trailing)
-                                    .keyboardType(.numberPad)
-                                    .focused($focusedField, equals: .kpi(template.id))
-                                    .frame(width: 70)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
-                                
-                                Text(template.unit ?? "(no unit)")
-                                    .foregroundStyle(.secondary)
-                                    .font(.caption)
-                                    .padding(.trailing, 4)
-                            }
+                    if let logEntries = day.logEntries, !logEntries.isEmpty {
+                        ForEach(day.logEntries?.sorted(by: { $0.timestamp < $1.timestamp } ) ?? []) { logEntry in
+                            LogEntryText(logEntry: logEntry)
+                                .padding(.vertical, featureFlags.iOS26 ? 0 : 5)
                         }
                     }
                 } header: {
-                    Text("Metrics")
-                }
-            }
-            Section {
-                if let logEntries = day.logEntries, !logEntries.isEmpty {
-                    ForEach(day.logEntries?.sorted(by: { $0.timestamp < $1.timestamp } ) ?? []) { logEntry in
-                        LogEntryText(logEntry: logEntry)
-                            .padding(.vertical, featureFlags.iOS26 ? 0 : 5)
+                    Text("Your Moments")
+                } footer: {
+                    if day.logEntries?.isEmpty ?? true {
+                        Text("No moments logged for this day.")
                     }
-                }
-            } header: {
-                Text("Your Moments")
-            } footer: {
-                if day.logEntries?.isEmpty ?? true {
-                    Text("No moments logged for this day.")
                 }
             }
         }
-        .navigationTitle("\(day.date.formatted(.dateTime.weekday(.wide).day().month(.defaultDigits).year()))")
+//        .navigationTitle("\(day.date.formatted(.dateTime.weekday(.wide).day().month(.defaultDigits).year(.twoDigits)))")
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Compat.confirmButton(String(localized: "Save")) {
@@ -229,8 +240,9 @@ struct DailyReflectionSheetPreviewContainer: View {
 #Preview("filled") {
     NavigationStack {
         DailyReflectionSheetPreviewContainer()
-            .modelContainer(SampleData.shared.modelContainer)
     }
+    .modelContainer(SampleData.shared.modelContainer)
+    .preferredColorScheme(.dark)
 }
 
 #Preview("empty") {
@@ -238,5 +250,6 @@ struct DailyReflectionSheetPreviewContainer: View {
         DailyReflectionSheet(day: .init(date: .now))
     }
     .modelContainer(SampleData.shared.modelContainer)
+    .preferredColorScheme(.dark)
 }
 

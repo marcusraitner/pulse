@@ -179,21 +179,21 @@ struct LogEntrySheet: View {
                             }
                         }
                     }
-                    HStack {
-                        TextField("Add a tag", text: $newTag)
-                            .submitLabel(.done)
-                            .onSubmit {
+                    if isEntryEditable {
+                        HStack {
+                            TextField("New Tag", text: $newTag)
+                                .submitLabel(.done)
+                                .onSubmit {
+                                    addCustomTag()
+                                }
+                            Button("Add") {
                                 addCustomTag()
                             }
-                        Button {
-                            addCustomTag()
-                        } label: {
-                            Label("Add", systemImage: "plus.circle")
-                                .labelStyle(.iconOnly)
+                            .buttonStyle(.bordered)
+                            .disabled(!isNewTagValid)
                         }
-                        .disabled(!isNewTagValid)
+                        .padding(.top, 4)
                     }
-                    .padding(.top, 4)
                 }
                 
                 
@@ -327,9 +327,17 @@ struct LogEntrySheet: View {
     }
 }
 
-#Preview {
+#Preview("Neu") {
     NavigationStack {
         LogEntrySheet(day: .init(date: .now))
+            .modelContainer(SampleData.shared.modelContainer)
+            .preferredColorScheme(.dark)
+    }
+}
+
+#Preview("Alt") {
+    NavigationStack {
+        LogEntrySheet(day: .init(date: .now), entry: .init(timestamp: .now, log: "Test", score: -2))
             .modelContainer(SampleData.shared.modelContainer)
             .preferredColorScheme(.dark)
     }

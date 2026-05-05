@@ -26,7 +26,7 @@ struct TagRowView: View {
         guard isEditing else { return }
         
         let trimmed = draftName.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty, trimmed != tag.name, !allTags.contains(where: { $0.name == trimmed }) else {
+        guard !trimmed.isEmpty, trimmed != tag.name, !allTags.contains(where: { $0.name.caseInsensitiveCompare(trimmed) == .orderedSame }) else {
             draftName = tag.name
             isEditing = false
             return

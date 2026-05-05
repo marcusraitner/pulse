@@ -33,21 +33,20 @@ struct SelectedDateView: View {
             }
         }
         .font(.system(.title, design: .serif).bold())
-        .foregroundStyle(.white.opacity(0.85))
     }
 }
 
 #Preview("Day") {
     SelectedDateView(date: .now)
-        .background(.black)
+        .preferredColorScheme(.dark)
 }
 
 #Preview("Week") {
     SelectedDateView(date: .now, level: .week)
-        .background(.black)
+        .preferredColorScheme(.dark)
 }
 
 #Preview("Month") {
     SelectedDateView(date: .now, level: .month)
-        .background(.black)
+        .preferredColorScheme(.dark)
 }

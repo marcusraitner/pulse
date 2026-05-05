@@ -64,13 +64,9 @@ struct KPITemplatesSettingsView: View {
                             Label("Delete", systemImage: "trash")
                         }
                     }
-                    .swipeActions(edge: .leading) {
-                        Button {
-                            templateToEdit = template
-                        } label: {
-                            Label("Edit", systemImage: "pencil")
-                        }
-                        .tint(.orange)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        templateToEdit = template
                     }
                 }
                 .onMove { indices, newOffsets in
