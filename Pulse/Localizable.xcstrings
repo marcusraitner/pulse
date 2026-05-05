@@ -53,7 +53,7 @@
         },
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "%1$@ – %2$@"
           }
         }
@@ -69,7 +69,7 @@
         },
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "%1$@: %2$@"
           }
         }
@@ -94,7 +94,7 @@
             "plural" : {
               "one" : {
                 "stringUnit" : {
-                  "state" : "needs_review",
+                  "state" : "translated",
                   "value" : "%lld Eintrag"
                 }
               },
@@ -118,7 +118,7 @@
               },
               "other" : {
                 "stringUnit" : {
-                  "state" : "new",
+                  "state" : "translated",
                   "value" : "%lld entries"
                 }
               }
@@ -148,7 +148,7 @@
               },
               "other" : {
                 "stringUnit" : {
-                  "state" : "new",
+                  "state" : "translated",
                   "value" : "%1$lld entries · %2$@"
                 }
               }
@@ -353,7 +353,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Soll die Messgröße „%@\" wirklich gelöscht werden?"
+            "value" : "Soll die Messgröße „%@“ wirklich gelöscht werden?"
           }
         }
       }
@@ -367,7 +367,7 @@
             "plural" : {
               "one" : {
                 "stringUnit" : {
-                  "state" : "needs_review",
+                  "state" : "translated",
                   "value" : "Willst du wirklich den Tag ‚%1$@‘ löschen? Er wird für %2$lld Eintrag verwendet und bei diesem dauerhaft entfernt werden."
                 }
               },
@@ -391,7 +391,7 @@
               },
               "other" : {
                 "stringUnit" : {
-                  "state" : "new",
+                  "state" : "translated",
                   "value" : "Are you sure you want to delete the tag '%1$@'? It is used in %2$lld entries and will be permanently removed from them."
                 }
               }
@@ -653,7 +653,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Beispiel: Titel „Deep Work\", Beschreibung „Zeit für konzentriertes Arbeiten\", Einheit „min\""
+            "value" : "Beispiel: Titel „Deep Work“, Beschreibung „Zeit für konzentriertes Arbeiten“, Einheit „min“"
           }
         }
       }
@@ -754,7 +754,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Below are your client's journal entries scored from -2 (very bad) to +2 (very good). Each line: „[score] text {tags}“ where tags can be empty, i.e. {}.  \n\n%@\n\nSynthesise — do not list — up to 3 insights per section. Speak directly to your client using 'you'. Never use 'the user' or 'this person'.\n\ngreatMoments: What recurring themes, contexts, or conditions appear across the high-scoring entries (+1, +2)? Name the underlying pattern and explain what it reveals about what energises your client.\n\npoorMoments: What recurring themes, contexts, or conditions appear across the low-scoring entries (-1, -2)? Name the underlying pattern and explain how it tends to affect your client.\n\nactionableTips: Based on the patterns above, what are up to 3 concrete, personalised actions your client could take? Each tip must be directly actionable, specific to the data, and phrased as advice you are giving directly to them.\n\nEach insight must be one sentence. Do not quote or restate individual entries."
+            "value" : "Below are your client's journal entries scored from -2 (very bad) to +2 (very good). Each line: \"[score] text {tags}\" where tags can be empty, i.e. {}.\n\n%@\n\nSynthesise — do not list — up to 3 insights per section. Speak directly to your client using 'you'. Never use 'the user' or 'this person'.\n\ngreatMoments: What recurring themes, contexts, or conditions appear across the high-scoring entries (+1, +2)? Name the underlying pattern and explain what it reveals about what energises your client.\n\npoorMoments: What recurring themes, contexts, or conditions appear across the low-scoring entries (-1, -2)? Name the underlying pattern and explain how it tends to affect your client.\n\nactionableTips: Based on the patterns above, what are up to 3 concrete, personalised actions your client could take? Each tip must be directly actionable, specific to the data, and phrased as advice you are giving directly to them.\n\nEach insight must be one sentence. Do not quote or restate individual entries."
           }
         }
       }
@@ -1572,6 +1572,18 @@
         }
       }
     },
+    "Summarize your day" : {
+      "comment" : "A label for a text field that allows the user to write a reflection of their day.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fasse deinen Tag zusammen"
+          }
+        }
+      }
+    },
     "Tag name" : {
       "comment" : "A label for a text field that edits a tag's name.",
       "isCommentAutoGenerated" : true,
@@ -1753,12 +1765,12 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Derzeit sind %lld Werte für die Messgröße „%@\" erfasst. Das Löschen entfernt auch alle Werte. Bist du sicher?"
+            "value" : "Derzeit sind %lld Werte für die Messgröße „%@“ erfasst. Das Löschen entfernt auch alle Werte. Bist du sicher?"
           }
         },
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "You currently have %1$lld values recorded for the metric \"%2$@\". Deleting it will also delete all the values. Are you sure?"
           }
         }

@@ -99,18 +99,9 @@ struct DailyReflectionSheet: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            HStack {
-                Text("\(day.date.formatted(.dateTime.weekday(.wide)))")
-                    .font(.system(.title, design: .serif).bold())
-                Spacer()
-                Text("\(day.date.formatted(.dateTime.day().month(.defaultDigits).year()))")
-                    .font(.system(.title, design: .serif).bold())
-            }
-            .padding(.horizontal)
-            .padding(.top, 10)
             List {
                 Section {
-                    TextField("", text: $reflection, axis: .vertical)
+                    TextField("Summarize your day", text: $reflection, axis: .vertical)
                         .multilineTextAlignment(.leading)
                         .lineLimit(5...Int.max)
                         .focused($focusedField, equals: .summary)
@@ -187,7 +178,7 @@ struct DailyReflectionSheet: View {
                 }
             }
         }
-//        .navigationTitle("\(day.date.formatted(.dateTime.weekday(.wide).day().month(.defaultDigits).year(.twoDigits)))")
+        .navigationTitle("\(day.date.formatted(.dateTime.weekday(.wide).day().month(.defaultDigits).year(.twoDigits)))")
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Compat.confirmButton(String(localized: "Save")) {
