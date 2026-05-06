@@ -40,6 +40,9 @@ struct SettingsView: View {
     
     @Query private var allEntries: [DailyEntry]
     @Query private var allLogs: [DailyLogEntry]
+    @Query private var allKPIValues: [DailyKPIValue]
+    @Query private var allTags: [Tag]
+    @Query private var allKPIs: [KPITemplate]
     
     private var countDays: Int { allEntries.count }
     private var countLogs: Int { allLogs.count }
@@ -340,7 +343,35 @@ struct SettingsView: View {
                     Text("Danger Zone")
                         .foregroundStyle(Color.red)
                     Button("Seed Samples") {
-                        for entry in SampleData.makeSeedEntries() {
+                        for log in allLogs {
+                            context.delete(log)
+                        }
+                        for value in allKPIValues {
+                            context.delete(value)
+                        }
+                        for entry in allEntries {
+                            context.delete(entry)
+                        }
+                        for template in allKPIs {
+                            context.delete(template)
+                        }
+                        for tag in allTags {
+                            context.delete(tag)
+                        }
+                        context.saveOrLog("Failed to clear existing data before seeding mock data", logger: logger)
+                        
+                        let seedLanguage = SampleData.SeedLanguage.current
+                        let templates = SampleData.makeSeedTemplates(language: seedLanguage)
+                        
+                        for template in templates {
+                            context.insert(template)
+                        }
+                        
+                        for tag in SampleData.makeSeedTags(language: seedLanguage) {
+                            context.insert(tag)
+                        }
+                        
+                        for entry in SampleData.makeSeedEntries(templates: templates, language: seedLanguage) {
                             context.insert(entry)
                         }
                         
@@ -410,4 +441,3 @@ extension View {
             .preferredColorScheme(.dark)
     }
 }
-

@@ -151,7 +151,7 @@ struct DailyReflectionSheet: View {
                                         .padding(.vertical, 4)
                                         .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
                                     
-                                    Text(template.unit ?? "(no unit)")
+                                    Text(template.unit ?? "")
                                         .foregroundStyle(.secondary)
                                         .font(.caption)
                                         .padding(.trailing, 4)

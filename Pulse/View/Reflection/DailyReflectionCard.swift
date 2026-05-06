@@ -22,21 +22,20 @@ struct DailyReflectionCard: View {
     }
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading) {
+        VStack(alignment: .leading) {
+            if day.summary.isEmpty {
                 Text("Reflection")
-                    .font(.title3)
+                    .font(.title2)
                     .padding(.bottom, 5)
-                
+            } else {
                 Text(day.summary)
-                
-                if !topTemplates.isEmpty {
-                    metricsRow
-                }
             }
-            .padding()
-            Spacer()
+            
+            if !topTemplates.isEmpty {
+                metricsRow
+            }
         }
+        .padding()
         .glassCard()
         .contentShape(Rectangle())
         .onTapGesture(perform: onTap)

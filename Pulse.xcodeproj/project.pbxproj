@@ -30,6 +30,22 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2D1F13C92FAB33BD00D19E59 /* Exceptions for "landing" folder in "Pulse" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"screenshot-metrics-de.png",
+				"screenshot-metrics-en.png",
+				"screenshot-moment-de.png",
+				"screenshot-moment-en.png",
+				"screenshot-reflection-de.png",
+				"screenshot-reflection-en.png",
+				"screenshot-timeline-de.png",
+				"screenshot-timeline-en.png",
+				"screenshot-week-de.png",
+				"screenshot-week-en.png",
+			);
+			target = 2C3749872F4308270079D893 /* Pulse */;
+		};
 		2DE4A2E82F646F2500FED667 /* Exceptions for "Pulse" folder in "Pulse" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -50,6 +66,9 @@
 		};
 		2C92C5EA2F7FDBDB0048B14D /* landing */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2D1F13C92FAB33BD00D19E59 /* Exceptions for "landing" folder in "Pulse" target */,
+			);
 			path = landing;
 			sourceTree = "<group>";
 		};
