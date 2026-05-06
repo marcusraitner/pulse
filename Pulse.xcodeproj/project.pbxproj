@@ -33,6 +33,8 @@
 		2D1F13C92FAB33BD00D19E59 /* Exceptions for "landing" folder in "Pulse" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"screenshot-aicoach-de.png",
+				"screenshot-aicoach-en.png",
 				"screenshot-metrics-de.png",
 				"screenshot-metrics-en.png",
 				"screenshot-moment-de.png",
