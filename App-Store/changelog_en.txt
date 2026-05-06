@@ -1,3 +1,10 @@
+Version 2.1
+
+- Tags are here: Add tags to your moments and quickly spot recurring patterns.
+- Improved reflection experience: Cleaner daily reflection flow and better overview of your day.
+- Metrics & settings polish: Smoother management of personal metrics and related settings.
+- Performance improvements and bug fixes for a more reliable experience.
+
 Version 2.0
 
 Pulse now lets you see the bigger picture.

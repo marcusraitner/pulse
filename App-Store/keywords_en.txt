@@ -1,0 +1,1 @@
+moodtracker,journal,diary,reflection,mindfulness,habittracker,selfcare,privatenotes,dailylog

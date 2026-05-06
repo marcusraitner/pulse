@@ -1,24 +1,27 @@
-Deine Tage zählen. Pulse hilft dir, sie festzuhalten — Moment für Moment, Tag für Tag, und jetzt auch Woche für Woche und Monat für Monat.
+Deine Tage zählen. Pulse hilft dir, sie festzuhalten — Moment für Moment, Tag für Tag und jetzt auch Woche für Woche oder Monat für Monat.
 
-Pulse ist eine schnelle, schöne Journal-App, die auf einer einfachen Idee basiert: Halte fest, was passiert und wie du dich dabei fühlst — genau dann, wenn es passiert. Keine langen Eingabemasken. Kein kompliziertes Setup. Nur deine Momente, bewertet und gespeichert.
+Pulse ist eine schnelle, elegante Journal-App mit einer einfachen Idee: Halte fest, was gerade passiert und wie du dich dabei fühlst — genau im richtigen Moment. Keine langen Fragen. Kein kompliziertes Setup. Nur deine Momente, bewertet und gespeichert.
 
-DEINEN TAG EINFANGEN
-Füge den ganzen Tag über Einträge hinzu — eine kurze Notiz und eine Bewertung von sehr negativ bis sehr positiv. Pulse zeichnet ein Bild deines Tages von innen heraus.
+DEINEN TAG IN ECHTZEIT FESTHALTEN
+Erfasse über den Tag kurze Einträge und bewerte jeden Moment von sehr negativ bis sehr positiv (−2 bis +2). So entsteht mit der Zeit ein klares Bild deiner emotionalen Muster.
 
-JEDEN ABEND REFLEKTIEREN
-Beende jeden Tag mit einer kurzen Reflexion. Pulse bewahrt deine tägliche Zusammenfassung neben deinen Momenten, damit du immer das vollständige Bild hast.
+MOMENTE TAGGEN
+Vergib Tags für Einträge (z. B. Tiefarbeit, Familie, Schlaf oder Stress), um wiederkehrende Themen schneller zu erkennen.
 
-DEINE ZEITLINIE AUF EINEN BLICK
-Das Balkendiagramm zeigt jeden Tag auf einen Blick — Höhe und Farbe der Balken spiegeln deinen Durchschnittsscore wider. Scrolle in Sekunden durch Wochen und Monate deiner Geschichte.
+ABENDS REFLEKTIEREN
+Schließe jeden Tag mit einer kurzen Reflexion ab. Deine Tageszusammenfassung bleibt mit deinen Momenten verknüpft — der Kontext bleibt erhalten.
 
-WOCHEN- UND MONATSANSICHT
-Zoome heraus und sieh das große Ganze. Blättere durch dein Journal Woche für Woche oder Monat für Monat. Jeder Zeitraum zeigt ein Mini-Diagramm deiner Scores, und die Tageskarten darunter zeigen deine Momente im Detail. Wechsle mit einem Tipp zwischen Tag, Woche und Monat — Pulse merkt sich deine Wahl.
+DAS GROSSE GANZE SEHEN
+Mit Tages-, Wochen- und Monatsansicht zoomst du flexibel durch deine Historie. Mini-Score-Charts und Tageskarten zeigen Trends auf einen Blick.
 
-DEIN PERSÖNLICHES ERSCHEINUNGSBILD
-Wähle aus mehreren Farbthemen und lege ein Hintergrundbild aus deiner Fotobibliothek oder unserer kuratierten Sammlung fest. Dein Journal soll sich wie deins anfühlen.
+PERSÖNLICHE METRIKEN TRACKEN
+Definiere eigene Metriken — z. B. Tiefarbeit, Schlaf oder Sport — und erfasse sie direkt in deiner täglichen Reflexion.
 
-KONSEQUENT BLEIBEN MIT ERINNERUNGEN
-Stelle mehrere tägliche Erinnerungen ein, um den ganzen Tag über zu loggen, plus eine optionale Abend-Erinnerung für deine tägliche Reflexion.
+INDIVIDUELL GESTALTEN
+Wähle aus mehreren Farbthemen und nutze ein Hintergrundbild aus deiner Fotomediathek oder aus kuratierten Vorlagen.
 
-PRIVAT UND IMMER BEI DIR
-Deine Einträge werden automatisch über alle deine Geräte via iCloud synchronisiert — privat, sicher und immer aktuell.
+MIT ERINNERUNGEN DRANBLEIBEN
+Lege mehrere Erinnerungen für den Tag fest und optional eine Abend-Erinnerung für deine Reflexion.
+
+PRIVAT, SICHER UND SYNCHRON
+Dein Journal synchronisiert automatisch über iCloud auf all deinen Apple-Geräten. Deine Daten bleiben privat und jederzeit aktuell.

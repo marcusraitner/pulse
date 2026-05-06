@@ -1,3 +1,10 @@
+Version 2.1
+
+- Tags sind da: Ergänze deine Momente mit Tags und erkenne wiederkehrende Muster schneller.
+- Verbesserte Tagesreflexion: Klarerer Ablauf und bessere Übersicht über deinen Tag.
+- Feinschliff bei Metriken & Einstellungen: Einfachere Verwaltung deiner persönlichen Metriken.
+- Performance-Verbesserungen und Fehlerbehebungen für ein stabileres Erlebnis.
+
 Version 2.0
 
 Pulse zeigt dir jetzt das große Ganze.

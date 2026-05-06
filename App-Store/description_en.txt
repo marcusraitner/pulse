@@ -1,24 +1,27 @@
-Your days matter. Pulse helps you capture them — moment by moment, day by day, and now week by month.
+Your days matter. Pulse helps you capture them — moment by moment, day by day, and now week by week or month by month.
 
-Pulse is a fast, beautiful journaling app built around one simple idea: log what's happening and how you feel about it, right when it happens. No lengthy prompts. No complicated setup. Just your moments, scored and saved.
+Pulse is a fast, beautiful journaling app built around one simple idea: log what’s happening and how you feel, right when it happens. No long prompts. No complicated setup. Just your moments, scored and saved.
 
-CAPTURE YOUR DAY AS IT HAPPENS
-Add log entries throughout the day — a quick note and a score from very negative to very positive. Pulse builds a picture of your day from the inside out.
+CAPTURE YOUR DAY IN REAL TIME
+Add quick entries throughout the day and rate each moment from very negative to very positive (−2 to +2). Over time, Pulse builds a clear picture of your emotional patterns.
+
+TAG YOUR MOMENTS
+Add tags to entries (like Deep Work, Family, Sleep, or Stress) to spot recurring themes and understand what shapes your days.
 
 REFLECT EVERY EVENING
-End each day with a short reflection. Pulse keeps your daily summary alongside your moments so you always have the full picture.
+Close each day with a short reflection. Your daily summary stays connected to your moments, so context is never lost.
 
-SEE YOUR TIMELINE AT A GLANCE
-The timeline bar chart shows every day at a glance — bar height and color reflect your average score. Scroll back through weeks and months of history in seconds.
+SEE THE BIG PICTURE
+Use Day, Week, and Month views to zoom in and out of your history. Mini score charts and daily cards help you understand trends at a glance.
 
-WEEK & MONTH VIEWS
-Zoom out and see the bigger picture. Browse your journal week by week or month by month. Each period shows a mini chart of your scores, and every day card beneath it reveals your moments in detail. Switch between Day, Week, and Month with a tap — Pulse remembers your choice.
+TRACK PERSONAL METRICS
+Define your own metrics — like deep work, sleep, or exercise — and record them alongside your reflection.
 
-PERSONALIZE YOUR EXPERIENCE
-Choose from multiple color themes and set a background image from your photo library or our curated collection. Your journal should feel like yours.
+MAKE IT YOURS
+Choose from multiple color themes and set a background image from your photo library or curated presets.
 
 STAY CONSISTENT WITH REMINDERS
-Set multiple daily reminders to log throughout the day, plus an optional evening reminder to write your daily reflection.
+Set multiple reminders during the day and an optional evening reminder for your reflection.
 
-PRIVATE AND ALWAYS WITH YOU
-Your entries sync automatically across all your devices via iCloud — private, secure, and always up to date.
+PRIVATE, SECURE, AND IN SYNC
+Your journal syncs automatically across your Apple devices via iCloud. Your data stays private and always up to date.
