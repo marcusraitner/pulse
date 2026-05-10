@@ -130,6 +130,47 @@
       max-width: 520px;
       margin: 0 auto 36px;
     }
+    
+    .announcement-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 0 auto 24px;
+    }
+    
+    .announcement-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(100, 210, 255, 0.45);
+      background: rgba(100, 210, 255, 0.14);
+      color: #dff6ff;
+      text-decoration: none;
+      transition: transform .15s, opacity .15s, border-color .2s;
+    }
+    
+    a.announcement-pill[data-lang].visible {
+      display: inline-flex;
+    }
+    
+    .announcement-pill:hover {
+      transform: translateY(-1px);
+      opacity: 0.92;
+      border-color: rgba(100, 210, 255, 0.7);
+    }
+    
+    .announcement-pill.secondary {
+      border-color: rgba(48, 209, 88, 0.5);
+      background: rgba(48, 209, 88, 0.16);
+      color: #deffe9;
+    }
 
     .appstore-btn,
     a.appstore-btn[data-lang].visible {
@@ -473,6 +514,12 @@
 
   <p class="hero-sub" data-lang="en">A quick check-in for your mind. Capture your moments, reflect on your day, and see your patterns — day by day, week by week, month by month.</p>
   <p class="hero-sub" data-lang="de">Ein kurzer Check-in für deinen Geist. Halte deine Momente fest, reflektiere deinen Tag und erkenne deine Muster — Tag für Tag, Woche für Woche, Monat für Monat.</p>
+  
+  <div class="announcement-row">
+    <a class="announcement-pill" data-lang="en" href="https://github.com/marcusraitner/pulse" target="_blank" rel="noopener">🧡 Now Free &amp; Open Source</a>
+    <a class="announcement-pill" data-lang="de" href="https://github.com/marcusraitner/pulse" target="_blank" rel="noopener">🧡 Jetzt kostenlos &amp; Open Source</a>
+    <a class="announcement-pill secondary" href="https://github.com/marcusraitner/pulse/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+  </div>
 
   <a href="https://apps.apple.com/app/pulse-your-micro-journal/id6759242390" class="appstore-btn" data-lang="en">
     <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us"
