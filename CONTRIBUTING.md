@@ -1,6 +1,6 @@
 # Contributing to Pulse
 
-Thanks for your interest in contributing.
+Thanks for your interest in contributing. This is how it works.
 
 ## Getting started
 
@@ -12,9 +12,9 @@ Thanks for your interest in contributing.
 
 ## Development notes
 
-- Keep changes scoped and avoid unrelated refactors.
+- Keep changes focused and avoid unrelated refactors.
 - Follow existing Swift/SwiftUI patterns in the codebase.
-- Prefer updating or adding tests for behavior changes.
+- Updating or adding tests for behavior changes is recommended.
 
 ## Pull request checklist
 

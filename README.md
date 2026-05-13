@@ -10,8 +10,9 @@ It helps you capture moments through the day, rate them from -2 to +2, reflect e
 - Daily reflection with summary notes
 - Week and month overviews
 - Custom metrics (KPIs)
-- Moment tags
-- Local notifications
+- Custom tags for moments
+- Reminders
+- AI Insights (Foundation Models)
 - iCloud sync via CloudKit
 
 ## Tech stack
@@ -25,13 +26,13 @@ It helps you capture moments through the day, rate them from -2 to +2, reflect e
 
 ```bash
 # Build
-xcodebuild build -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild build -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
 
 # Unit tests
-xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:PulseTests
+xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:PulseTests
 
 # UI tests
-xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:PulseUITests
+xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:PulseUITests
 ```
 
 ## Repository structure
