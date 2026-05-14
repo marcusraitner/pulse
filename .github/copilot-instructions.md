@@ -68,7 +68,3 @@ When asked to commit and push, do so immediately without running extra build ver
 ## Content Generation
 
 Never hallucinate or assume features exist in the app. Only reference features you have verified in the codebase when writing marketing copy, App Store descriptions, or release notes.
-
-## Data Analysis
-
-When working with Excel/data files, always inspect the actual column layout of each file before applying transformations. Never assume two files share the same column structure.
