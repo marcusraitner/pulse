@@ -17,7 +17,8 @@ enum AppStorageKeys {
     static let reflectionReminderTime = "reflectionReminderTime"
 
     // MARK: - Display
-    static let freezeHistory = "freezeHistory"
+    static let freezeHistory = "freezeHistory" // deprecated since 2.1.1
+    static let enableEditingHistory = "enableEditingHistory"
     static let theme = "theme"
     static let backgroundImageData = "backgroundImageData"
     static let backgroundImageName = "backgroundImageName"

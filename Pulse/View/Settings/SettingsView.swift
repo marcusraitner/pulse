@@ -14,7 +14,7 @@ import PhotosUI
 import UIKit
 
 struct SettingsView: View {
-    @AppStorage(AppStorageKeys.freezeHistory) private var freezeHistory: Bool = true
+    @AppStorage(AppStorageKeys.enableEditingHistory) private var enableEditingHistory: Bool = false
     @AppStorage(AppStorageKeys.notificationsEnabled) private var notificationsEnabled: Bool = true
     @AppStorage(AppStorageKeys.reflectionReminder) private var reflectionReminder: Bool = true
     @AppStorage(AppStorageKeys.reflectionReminderTime) private var reflectionReminderTime: Date =
@@ -65,17 +65,18 @@ struct SettingsView: View {
                                 .foregroundStyle(.secondary)
                             
                         }
-//                        Toggle(isOn: $showStats) {
-//                            Text("Show Statistics")
-//                                .font(.headline)
-//                            Text("Show number of days and entries")
-//                        }
                         
-                        if featureFlags.editHistory {
-                            Toggle(isOn: $freezeHistory) {
-                                Text("Freeze History")
-                                Text("If enabled, entries in the past cannot be modified")
-                            }
+                        Toggle(isOn: $enableEditingHistory) {
+                            Text("Edit past days and moments")
+                            Text("Enable this option to be able to add, delete, or edit moments for past days.")
+                            
+                        }
+                    }
+                    .task {
+                        // A small migration step to transfer the old `freezeHistory` setting to the new one
+                        if let freezeHistory = UserDefaults.standard.value(forKey: AppStorageKeys.freezeHistory) {
+                            enableEditingHistory = !(freezeHistory as! Bool)
+                            UserDefaults.standard.removeObject(forKey: AppStorageKeys.freezeHistory)
                         }
                     }
                 }

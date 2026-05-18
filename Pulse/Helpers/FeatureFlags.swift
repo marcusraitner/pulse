@@ -15,8 +15,6 @@ import FoundationModels
 /// Injected into the SwiftUI environment via `\.featureFlags`.
 /// `iOS26` is derived automatically at runtime from system availability.
 public struct FeatureFlags: Sendable, Decodable {
-    /// Allows editing log entries from previous days.
-    public let editHistory: Bool
     /// Enables admin-only UI controls such as the delete-entry button.
     public let adminEnabled: Bool
     /// `true` when running on iOS 26 or later; set automatically at init.
@@ -25,8 +23,7 @@ public struct FeatureFlags: Sendable, Decodable {
     public let foundationModelsAvailable: Bool
 
     /// Creates feature flags. `iOS26` and `foundationModelsAvailable` are derived automatically from system availability.
-    init(editHistory: Bool = false, adminEnabled: Bool = false) {
-        self.editHistory = editHistory
+    init(adminEnabled: Bool = false) {
         self.adminEnabled = adminEnabled
 
         if #available(iOS 26, *) {
@@ -40,5 +37,5 @@ public struct FeatureFlags: Sendable, Decodable {
 }
 
 extension EnvironmentValues {
-    @Entry public var featureFlags = FeatureFlags(editHistory: false, adminEnabled: false)
+    @Entry public var featureFlags = FeatureFlags(adminEnabled: false)
 }
