@@ -48,10 +48,10 @@ struct LogEntrySheet: View {
     @State private var isPresentingConfirm = false
     @State private var storeLocations: Bool = false
 
-    @AppStorage(AppStorageKeys.freezeHistory) private var freezeHistory: Bool = true
+    @AppStorage(AppStorageKeys.enableEditingHistory) private var enableEditingHistory: Bool = true
 
     private var isEntryEditable: Bool {
-        !freezeHistory || Calendar.current.isDateInToday(entry?.timestamp ?? .now)
+        enableEditingHistory || Calendar.current.isDateInToday(entry?.timestamp ?? .now)
     }
     
     @StateObject var locationManager = LocationManager()

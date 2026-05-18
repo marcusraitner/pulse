@@ -37,7 +37,7 @@ struct ContentView: View {
     private var countLogs: Int { allLogs.count }
     
     @AppStorage(AppStorageKeys.notificationsEnabled) private var notificationsEnabled: Bool = true
-    @AppStorage(AppStorageKeys.freezeHistory) private var freezeHistory: Bool = true
+    @AppStorage(AppStorageKeys.enableEditingHistory) private var enableEditingHistory: Bool = true
     @AppStorage(AppStorageKeys.reflectionReminder) private var reflectionReminder: Bool = true
     @AppStorage(AppStorageKeys.reflectionReminderTime) private var reflectionReminderTime: Date?
     @AppStorage(AppStorageKeys.viewMode) private var viewMode: ViewMode = .day
@@ -97,7 +97,7 @@ struct ContentView: View {
                 }
 
                 // The Add Button (day mode only)
-                if viewMode == .day && (Calendar.current.isDateInToday(selectedEntry.date) || !freezeHistory) {
+                if viewMode == .day && (Calendar.current.isDateInToday(selectedEntry.date) || enableEditingHistory) {
                     Button(action: { isPresentingNewEntry = true }) {
                         Image(systemName: "plus")
                             .font(.largeTitle)
@@ -239,11 +239,6 @@ struct ContentView: View {
             }
         #endif  // DEBUG only for testing
 
-        if !featureFlags.editHistory {
-            // make sure, that history is frozen if feature is disabled
-            freezeHistory = true
-        }
-        
         // Request authorization for notifications
         do {
             try await UNUserNotificationCenter.current().requestAuthorization(
@@ -274,7 +269,7 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .modelContainer(SampleData.shared.modelContainer)
-        .environment(\.featureFlags, FeatureFlags(editHistory: true, adminEnabled: false))
+        .environment(\.featureFlags, FeatureFlags(adminEnabled: false))
         .preferredColorScheme(.dark)
 }
 
