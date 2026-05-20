@@ -14,6 +14,22 @@ import PhotosUI
 import UIKit
 
 struct SettingsView: View {
+    private enum ExportDebugError: Error {
+        case forcedPayloadFailure
+    }
+
+    private static let failExportPayloadArgument = "--fail-export-payload"
+    private static let failExportSaveArgument = "--fail-export-save"
+
+    private static let exportFilenameFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyy-MM-dd_HHmmss"
+        return formatter
+    }()
+
     @AppStorage(AppStorageKeys.enableEditingHistory) private var enableEditingHistory: Bool = false
     @AppStorage(AppStorageKeys.notificationsEnabled) private var notificationsEnabled: Bool = true
     @AppStorage(AppStorageKeys.reflectionReminder) private var reflectionReminder: Bool = true
@@ -27,11 +43,48 @@ struct SettingsView: View {
     @State private var notificationTimes: [Date] = []
     @State private var notificationsAuthorized: Bool = true
     
+    // Export data
+    @State private var isPresentingExport: Bool = false
+    @State private var exportDocument: ExportJSONDocument?
+    @State private var exportFilename: String = "pulse-export.json"
+    @State private var exportErrorMessage: String?
+    
     @Environment(\.dismiss) private var dismiss
     @Environment(\.featureFlags) private var featureFlags
     @Environment(\.modelContext) private var context
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "SettingsView")
+
+    private var isShowingExportError: Binding<Bool> {
+        Binding(
+            get: { exportErrorMessage != nil },
+            set: { newValue in
+                if !newValue {
+                    exportErrorMessage = nil
+                }
+            }
+        )
+    }
+
+    private func makeExportFilename(for date: Date = .now) -> String {
+        "pulse-export-\(Self.exportFilenameFormatter.string(from: date)).json"
+    }
+
+    private var shouldFailExportPayloadInDebug: Bool {
+#if DEBUG
+        ProcessInfo.processInfo.arguments.contains(Self.failExportPayloadArgument)
+#else
+        false
+#endif
+    }
+
+    private var shouldFailExportSaveInDebug: Bool {
+#if DEBUG
+        ProcessInfo.processInfo.arguments.contains(Self.failExportSaveArgument)
+#else
+        false
+#endif
+    }
 
     private var backgroundImage: Image? {
         guard let data = backgroundImageData, let uiImage = UIImage(data: data) else { return nil }
@@ -71,6 +124,41 @@ struct SettingsView: View {
                             Text("Enable this option to be able to add, delete, or edit moments for past days.")
                             
                         }
+                        
+                        VStack(alignment: .leading) {
+                            Text("Backup")
+                            Text("Download your data in a JSON file.")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                            
+                            Button {
+                                do {
+                                    if shouldFailExportPayloadInDebug {
+                                        throw ExportDebugError.forcedPayloadFailure
+                                    }
+
+                                    let payload = ExportPayloadMapper.exportPayload(from: allEntries, kpiTemplates: allKPIs)
+                                    let encoder = JSONEncoder()
+                                    encoder.dateEncodingStrategy = .iso8601
+                                    encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+                                    
+                                    let data = try encoder.encode(payload)
+                                    
+                                    exportDocument = .init(data: data)
+                                    exportFilename = makeExportFilename()
+                                    isPresentingExport = true
+                                    
+                                } catch {
+                                    logger.error("Failed to create export payload: \(error.localizedDescription)")
+                                    exportErrorMessage = "Could not create data for download. Please try again."
+                                    isPresentingExport = false
+                                }
+                            } label: {
+                                Text("Download")
+                            }
+                            .buttonStyle(.bordered)
+                            .padding(.top, 10)
+                        }
                     }
                     .task {
                         // A small migration step to transfer the old `freezeHistory` setting to the new one
@@ -79,6 +167,32 @@ struct SettingsView: View {
                             UserDefaults.standard.removeObject(forKey: AppStorageKeys.freezeHistory)
                         }
                     }
+                    .alert("Download Failed", isPresented: isShowingExportError) {
+                        Button("OK") {
+                            exportErrorMessage = nil
+                        }
+                    } message: {
+                        Text(exportErrorMessage ?? "")
+                    }
+                    .fileExporter(
+                        isPresented: $isPresentingExport,
+                        document: exportDocument,
+                        contentType: .json,
+                        defaultFilename: exportFilename) { result in
+                            switch result {
+                            case .success:
+                                if shouldFailExportSaveInDebug {
+                                    exportDocument = nil
+                                    logger.error("Forced export save failure via launch argument")
+                                    exportErrorMessage = "Could not create file. Please try again."
+                                    return
+                                }
+                                exportDocument = nil
+                            case .failure(let error):
+                                logger.error("Failed to export to file: \(error.localizedDescription)")
+                                exportErrorMessage = "Could not create file. Please try again."
+                            }
+                        }
                 }
             } label: {
                 Label {
