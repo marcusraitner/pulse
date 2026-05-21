@@ -143,3 +143,98 @@ struct CascadeDeletionTests {
         #expect(remaining.isEmpty)
     }
 }
+
+// MARK: - Export payload mapping
+
+@Suite("ExportPayloadMapper")
+struct ExportPayloadMapperTests {
+    @Test("Maps and sorts entries, logs, KPI values, and templates")
+    func mapsAndSortsPayloadData() {
+        let templateB = KPITemplate(title: "Exercise", unit: "min", sortOrder: 2)
+        let templateA = KPITemplate(title: "Deep Work", note: "Focus time", unit: "h", sortOrder: 1)
+
+        let baseDate = Date(timeIntervalSince1970: 1_750_000_000)
+        let logLater = DailyLogEntry(timestamp: baseDate.addingTimeInterval(3_600), log: "Later", score: 1)
+        let logEarlier = DailyLogEntry(
+            timestamp: baseDate,
+            log: "Earlier",
+            score: 2,
+            latitude: 48.137_154,
+            longitude: 11.576_124,
+            address: "Munich",
+            tagsRaw: "deep work,focus"
+        )
+
+        let earlierEntry = DailyEntry(
+            date: baseDate,
+            summary: "Earlier day",
+            logEntries: [logLater, logEarlier]
+        )
+        let laterEntry = DailyEntry(
+            date: baseDate.addingTimeInterval(86_400),
+            summary: "Later day",
+            logEntries: []
+        )
+
+        let valueForTemplateB = DailyKPIValue(value: 10, template: templateB, entry: earlierEntry)
+        let valueForTemplateA = DailyKPIValue(value: 4, template: templateA, entry: earlierEntry)
+        earlierEntry.kpiValues = [valueForTemplateB, valueForTemplateA]
+        laterEntry.kpiValues = []
+
+        let payload = ExportPayloadMapper.exportPayload(
+            from: [laterEntry, earlierEntry],
+            kpiTemplates: [templateB, templateA]
+        )
+
+        #expect(payload.modelSchemaVersion == ExportPayloadMapper.currentModelSchemaVersion)
+        #expect(payload.formatVersion == ExportPayloadMapper.currentFormatVersion)
+        #expect(payload.entries.map(\.summary) == ["Earlier day", "Later day"])
+        #expect(payload.kpiTemplates.map(\.id) == [templateA.id, templateB.id])
+
+        let exportedEarlierEntry = payload.entries[0]
+        #expect(exportedEarlierEntry.logEntries.count == 2)
+        #expect(exportedEarlierEntry.logEntries.map(\.timestamp) == [logEarlier.timestamp, logLater.timestamp])
+
+        #expect(exportedEarlierEntry.logEntries[0].latitude == logEarlier.latitude)
+        #expect(exportedEarlierEntry.logEntries[0].longitude == logEarlier.longitude)
+        #expect(exportedEarlierEntry.logEntries[0].address == logEarlier.address)
+        #expect(exportedEarlierEntry.logEntries[0].tagsRaw == logEarlier.tagsRaw)
+
+        #expect(exportedEarlierEntry.kpiValues.count == 2)
+        #expect(exportedEarlierEntry.kpiValues.map(\.templateID) == [templateA.id, templateB.id])
+    }
+
+    @MainActor
+    @Test("Encoded payload contains export contract keys")
+    func encodedPayloadContainsExpectedKeys() throws {
+        let template = KPITemplate(title: "Sleep", unit: "h", sortOrder: 1)
+        let logEntry = DailyLogEntry(
+            timestamp: Date(timeIntervalSince1970: 1_750_000_100),
+            log: "Checked in",
+            score: 1,
+            tagsRaw: "sleep,recovery"
+        )
+        let entry = DailyEntry(
+            date: Date(timeIntervalSince1970: 1_750_000_000),
+            summary: "Summary",
+            logEntries: [logEntry]
+        )
+        entry.kpiValues = [DailyKPIValue(value: 7, template: template, entry: entry)]
+
+        let payload = ExportPayloadMapper.exportPayload(from: [entry], kpiTemplates: [template])
+
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let data = try encoder.encode(payload)
+        let json = try #require(String(data: data, encoding: .utf8))
+
+        #expect(json.contains("\"formatVersion\""))
+        #expect(json.contains("\"modelSchemaVersion\""))
+        #expect(json.contains("\"entries\""))
+        #expect(json.contains("\"kpiTemplates\""))
+        #expect(json.contains("\"templateID\""))
+        #expect(json.contains("\"tagsRaw\""))
+    }
+}
+

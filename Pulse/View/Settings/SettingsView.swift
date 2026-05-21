@@ -14,21 +14,6 @@ import PhotosUI
 import UIKit
 
 struct SettingsView: View {
-    private enum ExportDebugError: Error {
-        case forcedPayloadFailure
-    }
-
-    private static let failExportPayloadArgument = "--fail-export-payload"
-    private static let failExportSaveArgument = "--fail-export-save"
-
-    private static let exportFilenameFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.calendar = Calendar(identifier: .iso8601)
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        formatter.dateFormat = "yyyy-MM-dd_HHmmss"
-        return formatter
-    }()
 
     @AppStorage(AppStorageKeys.enableEditingHistory) private var enableEditingHistory: Bool = false
     @AppStorage(AppStorageKeys.notificationsEnabled) private var notificationsEnabled: Bool = true
@@ -64,26 +49,6 @@ struct SettingsView: View {
                 }
             }
         )
-    }
-
-    private func makeExportFilename(for date: Date = .now) -> String {
-        "pulse-export-\(Self.exportFilenameFormatter.string(from: date)).json"
-    }
-
-    private var shouldFailExportPayloadInDebug: Bool {
-#if DEBUG
-        ProcessInfo.processInfo.arguments.contains(Self.failExportPayloadArgument)
-#else
-        false
-#endif
-    }
-
-    private var shouldFailExportSaveInDebug: Bool {
-#if DEBUG
-        ProcessInfo.processInfo.arguments.contains(Self.failExportSaveArgument)
-#else
-        false
-#endif
     }
 
     private var backgroundImage: Image? {
@@ -125,18 +90,16 @@ struct SettingsView: View {
                             
                         }
                         
-                        VStack(alignment: .leading) {
-                            Text("Backup")
-                            Text("Download your data in a JSON file.")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text("Backup")
+                                Text("Download your data in a JSON file.")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
                             
                             Button {
                                 do {
-                                    if shouldFailExportPayloadInDebug {
-                                        throw ExportDebugError.forcedPayloadFailure
-                                    }
-
                                     let payload = ExportPayloadMapper.exportPayload(from: allEntries, kpiTemplates: allKPIs)
                                     let encoder = JSONEncoder()
                                     encoder.dateEncodingStrategy = .iso8601
@@ -145,7 +108,7 @@ struct SettingsView: View {
                                     let data = try encoder.encode(payload)
                                     
                                     exportDocument = .init(data: data)
-                                    exportFilename = makeExportFilename()
+                                    exportFilename = "pulse-export-\(DateFormatHelper.formatDate(.now)).json"
                                     isPresentingExport = true
                                     
                                 } catch {
@@ -157,7 +120,7 @@ struct SettingsView: View {
                                 Text("Download")
                             }
                             .buttonStyle(.bordered)
-                            .padding(.top, 10)
+                            .padding(.leading, 10)
                         }
                     }
                     .task {
@@ -181,12 +144,6 @@ struct SettingsView: View {
                         defaultFilename: exportFilename) { result in
                             switch result {
                             case .success:
-                                if shouldFailExportSaveInDebug {
-                                    exportDocument = nil
-                                    logger.error("Forced export save failure via launch argument")
-                                    exportErrorMessage = "Could not create file. Please try again."
-                                    return
-                                }
                                 exportDocument = nil
                             case .failure(let error):
                                 logger.error("Failed to export to file: \(error.localizedDescription)")
