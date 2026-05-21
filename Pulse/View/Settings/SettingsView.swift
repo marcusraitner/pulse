@@ -98,6 +98,8 @@ struct SettingsView: View {
                                     .foregroundStyle(.secondary)
                             }
                             
+                            Spacer()
+                            
                             Button {
                                 do {
                                     let payload = ExportPayloadMapper.exportPayload(from: allEntries, kpiTemplates: allKPIs)
