@@ -23,5 +23,8 @@ Choose from multiple color themes and set a background image from your photo lib
 STAY CONSISTENT WITH REMINDERS
 Set multiple reminders during the day and an optional evening reminder for your reflection.
 
+EXPORT YOUR DATA
+Create a JSON export of your journal any time from Settings, so you can keep a portable copy of your entries and metrics.
+
 PRIVATE, SECURE, AND IN SYNC
 Your journal syncs automatically across your Apple devices via iCloud. Your data stays private and always up to date.

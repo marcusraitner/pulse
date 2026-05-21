@@ -1,3 +1,9 @@
+Version 2.2
+
+- New: Export your data as a JSON file from Settings > General > Backup.
+- Clearer settings: Replaced the confusing negative "Freeze history" option with the positive "Edit past days and moments" toggle.
+- Minor fixes and polish.
+
 Version 2.1
 
 - Tags are here: Add tags to your moments and quickly spot recurring patterns.

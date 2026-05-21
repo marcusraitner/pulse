@@ -14,6 +14,7 @@ It helps you capture moments through the day, rate them from -2 to +2, reflect e
 - Reminders
 - AI Insights (Foundation Models)
 - iCloud sync via CloudKit
+- Full privacy and control over data
 
 ## Tech stack
 

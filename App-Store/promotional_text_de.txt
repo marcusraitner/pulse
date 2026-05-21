@@ -1,1 +1,1 @@
-Halte deinen Tag in Sekunden fest, tagge wichtige Momente und erkenne deine Muster über Tag, Woche und Monat – privat, schön gestaltet und per iCloud synchron.
+Neu in 2.2: Exportiere dein Journal als JSON und nutze die klarere positive Einstellung „Vergangene Tage und Momente bearbeiten“.

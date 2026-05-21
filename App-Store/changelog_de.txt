@@ -1,3 +1,9 @@
+Version 2.2
+
+- Neu: Exportiere deine Daten als JSON-Datei unter Einstellungen > Allgemein > Backup.
+- Klarere Einstellung: Die schwer verständliche negative Option „Verlauf einfrieren“ wurde durch den positiven Schalter „Vergangene Tage und Momente bearbeiten“ ersetzt.
+- Kleine Fehlerbehebungen und Verbesserungen.
+
 Version 2.1
 
 - Tags sind da: Ergänze deine Momente mit Tags und erkenne wiederkehrende Muster schneller.

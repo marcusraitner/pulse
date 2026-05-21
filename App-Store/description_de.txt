@@ -23,5 +23,8 @@ Wähle aus mehreren Farbthemen und nutze ein Hintergrundbild aus deiner Fotomedi
 MIT ERINNERUNGEN DRANBLEIBEN
 Lege mehrere Erinnerungen für den Tag fest und optional eine Abend-Erinnerung für deine Reflexion.
 
+DATEN EXPORTIEREN
+Erstelle jederzeit in den Einstellungen einen JSON-Export deines Journals, damit du eine portable Kopie deiner Einträge und Metriken hast.
+
 PRIVAT, SICHER UND SYNCHRON
 Dein Journal synchronisiert automatisch über iCloud auf all deinen Apple-Geräten. Deine Daten bleiben privat und jederzeit aktuell.

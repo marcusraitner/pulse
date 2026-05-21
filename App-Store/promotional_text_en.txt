@@ -1,1 +1,1 @@
-Capture your day in seconds, tag meaningful moments, and uncover your patterns across day, week, and month—private, beautiful journaling synced via iCloud.
+New in 2.2: Export your journal as JSON, plus clearer settings with a positive “Edit past days and moments” toggle.
