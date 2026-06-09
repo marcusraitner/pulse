@@ -28,6 +28,7 @@ struct LogEntrySheet: View {
         _latitude = State(initialValue: entry?.latitude)
         _longitude = State(initialValue: entry?.longitude)
         _address = State(initialValue: entry?.address)
+        _timestamp = State(initialValue: entry?.timestamp ?? .now)
         _entryTags = State(initialValue: .init(entry?.tags ?? []) )
     }
 
@@ -42,6 +43,7 @@ struct LogEntrySheet: View {
     @State private var address: String?
     @State private var entryTags: Set = Set<String>()
     @State private var newTag: String = ""
+    @State private var timestamp: Date = .now
     
     // used to manage validation; showing the validation message only if stepper was touched
     @State private var isNew = true
@@ -113,11 +115,12 @@ struct LogEntrySheet: View {
             entry.log = log
             entry.score = score
             entry.tagsRaw = rawTags
+            entry.timestamp = timestamp
             context.saveOrLog("Failure while saving entry", logger: logger)
         } else {
             // new entry
             let newEntry = DailyLogEntry(
-                timestamp: .now,
+                timestamp: timestamp,
                 log: log,
                 score: score,
                 entry: day,
@@ -196,11 +199,14 @@ struct LogEntrySheet: View {
                     }
                 }
                 
-                
                 HStack {
-                    Text("Recorded at")
-                    Spacer()
-                    Text((entry?.timestamp ?? .now).formatted(date: .numeric, time: .shortened))
+                    if isEntryEditable {
+                        DatePicker("Recorded at", selection: $timestamp, in: .init(uncheckedBounds: (.distantPast, .now)), displayedComponents: .hourAndMinute)
+                    } else {
+                        Text("Recorded at")
+                        Spacer()
+                        Text((entry?.timestamp ?? .now).formatted(date: .numeric, time: .shortened))
+                    }
                 }
                 
                 VStack(alignment: .leading) {
