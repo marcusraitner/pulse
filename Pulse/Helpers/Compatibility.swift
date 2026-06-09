@@ -16,53 +16,58 @@ import CoreLocation
 
 extension View {
     /// Interactive glass card (rounded rect). Falls back to ultraThinMaterial.
+    @ViewBuilder
     func glassCard(cornerRadius: CGFloat = 10) -> some View {
         if #available(iOS 26, *) {
-            AnyView(self.glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: cornerRadius)))
+            self.glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: cornerRadius))
         } else {
-            AnyView(self.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: cornerRadius)))
+            self.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: cornerRadius))
         }
     }
     
+    @ViewBuilder
     func glassBackground(cornerRadius: CGFloat = 10) -> some View {
         if #available(iOS 26, *) {
-            AnyView(self.glassEffect(.clear, in: RoundedRectangle(cornerRadius: cornerRadius)))
+            self.glassEffect(.clear, in: RoundedRectangle(cornerRadius: cornerRadius))
         } else {
-            AnyView(self.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: cornerRadius)))
+            self.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: cornerRadius))
         }
     }
 
     /// Glass capsule for pill-shaped buttons. Falls back to ultraThinMaterial in a Capsule.
+    @ViewBuilder
     func glassCapsule() -> some View {
         if #available(iOS 26, *) {
-            AnyView(self.glassEffect(.clear, in: Capsule()))
+            self.glassEffect(.clear, in: Capsule())
         } else {
-            AnyView(self.background(.ultraThinMaterial, in: Capsule()))
+            self.background(.ultraThinMaterial, in: Capsule())
         }
     }
 
     /// Glass circle for floating action buttons. Falls back to regularMaterial with a white glow shadow.
+    @ViewBuilder
     func glassCircle() -> some View {
         if #available(iOS 26, *) {
-            AnyView(self.glassEffect(.regular, in: Circle()).shadow(color: .white.opacity(0.4), radius: 12))
+            self.glassEffect(.regular, in: Circle()).shadow(color: .white.opacity(0.4), radius: 12)
         } else {
-            AnyView(self.background(.regularMaterial, in: Circle()).shadow(color: .white.opacity(0.4), radius: 12))
+            self.background(.regularMaterial, in: Circle()).shadow(color: .white.opacity(0.4), radius: 12)
         }
     }
 
     /// Tinted interactive glass card keyed to a score color. Falls back to light ultraThinMaterial with a semi-transparent color overlay.
+    @ViewBuilder
     func glassTintedCard(color: Color, cornerRadius: CGFloat = 10) -> some View {
         if #available(iOS 26, *) {
-            AnyView(self.glassEffect(.regular.tint(color.opacity(0.45)).interactive(), in: RoundedRectangle(cornerRadius: cornerRadius)))
+            self.glassEffect(.regular.tint(color.opacity(0.45)).interactive(), in: RoundedRectangle(cornerRadius: cornerRadius))
         } else {
-            AnyView(self.background {
+            self.background {
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .fill(.ultraThinMaterial)
                     .overlay {
                         RoundedRectangle(cornerRadius: cornerRadius)
                             .fill(color.opacity(0.45))
                     }
-            })
+            }
         }
     }
 }
