@@ -54,7 +54,7 @@ struct LogEntrySheet: View {
         enableEditingHistory || Calendar.current.isDateInToday(entry?.timestamp ?? .now)
     }
     
-    @StateObject var locationManager = LocationManager()
+    @State var locationManager = LocationManager()
     @State private var mapPosition: MapCameraPosition = .automatic
     
     @Environment(\.dismiss) private var dismiss
