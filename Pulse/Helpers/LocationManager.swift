@@ -9,12 +9,12 @@ import Foundation
 import MapKit
 import CoreLocation
 import OSLog
-internal import Combine
 
 /// Wraps CoreLocation permission requests and one-shot coordinate capture.
 /// Once a location fix is obtained it is automatically reverse-geocoded via `Compat.reverseGeocode`.
 /// Consumers react to new locations by assigning a closure to `setItem`.
-class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
+@Observable
+class LocationManager: NSObject, CLLocationManagerDelegate {
     private let locationManager = CLLocationManager()
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "LocationManager")
 
@@ -22,18 +22,18 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     var setItem: (MKMapItem) -> Void = { _ in }
 
     /// The most recently obtained device location.
-    @Published var location: CLLocation?
+    var location: CLLocation?
 
     /// Reverse-geocoded map items for the current location.
     /// Setting this property automatically calls `setItem` with the first result.
-    @Published var mapItems: [MKMapItem] = [] {
+    var mapItems: [MKMapItem] = [] {
         didSet {
             if let item = mapItems.first { setItem(item) }
         }
     }
 
     /// The current CoreLocation authorisation status.
-    @Published var authorizationStatus: CLAuthorizationStatus
+    var authorizationStatus: CLAuthorizationStatus
     
     override init() {
         self.authorizationStatus = locationManager.authorizationStatus
