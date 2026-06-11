@@ -146,7 +146,7 @@ struct LogEntrySheet: View {
     
     var body: some View {
         Form {
-            Section(header: Text(timestamp.formatted(date: .complete, time: .shortened))) {
+            Section(header: Text(timestamp.formatted(.dateTime.weekday().day().month().year().minute().hour()))) {
                 if isEntryEditable {
                     VStack(alignment: .leading) {
                         TextField("What's going on?", text: $log, axis: .vertical)

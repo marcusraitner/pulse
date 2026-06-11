@@ -48,9 +48,9 @@ extension View {
     @ViewBuilder
     func glassCircle() -> some View {
         if #available(iOS 26, *) {
-            self.glassEffect(.regular, in: Circle()).shadow(color: .white.opacity(0.4), radius: 12)
+            self.glassEffect(.regular, in: Circle())
         } else {
-            self.background(.regularMaterial, in: Circle()).shadow(color: .white.opacity(0.4), radius: 12)
+            self.background(.regularMaterial, in: Circle())
         }
     }
 
