@@ -125,6 +125,9 @@ struct DailyReflectionSheet: View {
                         }
                     }
                 }
+                .onAppear() {
+                    focusedField = .summary
+                }
                 
                 if !kpiTemplates.isEmpty {
                     Section {
@@ -164,13 +167,18 @@ struct DailyReflectionSheet: View {
                 }
                 Section {
                     if let logEntries = day.logEntries, !logEntries.isEmpty {
+                        // TODO: Add navigation to LogEntrySheet
                         ForEach(day.logEntries?.sorted(by: { $0.timestamp < $1.timestamp } ) ?? []) { logEntry in
-                            LogEntryText(logEntry: logEntry)
-                                .padding(.vertical, featureFlags.iOS26 ? 0 : 5)
+                            NavigationLink {
+                                LogEntrySheet(day: day, entry: logEntry, isModal: false)
+                            } label: {
+                                LogEntryText(logEntry: logEntry)
+                                    .padding(.vertical, featureFlags.iOS26 ? 0 : 5)
+                            }
                         }
                     }
                 } header: {
-                    Text("Your Moments")
+                    Text("Moments")
                 } footer: {
                     if day.logEntries?.isEmpty ?? true {
                         Text("No moments logged for this day.")
@@ -179,6 +187,7 @@ struct DailyReflectionSheet: View {
             }
         }
         .navigationTitle("\(day.date.formatted(.dateTime.weekday(.wide).day().month(.defaultDigits).year(.twoDigits)))")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Compat.confirmButton(String(localized: "Save")) {
