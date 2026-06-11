@@ -19,8 +19,9 @@ struct LogEntrySheet: View {
     
     let day: DailyEntry
     let entry: DailyLogEntry?
+    let isModalPresented: Bool
     
-    init(day: DailyEntry, entry: DailyLogEntry? = nil) {
+    init(day: DailyEntry, entry: DailyLogEntry? = nil, isModal: Bool = true) {
         self.day = day
         self.entry = entry
         _log = State(initialValue: entry?.log ?? "")
@@ -30,6 +31,7 @@ struct LogEntrySheet: View {
         _address = State(initialValue: entry?.address)
         _timestamp = State(initialValue: entry?.timestamp ?? .now)
         _entryTags = State(initialValue: .init(entry?.tags ?? []) )
+        isModalPresented = isModal
     }
 
     private var isEntryNew: Bool { entry == nil }
@@ -44,6 +46,14 @@ struct LogEntrySheet: View {
     @State private var entryTags: Set = Set<String>()
     @State private var newTag: String = ""
     @State private var timestamp: Date = .now
+
+    
+    // Controlling Focus
+    enum FocusedField {
+        case log, newTag, score, timestamp
+    }
+    
+    @FocusState private var focusedField: FocusedField?
     
     // used to manage validation; showing the validation message only if stepper was touched
     @State private var isNew = true
@@ -136,12 +146,13 @@ struct LogEntrySheet: View {
     
     var body: some View {
         Form {
-            Section {
+            Section(header: Text(timestamp.formatted(date: .complete, time: .shortened))) {
                 if isEntryEditable {
                     VStack(alignment: .leading) {
                         TextField("What's going on?", text: $log, axis: .vertical)
                             .multilineTextAlignment(.leading)
                             .lineLimit(5...Int.max)
+                            .focused($focusedField, equals: .log)
                         
                         Text("Please capture your moment here.")
                             .font(.caption)
@@ -160,6 +171,7 @@ struct LogEntrySheet: View {
                             Stepper("", value: $score, in: -2...2, step: 1)
                                 .labelsHidden()
                                 .padding(.top, 4)
+                                .focused($focusedField, equals: .score)
                         }
                         .padding(.leading)
                     }
@@ -189,6 +201,7 @@ struct LogEntrySheet: View {
                                 .onSubmit {
                                     addCustomTag()
                                 }
+                                .focused($focusedField, equals: .newTag)
                             Button("Add") {
                                 addCustomTag()
                             }
@@ -201,7 +214,8 @@ struct LogEntrySheet: View {
                 
                 HStack {
                     if isEntryEditable {
-                        DatePicker("Recorded at", selection: $timestamp, in: .init(uncheckedBounds: (.distantPast, .now)), displayedComponents: .hourAndMinute)
+                        DatePicker(timestamp.formatted(date: .abbreviated, time: .omitted), selection: $timestamp, in: .init(uncheckedBounds: (.distantPast, .now)), displayedComponents: .hourAndMinute)
+                            .focused($focusedField, equals: .timestamp)
                     } else {
                         Text("Recorded at")
                         Spacer()
@@ -278,6 +292,7 @@ struct LogEntrySheet: View {
                     }
                 }
             }
+            .headerProminence(.increased)
             .onChange(of: storeLocations) {
                 if storeLocations {
                     locationManager.setItem = self.setItem
@@ -288,7 +303,7 @@ struct LogEntrySheet: View {
             Section {
                 HStack {
                     Spacer()
-                    if let entry, isEntryEditable {
+                    if isEntryEditable {
                         Button(role: .destructive) {
                             isPresentingConfirm = true
                         } label: {
@@ -301,9 +316,11 @@ struct LogEntrySheet: View {
                                             isPresented: $isPresentingConfirm,
                                             titleVisibility: .visible) {
                             Button("Delete", role: .destructive) {
-                                context.delete(entry)
-                                context.saveOrLog("Failure saving deleted entry", logger: logger)
-                                dismiss()
+                                if let entry {
+                                    context.delete(entry)
+                                    context.saveOrLog("Failure saving deleted entry", logger: logger)
+                                    dismiss()
+                                }
                             }
                         } message: {
                             Text("This will delete the moment permanently and cannot be undone.")
@@ -317,7 +334,11 @@ struct LogEntrySheet: View {
         .onChange(of: score) {
             isNew = false
         }
+        .onAppear {
+            focusedField = .log
+        }
         .navigationTitle(isEntryNew ? "New Moment" : isEntryEditable ? "Edit Moment" : "View Moment")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Compat.confirmButton(String(localized: "Save")) {
@@ -326,8 +347,10 @@ struct LogEntrySheet: View {
                 }
                 .disabled(log.isEmpty)
             }
-            ToolbarItem(placement: .cancellationAction) {
-                Compat.closeButton { dismiss() }
+            if isModalPresented {
+                ToolbarItem(placement: .cancellationAction) {
+                    Compat.closeButton { dismiss() }
+                }
             }
         }
     }
