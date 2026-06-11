@@ -105,6 +105,7 @@ struct ContentView: View {
                             .glassCircle()
                             .foregroundStyle(.white)
                     }
+                    .contentShape(Circle())
                     .buttonStyle(.plain)
                     .padding(.trailing, 20)
                 }
