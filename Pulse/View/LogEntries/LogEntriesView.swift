@@ -16,6 +16,10 @@ struct LogEntriesView: View {
     @AppStorage(AppStorageKeys.theme) var themeName: String = "traffic"
 
     var body: some View {
+        
+        InlineLogEntryView(for: day)
+            .padding(.vertical, 10)
+        
         let logEntries = day.logEntries?.sorted(by: {
             $0.timestamp < $1.timestamp
         }) ?? []
