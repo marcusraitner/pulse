@@ -29,7 +29,18 @@ struct LogEntrySheet: View {
         _latitude = State(initialValue: entry?.latitude)
         _longitude = State(initialValue: entry?.longitude)
         _address = State(initialValue: entry?.address)
-        _timestamp = State(initialValue: entry?.timestamp ?? .now)
+        if let entry {
+            _timestamp = State(initialValue: entry.timestamp)
+        } else {
+            // this is an entry on a past day: we use hour and minute of now
+            var dayComponents = Calendar.current.dateComponents([.year, .month, .day], from: day.date)
+            let hourMinutes = Calendar.current.dateComponents([.hour, .minute], from: .now)
+            dayComponents.hour = hourMinutes.hour
+            dayComponents.minute = hourMinutes.minute
+            
+            // if no matching date is found (unlikely) we default to the timestamp of the day
+            _timestamp = State(initialValue: Calendar.current.date(from: dayComponents) ?? day.date)
+        }
         _entryTags = State(initialValue: .init(entry?.tags ?? []) )
         isModalPresented = isModal
     }

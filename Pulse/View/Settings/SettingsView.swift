@@ -445,8 +445,12 @@ struct SettingsView: View {
                             context.insert(tag)
                         }
                         
-                        for entry in SampleData.makeSeedEntries(templates: templates, language: seedLanguage) {
-                            context.insert(entry)
+                        let days = SampleData.makeSeedDays(templates: templates, language: seedLanguage)
+                        for day in days {
+                            context.insert(day)
+                        }
+                        for logEntry in SampleData.makeSeedLogEntries(for: days, language: seedLanguage) {
+                            context.insert(logEntry)
                         }
                         
                         context.saveOrLog("Failed to save mock data", logger: logger)
