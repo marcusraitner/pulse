@@ -23,11 +23,12 @@ struct DailyReflectionCard: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            if day.summary.isEmpty {
-                Text("Reflection")
-                    .font(.title2)
-                    .padding(.bottom, 5)
-            } else {
+            Text("Reflection")
+                .bold()
+                .italic()
+                .padding(.bottom, 4)
+
+            if !day.summary.isEmpty {
                 Text(day.summary)
             }
             
@@ -35,6 +36,7 @@ struct DailyReflectionCard: View {
                 metricsRow
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .glassCard()
         .contentShape(Rectangle())
