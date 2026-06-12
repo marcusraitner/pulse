@@ -27,239 +27,117 @@ class SampleData {
         }
     }
 
-    /// Creates fresh, unmanaged `DailyEntry` objects suitable for insertion into any context.
-    static func makeSeedEntries(language: SeedLanguage = .en) -> [DailyEntry] {
-        makeSeedEntries(templates: SampleData.makeSeedTemplates(language: language), language: language)
-    }
-    
-    /// Creates fresh, unmanaged `DailyEntry` objects and links KPI values to the provided templates.
-    static func makeSeedEntries(templates: [KPITemplate], language: SeedLanguage = .en) -> [DailyEntry] {
+    /// Creates fresh `DailyEntry` objects (without log entries) linked to the provided KPI templates.
+    static func makeSeedDays(templates: [KPITemplate], language: SeedLanguage = .en) -> [DailyEntry] {
         let cal = Calendar.current
-        func time(_ hour: Int, _ minute: Int = 0, on base: Date) -> Date {
-            cal.date(bySettingHour: hour, minute: minute, second: 0, of: base) ?? base
-        }
         let d: [Date] = (0...14).map { cal.date(byAdding: .day, value: -$0, to: .now)! }
 
         let entries: [DailyEntry] = [
-            .init(
-                date: d[0],
-                summary: "Strong start with deep work, then momentum dipped after distractions in the afternoon.",
-                logEntries: [
-                    DailyLogEntry(
-                        timestamp: time(9, 0, on: d[0]),
-                        log: "Good start; got distracted after an hour. Then the day went totally bogus.",
-                        score: 2,
-                        latitude: 37.3349,
-                        longitude: -122.0090,
-                        address: "Apple Park, Cupertino, CA",
-                        tagsRaw: "Deep Work,Focus"
-                    ),
-                    DailyLogEntry(
-                        timestamp: time(14, 30, on: d[0]),
-                        log: "Got distracted after an hour",
-                        score: 1,
-                        latitude: 37.3349,
-                        longitude: -122.0090,
-                        address: "Apple Park, Cupertino, CA",
-                        tagsRaw: "Work Stress"
-                    )
-                ]
-            ),
-            .init(
-                date: d[2],
-                summary: "Low-energy day with minimal progress; prioritized rest.",
-                logEntries: [
-                    DailyLogEntry(
-                        timestamp: time(9, 30, on: d[2]),
-                        log: "Empty day, just resting",
-                        score: -2,
-                        latitude: 37.7749,
-                        longitude: -122.4194,
-                        address: "Home",
-                        tagsRaw: "Sleep"
-                    ),
-                    DailyLogEntry(
-                        timestamp: time(15, 0, on: d[2]),
-                        log: "Nothing",
-                        score: -2,
-                        latitude: 37.7749,
-                        longitude: -122.4194,
-                        address: "Home",
-                        tagsRaw: "Sleep,Family"
-                    )
-                ]
-            ),
-            .init(
-                date: d[3],
-                summary: "Mixed focus: meaningful deep work tempered by distractions.",
-                logEntries: [
-                    DailyLogEntry(
-                        timestamp: time(9, 0, on: d[3]),
-                        log: "got some deep work done but also some distractions. And this is a very long sentence to make sure the summary is longer than the intent and to see what happens in the UI",
-                        score: 0,
-                        latitude: 37.7765,
-                        longitude: -122.4172,
-                        address: "Downtown Cafe",
-                        tagsRaw: "Deep Work"
-                    ),
-                    DailyLogEntry(
-                        timestamp: time(14, 0, on: d[3]),
-                        log: "Good start; got distracted after an hour",
-                        score: 1,
-                        latitude: 37.3317,
-                        longitude: -122.0301,
-                        address: "Office",
-                        tagsRaw: "Focus,Work Stress"
-                    ),
-                ]
-            ),
-            .init(
-                date: d[4],
-                summary: "Frustrating library session with very low perceived productivity.",
-                logEntries: [
-                    DailyLogEntry(
-                        timestamp: time(10, 0, on: d[4]),
-                        log: "Total waste of time",
-                        score: 1,
-                        latitude: 37.7793,
-                        longitude: -122.4192,
-                        address: "Library",
-                        tagsRaw: "Work Stress"
-                    )
-                ]
-            ),
-            .init(
-                date: d[5],
-                summary: "Closed core work and improved stability; solid progress.",
-                logEntries: [
-                    DailyLogEntry(timestamp: time(10, 0, on: d[5]), log: "Wrapped up core features", score: 2, latitude: 37.3317, longitude: -122.0301, address: "Office", tagsRaw: "Deep Work,Focus"),
-                    DailyLogEntry(timestamp: time(14, 0, on: d[5]), log: "Fixed a couple of bugs", score: 1, latitude: 37.3317, longitude: -122.0301, address: "Office", tagsRaw: "Focus")
-                ]
-            ),
-            .init(
-                date: d[6],
-                summary: "Sprint planning went well, but an unexpected meeting disrupted focus.",
-                logEntries: [
-                    DailyLogEntry(timestamp: time(9, 0, on: d[6]), log: "Sprint goals drafted", score: 1, latitude: 37.7739, longitude: -122.4312, address: "Home Office", tagsRaw: "Focus"),
-                    DailyLogEntry(timestamp: time(14, 0, on: d[6]), log: "Got derailed by unexpected meeting", score: -1, latitude: 37.7739, longitude: -122.4312, address: "Home Office", tagsRaw: "Work Stress")
-                ]
-            ),
-            .init(
-                date: d[7],
-                summary: "Analytics review uncovered onboarding opportunities.",
-                logEntries: [
-                    DailyLogEntry(timestamp: time(10, 0, on: d[7]), log: "Reviewed retention metrics", score: 0, latitude: 37.3317, longitude: -122.0301, address: "Office", tagsRaw: "Deep Work,Focus"),
-                    DailyLogEntry(timestamp: time(14, 0, on: d[7]), log: "Identified a drop-off in onboarding", score: 1, latitude: 37.3317, longitude: -122.0301, address: "Office", tagsRaw: "Focus")
-                ]
-            ),
-            .init(
-                date: d[8],
-                summary: "Design polish improved copy clarity and motion quality.",
-                logEntries: [
-                    DailyLogEntry(timestamp: time(11, 30, on: d[8]), log: "Tweaked copy and animations", score: 1, latitude: 37.7858, longitude: -122.4064, address: "Design Studio", tagsRaw: "Deep Work")
-                ]
-            ),
-            .init(
-                date: d[9],
-                summary: "Email management partially successful; focus fragmented.",
-                logEntries: [
-                    DailyLogEntry(timestamp: time(9, 0, on: d[9]), log: "Inbox zero attempt failed", score: -1, latitude: 37.7749, longitude: -122.4194, address: "Home", tagsRaw: "Work Stress"),
-                    DailyLogEntry(timestamp: time(15, 0, on: d[9]), log: "Went for a morning run to clear my head", score: 1, latitude: 37.7749, longitude: -122.4194, address: "Home", tagsRaw: "Sport,Outdoor")
-                ]
-            ),
-            .init(
-                date: d[10],
-                summary: "Solid UX progress early, then blocked by a data model issue.",
-                logEntries: [
-                    DailyLogEntry(timestamp: time(9, 0, on: d[10]), log: "Sketched interaction flow", score: 0, latitude: 37.7858, longitude: -122.4064, address: "Design Studio", tagsRaw: "Deep Work,Focus"),
-                    DailyLogEntry(timestamp: time(15, 0, on: d[10]), log: "Hit roadblock with data model", score: -1, latitude: 37.7739, longitude: -122.4312, address: "Home Office", tagsRaw: "Work Stress")
-                ]
-            ),
-            .init(
-                date: d[11],
-                summary: "Excellent performance work with clear gains in rendering and memory efficiency.",
-                logEntries: [
-                    DailyLogEntry(timestamp: time(10, 0, on: d[11]), log: "Optimized rendering pipeline", score: 2, latitude: 37.3317, longitude: -122.0301, address: "Office", tagsRaw: "Deep Work,Focus"),
-                    DailyLogEntry(timestamp: time(14, 0, on: d[11]), log: "Reduced memory usage by 20%", score: 1, latitude: 37.3317, longitude: -122.0301, address: "Office", tagsRaw: "Deep Work,Focus")
-                ]
-            ),
-            .init(
-                date: d[12],
-                summary: "Competitor research produced useful notes but felt draining.",
-                logEntries: [
-                    DailyLogEntry(timestamp: time(10, 0, on: d[12]), log: "Collected notes on top 3 competitors", score: -1, latitude: 37.7765, longitude: -122.4172, address: "Cafe", tagsRaw: "Focus")
-                ]
-            ),
-            .init(
-                date: d[13],
-                summary: "Architecture work improved modularity and reliability, but stress stayed high.",
-                logEntries: [
-                    DailyLogEntry(timestamp: time(9, 0, on: d[13]), log: "Split services into modules", score: -2, latitude: 37.7739, longitude: -122.4312, address: "Home Office", tagsRaw: "Work Stress"),
-                    DailyLogEntry(timestamp: time(14, 30, on: d[13]), log: "Improved error handling paths", score: -1, latitude: 37.7739, longitude: -122.4312, address: "Home Office", tagsRaw: "Work Stress")
-                ]
-            ),
-            .init(
-                date: d[14],
-                summary: "Quiet documentation day that kept project docs up to date.",
-                logEntries: [
-                    DailyLogEntry(timestamp: time(10, 0, on: d[14]), log: "Updated README and API docs", score: 0, latitude: 37.7749, longitude: -122.4194, address: "Home", tagsRaw: "Deep Work")
-                ]
-            ),
+            .init(date: d[0],  summary: "Strong start with deep work, then momentum dipped after distractions in the afternoon."),
+            .init(date: d[2],  summary: "Low-energy day with minimal progress; prioritized rest."),
+            .init(date: d[3],  summary: "Mixed focus: meaningful deep work tempered by distractions."),
+            .init(date: d[4],  summary: "Frustrating library session with very low perceived productivity."),
+            .init(date: d[5],  summary: "Closed core work and improved stability; solid progress."),
+            .init(date: d[6],  summary: "Sprint planning went well, but an unexpected meeting disrupted focus."),
+            .init(date: d[7],  summary: "Analytics review uncovered onboarding opportunities."),
+            .init(date: d[8],  summary: "Design polish improved copy clarity and motion quality."),
+            .init(date: d[9],  summary: "Email management partially successful; focus fragmented."),
+            .init(date: d[10], summary: "Solid UX progress early, then blocked by a data model issue."),
+            .init(date: d[11], summary: "Excellent performance work with clear gains in rendering and memory efficiency."),
+            .init(date: d[12], summary: "Competitor research produced useful notes but felt draining."),
+            .init(date: d[13], summary: "Architecture work improved modularity and reliability, but stress stayed high."),
+            .init(date: d[14], summary: "Quiet documentation day that kept project docs up to date."),
         ]
-        
-        applyLocalization(to: entries, language: language)
+
+        if language == .de {
+            for entry in entries {
+                if let localized = germanSummaryByEnglish[entry.summary] {
+                    entry.summary = localized
+                }
+            }
+        }
 
         let kpiTemplates = Array(templates.sorted(by: { $0.sortOrder < $1.sortOrder }).prefix(3))
-        guard kpiTemplates.count == 3 else { return entries }
-
-        let seedKPIValues: [(deepWorkMinutes: Int, sleepHours: Int, exerciseMinutes: Int)] = [
-            (150, 7, 25),
-            (20, 9, 10),
-            (95, 6, 20),
-            (30, 6, 15),
-            (180, 7, 35),
-            (60, 7, 20),
-            (110, 8, 15),
-            (75, 7, 30),
-            (45, 8, 40),
-            (90, 6, 20),
-            (200, 7, 25),
-            (50, 6, 10),
-            (80, 6, 15),
-            (70, 7, 20),
-        ]
-
-        for (index, entry) in entries.enumerated() {
-            let values = seedKPIValues[index]
-            entry.kpiValues = [
-                DailyKPIValue(value: values.deepWorkMinutes, template: kpiTemplates[0], entry: entry),
-                DailyKPIValue(value: values.sleepHours, template: kpiTemplates[1], entry: entry),
-                DailyKPIValue(value: values.exerciseMinutes, template: kpiTemplates[2], entry: entry),
+        if kpiTemplates.count == 3 {
+            let seedKPIValues: [(deepWorkMinutes: Int, sleepHours: Int, exerciseMinutes: Int)] = [
+                (150, 7, 25), (20, 9, 10),  (95, 6, 20),  (30, 6, 15),
+                (180, 7, 35), (60, 7, 20),  (110, 8, 15), (75, 7, 30),
+                (45, 8, 40),  (90, 6, 20),  (200, 7, 25), (50, 6, 10),
+                (80, 6, 15),  (70, 7, 20),
             ]
+            for (index, entry) in entries.enumerated() {
+                let v = seedKPIValues[index]
+                entry.kpiValues = [
+                    DailyKPIValue(value: v.deepWorkMinutes, template: kpiTemplates[0], entry: entry),
+                    DailyKPIValue(value: v.sleepHours,      template: kpiTemplates[1], entry: entry),
+                    DailyKPIValue(value: v.exerciseMinutes, template: kpiTemplates[2], entry: entry),
+                ]
+            }
         }
 
         return entries
     }
-    
-    private static func applyLocalization(to entries: [DailyEntry], language: SeedLanguage) {
-        guard language == .de else { return }
-        
-        for entry in entries {
-            if let localizedSummary = germanSummaryByEnglish[entry.summary] {
-                entry.summary = localizedSummary
-            }
-            
-            for logEntry in entry.logEntries ?? [] {
-                if let localizedLog = germanLogByEnglish[logEntry.log] {
-                    logEntry.log = localizedLog
-                }
-                if let address = logEntry.address, let localizedAddress = germanAddressByEnglish[address] {
-                    logEntry.address = localizedAddress
-                }
-                let localizedTags = logEntry.tags.map { germanTagByEnglish[$0] ?? $0 }
-                logEntry.tagsRaw = localizedTags.joined(separator: ",")
+
+    /// Creates `DailyLogEntry` objects for the given days with `entry` backlinks set.
+    /// Pass the array returned by `makeSeedDays` — order and count must match.
+    static func makeSeedLogEntries(for days: [DailyEntry], language: SeedLanguage = .en) -> [DailyLogEntry] {
+        let cal = Calendar.current
+        func time(_ hour: Int, _ minute: Int = 0, on base: Date) -> Date {
+            cal.date(bySettingHour: hour, minute: minute, second: 0, of: base) ?? base
+        }
+
+        guard days.count == 14 else { return [] }
+
+        let all: [DailyLogEntry] = [
+            // days[0] — today
+            DailyLogEntry(timestamp: time(9,  0,  on: days[0].date), log: "Good start; got distracted after an hour. Then the day went totally bogus.", score:  2, entry: days[0],  latitude: 37.3349, longitude: -122.0090, address: "Apple Park, Cupertino, CA", tagsRaw: "Deep Work,Focus"),
+            DailyLogEntry(timestamp: time(14, 30, on: days[0].date), log: "Got distracted after an hour",                                                score:  1, entry: days[0],  latitude: 37.3349, longitude: -122.0090, address: "Apple Park, Cupertino, CA", tagsRaw: "Work Stress"),
+            // days[1] — 2 days ago
+            DailyLogEntry(timestamp: time(9,  30, on: days[1].date), log: "Empty day, just resting",                                                     score: -2, entry: days[1],  latitude: 37.7749, longitude: -122.4194, address: "Home",                     tagsRaw: "Sleep"),
+            DailyLogEntry(timestamp: time(15, 0,  on: days[1].date), log: "Nothing",                                                                     score: -2, entry: days[1],  latitude: 37.7749, longitude: -122.4194, address: "Home",                     tagsRaw: "Sleep,Family"),
+            // days[2] — 3 days ago
+            DailyLogEntry(timestamp: time(9,  0,  on: days[2].date), log: "got some deep work done but also some distractions. And this is a very long sentence to make sure the summary is longer than the intent and to see what happens in the UI", score: 0, entry: days[2], latitude: 37.7765, longitude: -122.4172, address: "Downtown Cafe", tagsRaw: "Deep Work"),
+            DailyLogEntry(timestamp: time(14, 0,  on: days[2].date), log: "Good start; got distracted after an hour",                                    score:  1, entry: days[2],  latitude: 37.3317, longitude: -122.0301, address: "Office",                  tagsRaw: "Focus,Work Stress"),
+            // days[3] — 4 days ago
+            DailyLogEntry(timestamp: time(10, 0,  on: days[3].date), log: "Total waste of time",                                                         score:  1, entry: days[3],  latitude: 37.7793, longitude: -122.4192, address: "Library",                  tagsRaw: "Work Stress"),
+            // days[4] — 5 days ago
+            DailyLogEntry(timestamp: time(10, 0,  on: days[4].date), log: "Wrapped up core features",                                                    score:  2, entry: days[4],  latitude: 37.3317, longitude: -122.0301, address: "Office",                  tagsRaw: "Deep Work,Focus"),
+            DailyLogEntry(timestamp: time(14, 0,  on: days[4].date), log: "Fixed a couple of bugs",                                                      score:  1, entry: days[4],  latitude: 37.3317, longitude: -122.0301, address: "Office",                  tagsRaw: "Focus"),
+            // days[5] — 6 days ago
+            DailyLogEntry(timestamp: time(9,  0,  on: days[5].date), log: "Sprint goals drafted",                                                        score:  1, entry: days[5],  latitude: 37.7739, longitude: -122.4312, address: "Home Office",             tagsRaw: "Focus"),
+            DailyLogEntry(timestamp: time(14, 0,  on: days[5].date), log: "Got derailed by unexpected meeting",                                          score: -1, entry: days[5],  latitude: 37.7739, longitude: -122.4312, address: "Home Office",             tagsRaw: "Work Stress"),
+            // days[6] — 7 days ago
+            DailyLogEntry(timestamp: time(10, 0,  on: days[6].date), log: "Reviewed retention metrics",                                                  score:  0, entry: days[6],  latitude: 37.3317, longitude: -122.0301, address: "Office",                  tagsRaw: "Deep Work,Focus"),
+            DailyLogEntry(timestamp: time(14, 0,  on: days[6].date), log: "Identified a drop-off in onboarding",                                         score:  1, entry: days[6],  latitude: 37.3317, longitude: -122.0301, address: "Office",                  tagsRaw: "Focus"),
+            // days[7] — 8 days ago
+            DailyLogEntry(timestamp: time(11, 30, on: days[7].date), log: "Tweaked copy and animations",                                                 score:  1, entry: days[7],  latitude: 37.7858, longitude: -122.4064, address: "Design Studio",           tagsRaw: "Deep Work"),
+            // days[8] — 9 days ago
+            DailyLogEntry(timestamp: time(9,  0,  on: days[8].date), log: "Inbox zero attempt failed",                                                   score: -1, entry: days[8],  latitude: 37.7749, longitude: -122.4194, address: "Home",                    tagsRaw: "Work Stress"),
+            DailyLogEntry(timestamp: time(15, 0,  on: days[8].date), log: "Went for a morning run to clear my head",                                     score:  1, entry: days[8],  latitude: 37.7749, longitude: -122.4194, address: "Home",                    tagsRaw: "Sport,Outdoor"),
+            // days[9] — 10 days ago
+            DailyLogEntry(timestamp: time(9,  0,  on: days[9].date), log: "Sketched interaction flow",                                                   score:  0, entry: days[9],  latitude: 37.7858, longitude: -122.4064, address: "Design Studio",           tagsRaw: "Deep Work,Focus"),
+            DailyLogEntry(timestamp: time(15, 0,  on: days[9].date), log: "Hit roadblock with data model",                                               score: -1, entry: days[9],  latitude: 37.7739, longitude: -122.4312, address: "Home Office",             tagsRaw: "Work Stress"),
+            // days[10] — 11 days ago
+            DailyLogEntry(timestamp: time(10, 0,  on: days[10].date), log: "Optimized rendering pipeline",                                               score:  2, entry: days[10], latitude: 37.3317, longitude: -122.0301, address: "Office",                  tagsRaw: "Deep Work,Focus"),
+            DailyLogEntry(timestamp: time(14, 0,  on: days[10].date), log: "Reduced memory usage by 20%",                                                score:  1, entry: days[10], latitude: 37.3317, longitude: -122.0301, address: "Office",                  tagsRaw: "Deep Work,Focus"),
+            // days[11] — 12 days ago
+            DailyLogEntry(timestamp: time(10, 0,  on: days[11].date), log: "Collected notes on top 3 competitors",                                       score: -1, entry: days[11], latitude: 37.7765, longitude: -122.4172, address: "Cafe",                    tagsRaw: "Focus"),
+            // days[12] — 13 days ago
+            DailyLogEntry(timestamp: time(9,  0,  on: days[12].date), log: "Split services into modules",                                                score: -2, entry: days[12], latitude: 37.7739, longitude: -122.4312, address: "Home Office",             tagsRaw: "Work Stress"),
+            DailyLogEntry(timestamp: time(14, 30, on: days[12].date), log: "Improved error handling paths",                                               score: -1, entry: days[12], latitude: 37.7739, longitude: -122.4312, address: "Home Office",             tagsRaw: "Work Stress"),
+            // days[13] — 14 days ago
+            DailyLogEntry(timestamp: time(10, 0,  on: days[13].date), log: "Updated README and API docs",                                                score:  0, entry: days[13], latitude: 37.7749, longitude: -122.4194, address: "Home",                    tagsRaw: "Deep Work"),
+        ]
+
+        if language == .de {
+            for logEntry in all {
+                if let localized = germanLogByEnglish[logEntry.log] { logEntry.log = localized }
+                if let addr = logEntry.address, let localized = germanAddressByEnglish[addr] { logEntry.address = localized }
+                logEntry.tagsRaw = logEntry.tags.map { germanTagByEnglish[$0] ?? $0 }.joined(separator: ",")
             }
         }
+
+        return all
     }
     
     private static let germanTagByEnglish: [String: String] = [
@@ -345,8 +223,12 @@ class SampleData {
                 modelContainer.mainContext.insert(template)
             }
 
-            for entry in SampleData.makeSeedEntries(templates: templates, language: language) {
-                modelContainer.mainContext.insert(entry)
+            let days = SampleData.makeSeedDays(templates: templates, language: language)
+            for day in days {
+                modelContainer.mainContext.insert(day)
+            }
+            for logEntry in SampleData.makeSeedLogEntries(for: days, language: language) {
+                modelContainer.mainContext.insert(logEntry)
             }
 
             for tag in SampleData.makeSeedTags(language: language) {
