@@ -233,7 +233,7 @@ struct LogEntrySheet: View {
                         Text((entry?.timestamp ?? .now).formatted(date: .numeric, time: .shortened))
                     }
                 }
-                
+                // MARK: - Location
                 VStack(alignment: .leading) {
                     if isEntryNew {
                         Toggle(isOn: $storeLocations) {
