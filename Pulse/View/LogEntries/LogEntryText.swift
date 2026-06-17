@@ -24,7 +24,7 @@ struct LogEntryText: View {
                     }
                 }
                 if let address = logEntry.address {
-                    Label("\(address)", systemImage: "location.circle.fill")
+                    Label(address, systemImage: "location.circle.fill")
                         .labelStyle(.titleAndIcon)
                         .font(.footnote)
                         .foregroundStyle(.secondary)

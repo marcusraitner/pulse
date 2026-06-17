@@ -13,8 +13,9 @@ import MapKit
 struct InlineLogEntryView: View {
     let day: DailyEntry
     
-    init(for day: DailyEntry) {
+    init(for day: DailyEntry, isEditing: Binding<Bool>) {
         self.day = day
+        self._isEditing = isEditing
     }
    
     @Query private var tags: [Tag]
@@ -23,7 +24,7 @@ struct InlineLogEntryView: View {
     @State private var log = ""
     @State private var score: Float = 0.0
     @State private var entryTags: Set = Set<String>()
-    @State private var isEditing: Bool = false
+    @Binding var isEditing: Bool
     @State private var address: String?
     @State private var latitude: Double?
     @State private var longitude: Double?
@@ -121,7 +122,7 @@ struct InlineLogEntryView: View {
                 .padding()
                 .glassBackground()
                 .onAppear {
-                    isFocused = true
+//                    isFocused = true
                 }
                 
                 HStack {
@@ -171,5 +172,6 @@ struct InlineLogEntryView: View {
 }
 
 #Preview {
-    InlineLogEntryView(for: .init(date: .now))
+    @Previewable @State var isEditing: Bool = false
+    InlineLogEntryView(for: .init(date: .now), isEditing: $isEditing)
 }
