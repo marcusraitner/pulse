@@ -28,7 +28,7 @@ extension View {
     @ViewBuilder
     func glassBackground(cornerRadius: CGFloat = 10) -> some View {
         if #available(iOS 26, *) {
-            self.glassEffect(.clear, in: RoundedRectangle(cornerRadius: cornerRadius))
+            self.glassEffect(.regular, in: RoundedRectangle(cornerRadius: cornerRadius))
         } else {
             self.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: cornerRadius))
         }
@@ -56,9 +56,9 @@ extension View {
 
     /// Tinted interactive glass card keyed to a score color. Falls back to light ultraThinMaterial with a semi-transparent color overlay.
     @ViewBuilder
-    func glassTintedCard(color: Color, cornerRadius: CGFloat = 10) -> some View {
+    func glassTintedCard(color: Color, cornerRadius: CGFloat = 10, interactive: Bool = true) -> some View {
         if #available(iOS 26, *) {
-            self.glassEffect(.regular.tint(color.opacity(0.45)).interactive(), in: RoundedRectangle(cornerRadius: cornerRadius))
+            self.glassEffect(.regular.tint(color.opacity(0.45)).interactive(interactive), in: RoundedRectangle(cornerRadius: cornerRadius))
         } else {
             self.background {
                 RoundedRectangle(cornerRadius: cornerRadius)

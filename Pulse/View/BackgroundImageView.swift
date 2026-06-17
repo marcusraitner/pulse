@@ -23,14 +23,12 @@ struct BackgroundImageView: View {
                     .resizable()
                     .scaledToFill()
                     .frame(minWidth: 0, maxWidth: .infinity)
-                    .ignoresSafeArea()
             } else {
                 // load the image from assets
                 Image(backgroundImageName)
                     .resizable()
                     .scaledToFill()
                     .frame(minWidth: 0, maxWidth: .infinity)
-                    .ignoresSafeArea()
             }
         }
         .onChange(of: backgroundImageData, initial: true) {
