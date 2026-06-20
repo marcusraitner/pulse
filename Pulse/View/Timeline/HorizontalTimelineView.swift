@@ -31,8 +31,8 @@ struct HorizontalTimelineView: View {
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "TimeLineView")
 
     var body: some View {
-        let barWidth: CGFloat = 20
-        let heightScale: CGFloat = 20
+        let barWidth: CGFloat = 18
+        let heightScale: CGFloat = 15
         let totalHeight: CGFloat = 4 * heightScale
 
         ScrollView(.horizontal, showsIndicators: false) {
@@ -42,11 +42,11 @@ struct HorizontalTimelineView: View {
                     let barHeight: CGFloat = max(2, heightScale * avg.magnitude)
                     let yOffset: CGFloat = -0.5 * heightScale * avg
 
-                    RoundedRectangle(cornerRadius: 4)
+                    RoundedRectangle(cornerRadius: 2)
                         .fill(Color.clear)
                         .frame(width: barWidth, height: totalHeight)
                         .overlay {
-                            RoundedRectangle(cornerRadius: 4)
+                            RoundedRectangle(cornerRadius: 2)
                                 .fill(Theme.named(themeName).gradient(for: avg))
                                 .frame(width: barWidth, height: barHeight)
                                 .offset(y: yOffset)

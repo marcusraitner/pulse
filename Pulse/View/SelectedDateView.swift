@@ -28,11 +28,13 @@ struct SelectedDateView: View {
                     Text(date.formatted(.dateTime.year()))
                 }
             } else {
-                Text(date.formatted(.dateTime.weekday(.wide)))
-                Text(date.formatted(.dateTime.day().month(.wide).year()))
+                Text(date.formatted(.dateTime.weekday().day().month().year()))
+                
+                //                Text(date.formatted(.dateTime.weekday(.wide)))
+//                Text(date.formatted(.dateTime.day().month(.wide).year()))
             }
         }
-        .font(.system(.title, design: .serif).bold())
+        .bold()
     }
 }
 

@@ -23,7 +23,7 @@ struct AggregatedTimelineView: View {
     
     @State private var containerWidth: CGFloat = 0.0
     @State private var cardWidth: CGFloat = 0.0
-    @State private var selectedStartDate: Date = .now
+    @Binding var selectedStartDate: Date
     @State private var position: ScrollPosition = .init(idType: Date.self)
     
     @Query(sort: \DailyEntry.date) private var allEntries: [DailyEntry]
@@ -75,9 +75,6 @@ struct AggregatedTimelineView: View {
         
         ScrollView(.vertical) {
             VStack(spacing: 0) {
-                SelectedDateView(date: selectedStartDate, level: aggregationLevel)
-                    .padding(.vertical)
-                
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: 8) {
                         ForEach(periodStarts, id: \.self) { periodStart in
@@ -120,11 +117,11 @@ struct AggregatedTimelineView: View {
                 .scrollTargetBehavior(.viewAligned)
                 .scrollPosition($position, anchor: .center)
                 .contentMargins(.horizontal, (containerWidth - cardWidth - 20) * 0.5, for: .scrollContent)
-                .onChange(of: periodStarts, initial: true) { _, newPeriods in
-                    guard let last = newPeriods.last else { return }
-                    position.scrollTo(id: last, anchor: .center)
-                    selectedStartDate = last
-                }
+//                .onChange(of: periodStarts, initial: true) { _, newPeriods in
+//                    guard let last = newPeriods.last else { return }
+//                    position.scrollTo(id: last, anchor: .center)
+//                    selectedStartDate = last
+//                }
                 .onGeometryChange(for: CGSize.self) { proxy in
                     proxy.size
                 } action: { old, new in
@@ -153,12 +150,12 @@ struct AggregatedTimelineView: View {
 // MARK: - Previews
 
 #Preview("Week") {
-    AggregatedTimelineView(aggregationLevel: .week)
+    AggregatedTimelineView(aggregationLevel: .week, selectedStartDate: .constant(.now))
         .modelContainer(SampleData.shared.modelContainer)
 }
 
 
 #Preview("Month") {
-    AggregatedTimelineView(aggregationLevel: .month)
+    AggregatedTimelineView(aggregationLevel: .month, selectedStartDate: .constant(.now))
         .modelContainer(SampleData.shared.modelContainer)
 }

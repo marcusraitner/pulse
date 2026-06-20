@@ -6,17 +6,17 @@
 //
 
 import OSLog
+import StoreKit
 import SwiftData
 import SwiftUI
-import StoreKit
 
 enum ViewMode: String, CaseIterable {
     case day, week, month
 
     var systemImage: String {
         switch self {
-        case .day:   return "calendar.day.timeline.left"
-        case .week:  return "rectangle.grid.1x2"
+        case .day: return "calendar.day.timeline.left"
+        case .week: return "rectangle.grid.1x2"
         case .month: return "square.grid.3x3"
         }
     }
@@ -30,18 +30,23 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.featureFlags) private var featureFlags
     @Environment(\.requestReview) private var requestReview
-    
+
     @Query private var allEntries: [DailyEntry]
     @Query private var allLogs: [DailyLogEntry]
-    
+
     private var countLogs: Int { allLogs.count }
-    
-    @AppStorage(AppStorageKeys.notificationsEnabled) private var notificationsEnabled: Bool = true
-    @AppStorage(AppStorageKeys.enableEditingHistory) private var enableEditingHistory: Bool = true
-    @AppStorage(AppStorageKeys.reflectionReminder) private var reflectionReminder: Bool = true
-    @AppStorage(AppStorageKeys.reflectionReminderTime) private var reflectionReminderTime: Date?
+
+    @AppStorage(AppStorageKeys.notificationsEnabled) private
+        var notificationsEnabled: Bool = true
+    @AppStorage(AppStorageKeys.enableEditingHistory) private
+        var enableEditingHistory: Bool = true
+    @AppStorage(AppStorageKeys.reflectionReminder) private
+        var reflectionReminder: Bool = true
+    @AppStorage(AppStorageKeys.reflectionReminderTime) private
+        var reflectionReminderTime: Date?
     @AppStorage(AppStorageKeys.viewMode) private var viewMode: ViewMode = .day
-    
+
+//    @State private var viewMode: ViewMode = .day
     @State private var reviewService = ReviewService()
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
     @State private var triggerScrollToToday: Bool = false
@@ -50,95 +55,111 @@ struct ContentView: View {
     @State private var isPresentingReflection: Bool = false
     @State private var isPresentingInsights: Bool = false
     @State private var isInlineEditing: Bool = false
-    @State private var scrollPosition: String?
-    
-    private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
+    @State private var selectedDate: Date = .now
 
-    
+    private let logger = Logger(
+        subsystem: "de.raitner.pulse",
+        category: "ContentView"
+    )
+
     var body: some View {
         NavigationStack {
-            ZStack(alignment: .bottomTrailing) {
-
-                BackgroundImageView()
-                    .ignoresSafeArea()
-
-                if viewMode == .day {
+            //            ZStack(alignment: .bottomTrailing) {
+            //
+            //                BackgroundImageView()
+            //                    .ignoresSafeArea()
+            //
+            TabView(selection: $viewMode) {
+                Tab("Day", systemImage:"calendar.day", value: .day) {
                     ScrollView {
                         VStack {
-                            // The currently selected date
-                            SelectedDateView(date: selectedEntry.date)
-                                .padding(.vertical)
-                                .padding(.horizontal)
-
                             // Delete Button (only admin mode)
                             if featureFlags.adminEnabled {
                                 Button("Delete Entry", systemImage: "trash") {
                                     context.delete(selectedEntry)
-                                    context.saveOrLog("Failure saving deleted entry", logger: logger)
+                                    context.saveOrLog(
+                                        "Failure saving deleted entry",
+                                        logger: logger
+                                    )
                                 }
                                 .tint(.white)
                             }
-
-                            // The timeline scroll view
-                            HorizontalTimelineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
-                                .padding(.vertical)
-
+                            
                             // The daily reflection
                             DailyReflectionCard(day: selectedEntry) {
                                 isPresentingReflection = true
                             }
                             .padding(.horizontal, 8)
-
                             
-                            InlineLogEntryView(for: selectedEntry, isEditing: $isInlineEditing)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 10)
-                                .id("inlineEditor")
-
+                            InlineLogEntryView(
+                                for: selectedEntry,
+                                isEditing: $isInlineEditing
+                            )
+                            .padding(.horizontal, 8)
+                            
                             // The log entries for this day
                             LogEntriesView(day: selectedEntry)
                                 .padding(.horizontal, 8)
                         }
                         .scrollTargetLayout()
                     }
-                    .scrollPosition(id: $scrollPosition, anchor: .top)
-                    .scrollTargetBehavior(.viewAligned)
-                    .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardDidShowNotification)) { _ in
-                        scrollPosition = "inlineEditor"
+                    .defaultScrollAnchor(.top)
+                    .safeAreaInset(edge: .top) {
+                        // The timeline scroll view
+                        VStack {
+                            HorizontalTimelineView(
+                                selectedEntry: $selectedEntry,
+                                scrollToToday: $triggerScrollToToday
+                            )
+                        }
+                        .padding(.vertical)
+                        .background(.bar)
                     }
-                    .onChange(of: scrollPosition) {
-                        logger.info("scrollPosition: \(scrollPosition as NSObject?)")
-                    }
-                } else {
-                    AggregatedTimelineView(aggregationLevel: viewMode == .week ? .week : .month)
-                        .id(viewMode)
                 }
-
-                // The Add Button (day mode only)
-                if viewMode == .day && (Calendar.current.isDateInToday(selectedEntry.date) || enableEditingHistory) {
-                    Button(action: { isPresentingNewEntry = true }) {
-                        Image(systemName: "plus")
-                            .font(.largeTitle)
-                            .padding()
-                            .glassCircle()
-                            .foregroundStyle(.white)
-                    }
-                    .contentShape(Circle())
-                    .buttonStyle(.plain)
-                    .padding(.trailing, 20)
+                
+                Tab("Week", systemImage: "rectangle.split.3x1", value: .week) {
+                    AggregatedTimelineView(aggregationLevel: .week, selectedStartDate: $selectedDate)
                 }
+                
+                Tab("Month", systemImage: "calendar", value: .month) {
+                    AggregatedTimelineView(aggregationLevel: .month, selectedStartDate: $selectedDate)
+                }
+                    
             }
             .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $isPresentingSettings,
-                   onDismiss: setNotifications) {
+            .navigationTitle(Text(formatDate(from: selectedDate, level: viewMode)))
+            .onChange(of: selectedEntry) { _, new in
+                selectedDate = new.date
+                isInlineEditing = false
+            }
+            .onChange(of: selectedDate) { _, new in
+                // TODO: find nearest DailyEntry and set it
+            }
+//            .onReceive(
+//                NotificationCenter.default.publisher(
+//                    for: UIResponder.keyboardWillShowNotification
+//                )
+//            ) { _ in
+//                withAnimation {
+//                    scrollPosition = "pseudo"
+//                }
+//            }
+//            .onChange(of: scrollPosition) {
+//                logger.info("scrollPosition: \(scrollPosition as NSObject?)")
+//            }
+            //            }
+            .sheet(
+                isPresented: $isPresentingSettings,
+                onDismiss: setNotifications
+            ) {
                 settingsSheetStack
             }
-            .sheet(isPresented: $isPresentingNewEntry) {
-                NavigationStack {
-                    LogEntrySheet(day: selectedEntry)
-                }
-                .presentationDetents([.large])
-            }
+            //            .sheet(isPresented: $isPresentingNewEntry) {
+            //                NavigationStack {
+            //                    LogEntrySheet(day: selectedEntry)
+            //                }
+            //                .presentationDetents([.large])
+            //            }
             .sheet(isPresented: $isPresentingReflection) {
                 NavigationStack {
                     DailyReflectionSheet(day: selectedEntry)
@@ -162,28 +183,28 @@ struct ContentView: View {
                         }
                     }
                 }
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        scrollPosition = "inlineEditor"
-                    } label: {
-                        Image(systemName: "chevron.up.2")
-                    }
-                }
+//                ToolbarItem(placement: .topBarLeading) {
+//                    Button {
+//                        scrollPosition = "pseudo"
+//                    } label: {
+//                        Image(systemName: "chevron.up.2")
+//                    }
+//                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Settings", systemImage: "gearshape.fill") {
                         isPresentingSettings = true
                     }
                     .tint(.white)
                 }
-                ToolbarItem(placement: .principal) {
-                    Picker("View Mode", selection: $viewMode) {
-                        ForEach(ViewMode.allCases, id: \.self) { mode in
-                            Image(systemName: mode.systemImage).tag(mode)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(maxWidth: 160)
-                }
+//                ToolbarItem(placement: .principal) {
+//                    Picker("View Mode", selection: $viewMode) {
+//                        ForEach(ViewMode.allCases, id: \.self) { mode in
+//                            Image(systemName: mode.systemImage).tag(mode)
+//                        }
+//                    }
+//                    .pickerStyle(.segmented)
+//                    .frame(maxWidth: 160)
+//                }
             }
             .task {
                 await initApplication()
@@ -197,19 +218,71 @@ struct ContentView: View {
             }
             .onChange(of: countLogs) { old, new in
                 if new > old {
-                    reviewService.considerRequesting(countLog: countLogs) { requestReview() }
+                    reviewService.considerRequesting(countLog: countLogs) {
+                        requestReview()
+                    }
                 }
             }
-#if DEBUG
-            // Expose an accessibility identifier
-            .accessibilityIdentifier("dateView")
-            // and a values containing the selectedEntry for UI Tests
-            .accessibilityValue(
-                Text("selectedEntry:\(DateFormatHelper.formatDate(selectedEntry.date))")
-            )
-#endif  // DEBUG only for UI Tests
+            //            .safeAreaInset(edge: .bottom, alignment: .trailing) {
+            //                // The Add Button (day mode only)
+            //                if !isInlineEditing && viewMode == .day
+            //                    && (Calendar.current.isDateInToday(selectedEntry.date)
+            //                        || enableEditingHistory)
+            //                {
+            //                    Button {
+            //                        withAnimation {
+            //                            isInlineEditing = true
+            //                            scrollPosition = "pseudo"
+            //                        }
+            //                    } label: {
+            //                        Image(systemName: "plus")
+            //                            .font(.largeTitle)
+            //                            .padding()
+            //                            .glassCircle()
+            //                            .foregroundStyle(.white)
+            //                    }
+            //                    .contentShape(Circle())
+            //                    .buttonStyle(.plain)
+            //                    .padding(.trailing, 20)
+            //                }
+            //            }
+//            .safeAreaInset(edge: .top) {
+//                if isInlineEditing {
+//                    HStack {
+//                        Button("Cancel", systemImage: "xmark") {
+//                            isInlineEditing = false
+//                            scrollPosition = ""
+//                        }
+//                        .labelStyle(.iconOnly)
+//                        .buttonStyle(.bordered)
+//                        Spacer()
+//                        Button("Save", systemImage: "checkmark") {
+//                        }
+//                        .labelStyle(.iconOnly)
+//                        .buttonStyle(.borderedProminent)
+//                    }
+//                    .padding(.horizontal)
+//                    .padding(.bottom)
+//                    .background(.bar)
+//                }
+//            }
+            //            .background {
+            //                BackgroundImageView()
+            //                    .ignoresSafeArea()
+            //            }
+            #if DEBUG
+                // Expose an accessibility identifier
+                .accessibilityIdentifier("dateView")
+                // and a values containing the selectedEntry for UI Tests
+                .accessibilityValue(
+                    Text(
+                        "selectedEntry:\(DateFormatHelper.formatDate(selectedEntry.date))"
+                    )
+                )
+            #endif  // DEBUG only for UI Tests
         }
-//        .ignoresSafeArea(.keyboard)
+        //        .border(Color.cyan, width: 1)
+
         .onOpenURL { url in
             switch url.host() {
             case "log":
@@ -223,25 +296,48 @@ struct ContentView: View {
             }
         }
     }
+
+    private func formatDate(from date: Date, level: ViewMode) -> String {
+        var str: String
+        switch level {
+        case .day:
+            str = date.formatted(.dateTime.weekday().day().month().year())
+        case .week:
+            let cal = Calendar.current
+            let start = cal.dateInterval(of: .weekOfYear, for: date)?.start ?? date
+            let end = cal.date(byAdding: .day, value: 6, to: start) ?? start
+            
+            str = "\(start.formatted(.dateTime.day().month(.defaultDigits).year())) – \(end.formatted(.dateTime.day().month(.defaultDigits).year()))"
+        case .month:
+            str = date.formatted(.dateTime.month(.wide).year())
+        }
+        return str
+    }
     
     /// Re-schedules local notifications from current `AppStorage` values.
     /// Called when the settings sheet is dismissed.
     private func setNotifications() {
         NotificationScheduler.setNotifications(
             notificationsEnabled: notificationsEnabled,
-            notificationTimes: UserDefaults.standard.array(forKey: AppStorageKeys.notificationTimes) as? [Date] ?? [],
+            notificationTimes: UserDefaults.standard.array(
+                forKey: AppStorageKeys.notificationTimes
+            ) as? [Date] ?? [],
             reflectionReminder: reflectionReminder,
-            reflectionReminderTime: reflectionReminderTime)
+            reflectionReminderTime: reflectionReminderTime
+        )
     }
 
     /// Ensures today's `DailyEntry` exists, creating and inserting one if it is missing.
     /// Scrolls the timeline to today after creating a new entry.
     private func updateToday() {
-        var descriptor = FetchDescriptor<DailyEntry>(sortBy: [SortDescriptor(\.date, order: .reverse)])
+        var descriptor = FetchDescriptor<DailyEntry>(sortBy: [
+            SortDescriptor(\.date, order: .reverse)
+        ])
         descriptor.fetchLimit = 1
 
         if let last = try? context.fetch(descriptor).first,
-           Calendar.current.isDateInToday(last.date) {
+            Calendar.current.isDateInToday(last.date)
+        {
             return
         }
 
@@ -270,11 +366,12 @@ struct ContentView: View {
             try await UNUserNotificationCenter.current().requestAuthorization(
                 options: [.alert, .badge, .sound])
         } catch {
-            logger.error("Error NotificationCenter: \(error.localizedDescription)")
+            logger.error(
+                "Error NotificationCenter: \(error.localizedDescription)"
+            )
         }
     }
 
-    
     /// The `NavigationStack`-wrapped settings sheet with a Close toolbar button.
     private var settingsSheetStack: some View {
         NavigationStack {
@@ -288,9 +385,8 @@ struct ContentView: View {
                 }
         }
     }
-    
-}
 
+}
 
 #Preview {
     ContentView()
@@ -298,4 +394,3 @@ struct ContentView: View {
         .environment(\.featureFlags, FeatureFlags(adminEnabled: false))
         .preferredColorScheme(.dark)
 }
-

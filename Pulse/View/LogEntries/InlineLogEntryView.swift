@@ -10,6 +10,7 @@ import SwiftData
 import OSLog
 import MapKit
 
+// TODO: Always work on a DailyLogEntry (either newly created or already existing)
 struct InlineLogEntryView: View {
     let day: DailyEntry
     
@@ -53,11 +54,21 @@ struct InlineLogEntryView: View {
     }
     
     private func setItem(item: MKMapItem) -> Void {
-        var coordinate: CLLocationCoordinate2D = CLLocationCoordinate2D()
-        coordinate = Compat.coordinate(from: item)
+        let coordinate = Compat.coordinate(from: item)
         latitude = coordinate.latitude
         longitude = coordinate.longitude
         address = Compat.address(from: item)
+    }
+    
+    private func reset() {
+        timestamp = .now
+        log = ""
+        entryTags = .init()
+        score = 0.0
+        address = nil
+        latitude = nil
+        longitude = nil
+        isFocused = false
     }
     
     var body: some View {
@@ -84,20 +95,17 @@ struct InlineLogEntryView: View {
                                 style: .selectable(
                                     isSelected: entryTags.contains(tag.name),
                                     onTap: {
-                                        if entryTags.contains(tag.name) {
-                                            entryTags.remove(tag.name)
-                                        } else {
-                                            entryTags.insert(tag.name)
-                                        }
+                                        entryTags.formSymmetricDifference([tag.name])
                                     }
                                 )
                             )
                         }
                     }
                     .padding(.top, 5)
+                    .padding(.bottom, 8)
                     
                     if let address {
-                        HStack {
+                        HStack(alignment: .top) {
                             Button {
                                 self.address = nil
                             } label: {
@@ -121,32 +129,21 @@ struct InlineLogEntryView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
                 .glassBackground()
-                .onAppear {
-//                    isFocused = true
-                }
                 
                 HStack {
                     Button("Save", systemImage: "checkmark") {
                         save()
-                        log = ""
-                        entryTags = .init()
-                        score = 0.0
-                        address = nil
-                        latitude = nil
-                        longitude = nil
-                        isFocused = false
-                        isEditing = false
+                        reset()
+                        withAnimation(.bouncy) {
+                            isEditing = false
+                        }
                     }
                     .labelStyle(.iconOnly)
                     Button("Cancel", systemImage: "xmark") {
-                        log = ""
-                        entryTags = .init()
-                        score = 0.0
-                        address = nil
-                        isFocused = false
-                        latitude = nil
-                        longitude = nil
-                        isEditing = false
+                        reset()
+                        withAnimation(.bouncy) {
+                            isEditing = false
+                        }
                     }
                     .labelStyle(.iconOnly)
                 }
@@ -154,19 +151,19 @@ struct InlineLogEntryView: View {
                 .padding()
             }
         } else {
-            withAnimation(.bouncy) {
-                HStack {
-                    Button("Add Log", systemImage: "plus.circle") {
-                        timestamp = .now
+            HStack {
+                Button("Add Log", systemImage: "plus.circle") {
+                    reset()
+                    
+                    withAnimation(.bouncy) {
                         isEditing = true
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .padding(.vertical, 1)
-                .glassBackground()
-                
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
+            .padding(.vertical, 1)
+            .glassBackground()
         }
     }
 }
