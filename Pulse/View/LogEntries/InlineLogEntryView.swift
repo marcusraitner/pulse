@@ -8,7 +8,6 @@
 import SwiftUI
 import SwiftData
 import OSLog
-import MapKit
 
 struct InlineLogEntryView: View {
     let day: DailyEntry
@@ -24,11 +23,6 @@ struct InlineLogEntryView: View {
     @State private var score: Float = 0.0
     @State private var entryTags: Set = Set<String>()
     @State private var isEditing: Bool = false
-    @State private var address: String?
-    @State private var latitude: Double?
-    @State private var longitude: Double?
-    
-    @State private var locationManager = LocationManager()
     
     @FocusState private var isFocused: Bool
     
@@ -42,21 +36,10 @@ struct InlineLogEntryView: View {
             log: log,
             score: Int(score),
             entry: day,
-            latitude: latitude,
-            longitude: longitude,
-            address: address,
             tagsRaw: entryTags.joined(separator: ","))
         
         context.insert(entry)
         context.saveOrLog("Failed to create new log entry", logger: logger)
-    }
-    
-    private func setItem(item: MKMapItem) -> Void {
-        var coordinate: CLLocationCoordinate2D = CLLocationCoordinate2D()
-        coordinate = Compat.coordinate(from: item)
-        latitude = coordinate.latitude
-        longitude = coordinate.longitude
-        address = Compat.address(from: item)
     }
     
     var body: some View {
@@ -94,28 +77,6 @@ struct InlineLogEntryView: View {
                         }
                     }
                     .padding(.top, 5)
-                    
-                    if let address {
-                        HStack {
-                            Button {
-                                self.address = nil
-                            } label: {
-                                Image(systemName: "location.fill")
-                                    .font(.caption)
-                            }
-                            
-                            Text(address)
-                                .font(.caption)
-                        }
-                    } else {
-                        Button {
-                            locationManager.setItem = self.setItem
-                            locationManager.requestLocation()
-                        } label: {
-                            Image(systemName: "location.slash.fill")
-                                .font(.caption)
-                        }
-                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
@@ -130,9 +91,6 @@ struct InlineLogEntryView: View {
                         log = ""
                         entryTags = .init()
                         score = 0.0
-                        address = nil
-                        latitude = nil
-                        longitude = nil
                         isFocused = false
                         isEditing = false
                     }
@@ -141,10 +99,7 @@ struct InlineLogEntryView: View {
                         log = ""
                         entryTags = .init()
                         score = 0.0
-                        address = nil
                         isFocused = false
-                        latitude = nil
-                        longitude = nil
                         isEditing = false
                     }
                     .labelStyle(.iconOnly)
