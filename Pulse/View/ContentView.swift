@@ -49,8 +49,6 @@ struct ContentView: View {
     @State private var isPresentingNewEntry: Bool = false
     @State private var isPresentingReflection: Bool = false
     @State private var isPresentingInsights: Bool = false
-    @State private var isInlineEditing: Bool = false
-    @State private var scrollPosition: String?
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
 
@@ -60,11 +58,10 @@ struct ContentView: View {
             ZStack(alignment: .bottomTrailing) {
 
                 BackgroundImageView()
-                    .ignoresSafeArea()
 
                 if viewMode == .day {
                     ScrollView {
-                        VStack {
+                        LazyVStack {
                             // The currently selected date
                             SelectedDateView(date: selectedEntry.date)
                                 .padding(.vertical)
@@ -89,25 +86,10 @@ struct ContentView: View {
                             }
                             .padding(.horizontal, 8)
 
-                            
-                            InlineLogEntryView(for: selectedEntry, isEditing: $isInlineEditing)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 10)
-                                .id("inlineEditor")
-
                             // The log entries for this day
                             LogEntriesView(day: selectedEntry)
                                 .padding(.horizontal, 8)
                         }
-                        .scrollTargetLayout()
-                    }
-                    .scrollPosition(id: $scrollPosition, anchor: .top)
-                    .scrollTargetBehavior(.viewAligned)
-                    .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardDidShowNotification)) { _ in
-                        scrollPosition = "inlineEditor"
-                    }
-                    .onChange(of: scrollPosition) {
-                        logger.info("scrollPosition: \(scrollPosition as NSObject?)")
                     }
                 } else {
                     AggregatedTimelineView(aggregationLevel: viewMode == .week ? .week : .month)
@@ -160,13 +142,6 @@ struct ContentView: View {
                         } label: {
                             Image(systemName: "sparkles")
                         }
-                    }
-                }
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        scrollPosition = "inlineEditor"
-                    } label: {
-                        Image(systemName: "chevron.up.2")
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
