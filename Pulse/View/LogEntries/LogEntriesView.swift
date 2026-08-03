@@ -17,9 +17,11 @@ struct LogEntriesView: View {
 
     var body: some View {
         
+        InlineLogEntryView(for: day)
+            .padding(.vertical, 10)
         
         let logEntries = day.logEntries?.sorted(by: {
-            $0.timestamp > $1.timestamp
+            $0.timestamp < $1.timestamp
         }) ?? []
         
         ForEach(logEntries) { entry in
@@ -31,7 +33,6 @@ struct LogEntriesView: View {
                 .onTapGesture {
                     entryToEdit = entry
                 }
-                .id(entry.timestamp.formatted())
         }
         .sheet(item: $entryToEdit) { entry in
             NavigationStack {

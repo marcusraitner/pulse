@@ -20,8 +20,7 @@ struct HorizontalTimelineView: View {
     @Binding var scrollToToday: Bool
 
     @State private var entriesByDate: [Date: DailyEntry] = [:]
-//    @State private var position: ScrollPosition = .init(idType: Date.self)
-    @State private var position: Date?
+    @State private var position: ScrollPosition = .init(idType: Date.self)
     @State private var containerWidth: CGFloat = 0.0
 
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
@@ -53,8 +52,11 @@ struct HorizontalTimelineView: View {
                         }
                         .id(entry.date)
                         .onTapGesture {
-                            withAnimation(.easeInOut) {
-                                position = entry.date
+                            withAnimation(.default) {
+                                position.scrollTo(
+                                    id: entry.date,
+                                    anchor: .center
+                                )
                             }
                     }
                 }
@@ -63,7 +65,7 @@ struct HorizontalTimelineView: View {
             .scrollTargetLayout()
         }
         .scrollTargetBehavior(.viewAligned)
-        .scrollPosition(id: $position, anchor: .center)
+        .scrollPosition($position, anchor: .center)
         .contentMargins(.horizontal, (containerWidth - barWidth) * 0.5, for: .scrollContent)
         .onGeometryChange(for: CGSize.self) { proxy in
             proxy.size
@@ -86,13 +88,13 @@ struct HorizontalTimelineView: View {
         .onChange(of: position) { _, new in
             // set selectedEntry on scroll pos change
             
-            guard let new else {
+            guard let date = new.viewID(type: Date.self) else {
                 logger.warning("Could not find date in scroll position")
                 return
             }
             
-            guard let newSelected = entriesByDate[new] else {
-                logger.warning("Could not find entry for date \(new)")
+            guard let newSelected = entriesByDate[date] else {
+                logger.warning("Could not find entry for date \(date)")
                 return
             }
             
@@ -103,7 +105,7 @@ struct HorizontalTimelineView: View {
             entriesByDate = Dictionary(uniqueKeysWithValues: allEntries.map { ($0.date, $0 ) } )
             
             if let last = allEntries.last {
-                position = last.date
+                position.scrollTo(id: last.date, anchor: .center)
             }
         }
         .sensoryFeedback(.impact, trigger: selectedEntry)
@@ -111,7 +113,7 @@ struct HorizontalTimelineView: View {
             if new {
                 logger.trace("scroll to today triggered")
                 if let last = allEntries.last {
-                    position = last.date
+                    position.scrollTo(id: last.date, anchor: .center)
                 }
                 scrollToToday = false
             }
