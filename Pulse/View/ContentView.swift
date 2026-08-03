@@ -22,6 +22,11 @@ enum ViewMode: String, CaseIterable {
     }
 }
 
+enum InlineFocusField: nonisolated Hashable {
+    case tagField(timestamp: Date)
+    case log(timestamp: Date)
+}
+
 /// Root view that orchestrates the timeline, selected-date display, log entries,
 /// reflection card, and FAB. Also owns sheet presentation for settings, new/edit
 /// entry, and reflection, and handles deep-link URLs (`pulseapp://log`, `pulseapp://reflect`).
@@ -46,7 +51,7 @@ struct ContentView: View {
         var reflectionReminderTime: Date?
     @AppStorage(AppStorageKeys.viewMode) private var viewMode: ViewMode = .day
 
-//    @State private var viewMode: ViewMode = .day
+    //    @State private var viewMode: ViewMode = .day
     @State private var reviewService = ReviewService()
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
     @State private var triggerScrollToToday: Bool = false
@@ -54,8 +59,9 @@ struct ContentView: View {
     @State private var isPresentingNewEntry: Bool = false
     @State private var isPresentingReflection: Bool = false
     @State private var isPresentingInsights: Bool = false
-    @State private var isInlineEditing: Bool = false
     @State private var selectedDate: Date = .now
+    @State private var scrollPosition: ScrollPosition = .init()
+    @FocusState private var focus: InlineFocusField?
 
     private let logger = Logger(
         subsystem: "de.raitner.pulse",
@@ -70,7 +76,7 @@ struct ContentView: View {
             //                    .ignoresSafeArea()
             //
             TabView(selection: $viewMode) {
-                Tab("Day", systemImage:"calendar.day", value: .day) {
+                Tab("Day", systemImage: "calendar.day", value: .day) {
                     ScrollView {
                         VStack {
                             // Delete Button (only admin mode)
@@ -84,25 +90,42 @@ struct ContentView: View {
                                 }
                                 .tint(.white)
                             }
-                            
+
                             // The daily reflection
                             DailyReflectionCard(day: selectedEntry) {
                                 isPresentingReflection = true
                             }
                             .padding(.horizontal, 8)
+
+                            Button {
+                                let newEntry = DailyLogEntry(
+                                    timestamp: .now,
+                                    log: "",
+                                    score: 0,
+                                    entry: selectedEntry
+                                )
+                                context.insert(newEntry)
+                                withAnimation {
+                                    focus = .log(timestamp: newEntry.timestamp)
+                                }
+                            } label: {
+                                Label("Add moment", systemImage: "plus.circle")
+                            }
+                            .padding(.vertical, 5)
+                            .buttonStyle(.bordered)
                             
-                            InlineLogEntryView(
-                                for: selectedEntry,
-                                isEditing: $isInlineEditing
-                            )
+                            let logEntries = selectedEntry.logEntries?.sorted(by: {
+                                $0.timestamp > $1.timestamp
+                            }) ?? []
+                            
+                            ForEach(logEntries) { entry in
+                                InlineLogEntryView(logEntry: entry, focused: $focus)
+                            }
                             .padding(.horizontal, 8)
-                            
-                            // The log entries for this day
-                            LogEntriesView(day: selectedEntry)
-                                .padding(.horizontal, 8)
                         }
                         .scrollTargetLayout()
                     }
+                    .scrollPosition($scrollPosition)
                     .defaultScrollAnchor(.top)
                     .safeAreaInset(edge: .top) {
                         // The timeline scroll view
@@ -115,38 +138,65 @@ struct ContentView: View {
                         .padding(.vertical)
                         .background(.bar)
                     }
+                    .onChange(of: focus) { old , new in
+                        guard let new else { return }
+                        
+                        switch new {
+                        case .log(let timestamp):
+                            // only scroll if we are coming from another date
+                            if case .log = old {
+                                withAnimation {
+                                    DispatchQueue.main.async {
+                                        logger.info("Scrolling to date: \(timestamp)")
+                                        scrollPosition.scrollTo(id: timestamp, anchor: .bottom)
+                                    }
+                                }
+                            }
+                        case .tagField(let timestamp):
+                            logger.info("Tag Field selected for \(timestamp)")
+                            return
+                        }
+                    }
                 }
-                
+
                 Tab("Week", systemImage: "rectangle.split.3x1", value: .week) {
-                    AggregatedTimelineView(aggregationLevel: .week, selectedStartDate: $selectedDate)
+                    AggregatedTimelineView(
+                        aggregationLevel: .week,
+                        selectedStartDate: $selectedDate
+                    )
                 }
-                
+
                 Tab("Month", systemImage: "calendar", value: .month) {
-                    AggregatedTimelineView(aggregationLevel: .month, selectedStartDate: $selectedDate)
+                    AggregatedTimelineView(
+                        aggregationLevel: .month,
+                        selectedStartDate: $selectedDate
+                    )
                 }
-                    
+
             }
             .navigationBarTitleDisplayMode(.inline)
-            .navigationTitle(Text(formatDate(from: selectedDate, level: viewMode)))
+            .navigationTitle(
+                Text(formatDate(from: selectedDate, level: viewMode))
+            )
             .onChange(of: selectedEntry) { _, new in
                 selectedDate = new.date
-                isInlineEditing = false
+                scrollPosition.scrollTo(edge: .top)
             }
             .onChange(of: selectedDate) { _, new in
                 // TODO: find nearest DailyEntry and set it
             }
-//            .onReceive(
-//                NotificationCenter.default.publisher(
-//                    for: UIResponder.keyboardWillShowNotification
-//                )
-//            ) { _ in
-//                withAnimation {
-//                    scrollPosition = "pseudo"
-//                }
-//            }
-//            .onChange(of: scrollPosition) {
-//                logger.info("scrollPosition: \(scrollPosition as NSObject?)")
-//            }
+            //            .onReceive(
+            //                NotificationCenter.default.publisher(
+            //                    for: UIResponder.keyboardWillShowNotification
+            //                )
+            //            ) { _ in
+            //                withAnimation {
+            //                    scrollPosition = "pseudo"
+            //                }
+            //            }
+            //            .onChange(of: scrollPosition) {
+            //                logger.info("scrollPosition: \(scrollPosition as NSObject?)")
+            //            }
             //            }
             .sheet(
                 isPresented: $isPresentingSettings,
@@ -174,37 +224,31 @@ struct ContentView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    if featureFlags.foundationModelsAvailable {
-                        Button {
-                            isPresentingInsights = true
-                        } label: {
-                            Image(systemName: "sparkles")
+                if focus != nil {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done", systemImage: "checkmark") {
+                            withAnimation {
+                                focus = nil
+                            }
                         }
                     }
-                }
-//                ToolbarItem(placement: .topBarLeading) {
-//                    Button {
-//                        scrollPosition = "pseudo"
-//                    } label: {
-//                        Image(systemName: "chevron.up.2")
-//                    }
-//                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Settings", systemImage: "gearshape.fill") {
-                        isPresentingSettings = true
+                } else {
+                    ToolbarItem(placement: .topBarLeading) {
+                        if featureFlags.foundationModelsAvailable {
+                            Button {
+                                isPresentingInsights = true
+                            } label: {
+                                Image(systemName: "sparkles")
+                            }
+                        }
                     }
-                    .tint(.white)
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Settings", systemImage: "gearshape.fill") {
+                            isPresentingSettings = true
+                        }
+                        .tint(.white)
+                    }
                 }
-//                ToolbarItem(placement: .principal) {
-//                    Picker("View Mode", selection: $viewMode) {
-//                        ForEach(ViewMode.allCases, id: \.self) { mode in
-//                            Image(systemName: mode.systemImage).tag(mode)
-//                        }
-//                    }
-//                    .pickerStyle(.segmented)
-//                    .frame(maxWidth: 160)
-//                }
             }
             .task {
                 await initApplication()
@@ -246,26 +290,26 @@ struct ContentView: View {
             //                    .padding(.trailing, 20)
             //                }
             //            }
-//            .safeAreaInset(edge: .top) {
-//                if isInlineEditing {
-//                    HStack {
-//                        Button("Cancel", systemImage: "xmark") {
-//                            isInlineEditing = false
-//                            scrollPosition = ""
-//                        }
-//                        .labelStyle(.iconOnly)
-//                        .buttonStyle(.bordered)
-//                        Spacer()
-//                        Button("Save", systemImage: "checkmark") {
-//                        }
-//                        .labelStyle(.iconOnly)
-//                        .buttonStyle(.borderedProminent)
-//                    }
-//                    .padding(.horizontal)
-//                    .padding(.bottom)
-//                    .background(.bar)
-//                }
-//            }
+            //            .safeAreaInset(edge: .top) {
+            //                if isInlineEditing {
+            //                    HStack {
+            //                        Button("Cancel", systemImage: "xmark") {
+            //                            isInlineEditing = false
+            //                            scrollPosition = ""
+            //                        }
+            //                        .labelStyle(.iconOnly)
+            //                        .buttonStyle(.bordered)
+            //                        Spacer()
+            //                        Button("Save", systemImage: "checkmark") {
+            //                        }
+            //                        .labelStyle(.iconOnly)
+            //                        .buttonStyle(.borderedProminent)
+            //                    }
+            //                    .padding(.horizontal)
+            //                    .padding(.bottom)
+            //                    .background(.bar)
+            //                }
+            //            }
             //            .background {
             //                BackgroundImageView()
             //                    .ignoresSafeArea()
@@ -304,16 +348,18 @@ struct ContentView: View {
             str = date.formatted(.dateTime.weekday().day().month().year())
         case .week:
             let cal = Calendar.current
-            let start = cal.dateInterval(of: .weekOfYear, for: date)?.start ?? date
+            let start =
+                cal.dateInterval(of: .weekOfYear, for: date)?.start ?? date
             let end = cal.date(byAdding: .day, value: 6, to: start) ?? start
-            
-            str = "\(start.formatted(.dateTime.day().month(.defaultDigits).year())) – \(end.formatted(.dateTime.day().month(.defaultDigits).year()))"
+
+            str =
+                "\(start.formatted(.dateTime.day().month(.defaultDigits).year())) – \(end.formatted(.dateTime.day().month(.defaultDigits).year()))"
         case .month:
             str = date.formatted(.dateTime.month(.wide).year())
         }
         return str
     }
-    
+
     /// Re-schedules local notifications from current `AppStorage` values.
     /// Called when the settings sheet is dismissed.
     private func setNotifications() {

@@ -5,22 +5,22 @@
 //  Created by Marcus Raitner on 21.02.26.
 //
 
-import SwiftUI
-import OSLog
-import SwiftData
 import CoreLocation
 import MapKit
+import OSLog
+import SwiftData
+import SwiftUI
 
 /// Modal sheet for creating a new log entry or viewing/editing an existing one.
 ///
 /// Pass `entry` to open an existing entry for editing. Omit it (or pass `nil`)
 /// to open a blank new-entry form. Saves directly to the SwiftData context on confirm.
 struct LogEntrySheet: View {
-    
+
     let day: DailyEntry
     let entry: DailyLogEntry?
     let isModalPresented: Bool
-    
+
     init(day: DailyEntry, entry: DailyLogEntry? = nil, isModal: Bool = true) {
         self.day = day
         self.entry = entry
@@ -33,22 +33,31 @@ struct LogEntrySheet: View {
             _timestamp = State(initialValue: entry.timestamp)
         } else {
             // this is an entry on a past day: we use hour and minute of now
-            var dayComponents = Calendar.current.dateComponents([.year, .month, .day], from: day.date)
-            let hourMinutes = Calendar.current.dateComponents([.hour, .minute], from: .now)
+            var dayComponents = Calendar.current.dateComponents(
+                [.year, .month, .day],
+                from: day.date
+            )
+            let hourMinutes = Calendar.current.dateComponents(
+                [.hour, .minute],
+                from: .now
+            )
             dayComponents.hour = hourMinutes.hour
             dayComponents.minute = hourMinutes.minute
-            
+
             // if no matching date is found (unlikely) we default to the timestamp of the day
-            _timestamp = State(initialValue: Calendar.current.date(from: dayComponents) ?? day.date)
+            _timestamp = State(
+                initialValue: Calendar.current.date(from: dayComponents)
+                    ?? day.date
+            )
         }
-        _entryTags = State(initialValue: .init(entry?.tags ?? []) )
+        _entryTags = State(initialValue: .init(entry?.tags ?? []))
         isModalPresented = isModal
     }
 
     private var isEntryNew: Bool { entry == nil }
 
     @Query private var tags: [Tag]
-    
+
     @State private var log: String
     @State private var score: Int
     @State private var latitude: Double?
@@ -58,49 +67,54 @@ struct LogEntrySheet: View {
     @State private var newTag: String = ""
     @State private var timestamp: Date = .now
 
-    
     // Controlling Focus
     enum FocusedField {
         case log, newTag, score, timestamp
     }
-    
+
     @FocusState private var focusedField: FocusedField?
-    
+
     // used to manage validation; showing the validation message only if stepper was touched
     @State private var isNew = true
     @State private var isPresentingConfirm = false
     @State private var storeLocations: Bool = false
 
-    @AppStorage(AppStorageKeys.enableEditingHistory) private var enableEditingHistory: Bool = true
+    @AppStorage(AppStorageKeys.enableEditingHistory) private
+        var enableEditingHistory: Bool = true
 
     private var isEntryEditable: Bool {
-        enableEditingHistory || Calendar.current.isDateInToday(entry?.timestamp ?? .now)
+        enableEditingHistory
+            || Calendar.current.isDateInToday(entry?.timestamp ?? .now)
     }
-    
+
     @State var locationManager = LocationManager()
     @State private var mapPosition: MapCameraPosition = .automatic
-    
+
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
 
     private var allTags: [String] {
-       tags.map(\.name)
+        tags.map(\.name)
     }
-    
+
     private var rawTags: String {
         entryTags.joined(separator: ",")
     }
 
     private var sanitizedNewTag: String {
-        newTag.replacingOccurrences(of: ",", with: "").trimmingCharacters(in: .whitespaces)
+        newTag.replacingOccurrences(of: ",", with: "").trimmingCharacters(
+            in: .whitespaces
+        )
     }
 
     private var isNewTagValid: Bool {
         let name = sanitizedNewTag
         guard !name.isEmpty else { return false }
-        return !tags.contains(where: { $0.name.caseInsensitiveCompare(name) == .orderedSame })
+        return !tags.contains(where: {
+            $0.name.caseInsensitiveCompare(name) == .orderedSame
+        })
     }
-    
+
     private func addCustomTag() {
         // Button calling this is checking isNewTagValid before, but let's make it explicit
         guard isNewTagValid else { return }
@@ -110,13 +124,16 @@ struct LogEntrySheet: View {
         entryTags.insert(name)
         newTag = ""
     }
-    
-    private let logger = Logger(subsystem: "de.raitner.pulse", category: "LogEntrySheet")
+
+    private let logger = Logger(
+        subsystem: "de.raitner.pulse",
+        category: "LogEntrySheet"
+    )
 
     /// Updates the location state with the coordinate and reverse-geocoded address from `item`.
-    private func setItem(item: MKMapItem) -> Void {
+    private func setItem(item: MKMapItem) {
         var coordinate: CLLocationCoordinate2D = CLLocationCoordinate2D()
-        
+
         coordinate = Compat.coordinate(from: item)
 
         latitude = coordinate.latitude
@@ -130,7 +147,7 @@ struct LogEntrySheet: View {
 
         address = Compat.address(from: item)
     }
-    
+
     private func save() {
         if let entry {
             entry.log = log
@@ -154,27 +171,41 @@ struct LogEntrySheet: View {
             context.saveOrLog("Failure saving new entry", logger: logger)
         }
     }
-    
+
     var body: some View {
         Form {
-            Section(header: Text(timestamp.formatted(.dateTime.weekday().day().month().year().minute().hour()))) {
+            Section(
+                header: Text(
+                    timestamp.formatted(
+                        .dateTime.weekday().day().month().year().minute().hour()
+                    )
+                )
+            ) {
                 if isEntryEditable {
                     VStack(alignment: .leading) {
-                        TextField("What's going on?", text: $log, axis: .vertical)
-                            .multilineTextAlignment(.leading)
-                            .lineLimit(5...Int.max)
-                            .focused($focusedField, equals: .log)
-                        
+                        TextField(
+                            "What's going on?",
+                            text: $log,
+                            axis: .vertical
+                        )
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(5...Int.max)
+                        .focused($focusedField, equals: .log)
+
                         Text("Please capture your moment here.")
                             .font(.caption)
-                            .foregroundStyle(!isNew && log.isEmpty ? .red : .clear)
+                            .foregroundStyle(
+                                !isNew && log.isEmpty ? .red : .clear
+                            )
                     }
                     HStack(alignment: .top) {
                         VStack(alignment: .leading) {
                             Text("How are you feeling?")
-                            Text("Capture your mood on a scale from -2 (bad) to 2 (good)")
-                                .foregroundStyle(.secondary)
-                                .padding(.top, 2)
+                            Text(
+                                "Capture your mood on a scale from -2 (bad) to 2 (good)"
+                            )
+                            .foregroundStyle(.secondary)
+                            .padding(.top, 2)
                         }
                         Spacer()
                         VStack {
@@ -187,19 +218,34 @@ struct LogEntrySheet: View {
                         .padding(.leading)
                     }
                 } else {
-                    HStack (alignment: .top) {
+                    HStack(alignment: .top) {
                         Text(log)
                         Spacer()
                         ScoreLabelView(score: score, style: .outlined)
                     }
                 }
-                
+
                 // MARK: - Tags
                 VStack {
                     FlowLayout {
-                        ForEach(isEntryEditable ? allTags : entry?.tags ?? [], id: \.self) { tag in
+                        ForEach(
+                            isEntryEditable ? allTags : entry?.tags ?? [],
+                            id: \.self
+                        ) { tag in
                             if isEntryEditable {
-                                TagChipView(label: tag, style: .selectable(isSelected: entryTags.contains(tag), onTap: { if entryTags.contains(tag) { entryTags.remove(tag) } else { entryTags.insert(tag) } } ))
+                                TagChipView(
+                                    label: tag,
+                                    style: .selectable(
+                                        isSelected: entryTags.contains(tag),
+                                        onTap: {
+                                            if entryTags.contains(tag) {
+                                                entryTags.remove(tag)
+                                            } else {
+                                                entryTags.insert(tag)
+                                            }
+                                        }
+                                    )
+                                )
                             } else {
                                 TagChipView(label: tag, style: .display)
                             }
@@ -222,15 +268,28 @@ struct LogEntrySheet: View {
                         .padding(.top, 4)
                     }
                 }
-                
+
                 HStack {
                     if isEntryEditable {
-                        DatePicker(timestamp.formatted(date: .abbreviated, time: .omitted), selection: $timestamp, in: .init(uncheckedBounds: (.distantPast, .now)), displayedComponents: .hourAndMinute)
-                            .focused($focusedField, equals: .timestamp)
+                        DatePicker(
+                            timestamp.formatted(
+                                date: .abbreviated,
+                                time: .omitted
+                            ),
+                            selection: $timestamp,
+                            in: .init(uncheckedBounds: (.distantPast, .now)),
+                            displayedComponents: .hourAndMinute
+                        )
+                        .focused($focusedField, equals: .timestamp)
                     } else {
                         Text("Recorded at")
                         Spacer()
-                        Text((entry?.timestamp ?? .now).formatted(date: .numeric, time: .shortened))
+                        Text(
+                            (entry?.timestamp ?? .now).formatted(
+                                date: .numeric,
+                                time: .shortened
+                            )
+                        )
                     }
                 }
                 // MARK: - Location
@@ -239,12 +298,19 @@ struct LogEntrySheet: View {
                         Toggle(isOn: $storeLocations) {
                             Text("Store location")
                         }
-                        
+
                         if storeLocations {
-                            if locationManager.authorizationStatus == .denied || locationManager.authorizationStatus == .restricted {
-                                Text("Location services are disabled. Please open settings to enable location services.")
-                                
-                                if let url = URL(string: UIApplication.openSettingsURLString) {
+                            if locationManager.authorizationStatus == .denied
+                                || locationManager.authorizationStatus
+                                    == .restricted
+                            {
+                                Text(
+                                    "Location services are disabled. Please open settings to enable location services."
+                                )
+
+                                if let url = URL(
+                                    string: UIApplication.openSettingsURLString
+                                ) {
                                     Button("Open Settings") {
                                         UIApplication.shared.open(url)
                                     }
@@ -253,7 +319,7 @@ struct LogEntrySheet: View {
                             } else {
                                 if let item = locationManager.mapItems.first {
                                     Text(address ?? "Unknown")
-                                    
+
                                     Map(position: $mapPosition) {
                                         Marker(item: item)
                                     }
@@ -276,21 +342,33 @@ struct LogEntrySheet: View {
                                 }
                             }
                         }
-                        
+
                     } else {
                         if let address {
                             Label(address, systemImage: "location.circle.fill")
                                 .labelStyle(.titleAndIcon)
-                            
+
                             if let latitude, let longitude {
-                                let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                                let coordinate = CLLocationCoordinate2D(
+                                    latitude: latitude,
+                                    longitude: longitude
+                                )
                                 let region = MKCoordinateRegion(
                                     center: coordinate,
-                                    span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01) // ~1–2 km depending on latitude
+                                    span: MKCoordinateSpan(
+                                        latitudeDelta: 0.01,
+                                        longitudeDelta: 0.01
+                                    )  // ~1–2 km depending on latitude
                                 )
-                                
+
                                 Map(position: .constant(.region(region))) {
-                                    Marker(address, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                                    Marker(
+                                        address,
+                                        coordinate: CLLocationCoordinate2D(
+                                            latitude: latitude,
+                                            longitude: longitude
+                                        )
+                                    )
                                 }
                                 .mapControls {
                                     MapScaleView()
@@ -310,7 +388,7 @@ struct LogEntrySheet: View {
                     locationManager.requestLocation()
                 }
             }
-            
+
             Section {
                 HStack {
                     Spacer()
@@ -323,19 +401,26 @@ struct LogEntrySheet: View {
                                 .foregroundStyle(.red)
                         }
                         .buttonStyle(.automatic)
-                        .confirmationDialog("Are you sure?",
-                                            isPresented: $isPresentingConfirm,
-                                            titleVisibility: .visible) {
+                        .confirmationDialog(
+                            "Are you sure?",
+                            isPresented: $isPresentingConfirm,
+                            titleVisibility: .visible
+                        ) {
                             Button("Delete", role: .destructive) {
                                 if let entry {
                                     context.delete(entry)
-                                    context.saveOrLog("Failure saving deleted entry", logger: logger)
+                                    context.saveOrLog(
+                                        "Failure saving deleted entry",
+                                        logger: logger
+                                    )
                                     dismiss()
                                 }
                             }
                         } message: {
-                            Text("This will delete the moment permanently and cannot be undone.")
-                          }
+                            Text(
+                                "This will delete the moment permanently and cannot be undone."
+                            )
+                        }
                     }
                     Spacer()
                 }
@@ -348,7 +433,10 @@ struct LogEntrySheet: View {
         .onAppear {
             focusedField = .log
         }
-        .navigationTitle(isEntryNew ? "New Moment" : isEntryEditable ? "Edit Moment" : "View Moment")
+        .navigationTitle(
+            isEntryNew
+                ? "New Moment" : isEntryEditable ? "Edit Moment" : "View Moment"
+        )
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
@@ -377,8 +465,11 @@ struct LogEntrySheet: View {
 
 #Preview("Alt") {
     NavigationStack {
-        LogEntrySheet(day: .init(date: .now), entry: .init(timestamp: .now, log: "Test", score: -2))
-            .modelContainer(SampleData.shared.modelContainer)
-            .preferredColorScheme(.dark)
+        LogEntrySheet(
+            day: .init(date: .now),
+            entry: .init(timestamp: .now, log: "Test", score: -2)
+        )
+        .modelContainer(SampleData.shared.modelContainer)
+        .preferredColorScheme(.dark)
     }
 }

@@ -43,7 +43,7 @@ struct ScoreLabelView: View {
             Text(label)
                 .font(.title.bold())
                 .foregroundStyle(.primary)
-                .frame(width: 72, height: 72)
+                .frame(width: 80, height: 80)
                 .background(color.opacity(0.2), in: Circle())
                 .overlay(Circle().stroke(color, lineWidth: 7))
         }

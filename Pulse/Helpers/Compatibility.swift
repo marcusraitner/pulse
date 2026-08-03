@@ -38,9 +38,9 @@ extension View {
     @ViewBuilder
     func glassCapsule() -> some View {
         if #available(iOS 26, *) {
-            self.glassEffect(.clear, in: Capsule())
+            self.glassEffect(.regular, in: RoundedRectangle(cornerRadius: 8))
         } else {
-            self.background(.ultraThinMaterial, in: Capsule())
+            self.background(.regularMaterial, in: Capsule())
         }
     }
 

@@ -40,7 +40,7 @@ struct PulseApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.featureFlags, FeatureFlags(adminEnabled: false))
+                .environment(\.featureFlags, FeatureFlags(adminEnabled: true))
                 .preferredColorScheme(.dark)
         }
         .modelContainer(modelContainer)
