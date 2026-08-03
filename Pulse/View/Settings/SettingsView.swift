@@ -12,6 +12,7 @@ import SwiftData
 import OSLog
 import PhotosUI
 import UIKit
+import CloudKitSyncMonitor
 
 struct SettingsView: View {
 
@@ -33,6 +34,8 @@ struct SettingsView: View {
     @State private var exportDocument: ExportJSONDocument?
     @State private var exportFilename: String = "pulse-export.json"
     @State private var exportErrorMessage: String?
+    
+    @StateObject private var syncMonitor = SyncMonitor.default
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.featureFlags) private var featureFlags
@@ -399,6 +402,12 @@ struct SettingsView: View {
                             Text("Number of moments")
                             Spacer()
                             Text("\(countLogs)")
+                        }
+                        HStack {
+                            Text("iCloud Sync Status")
+                            Spacer()
+                            Image(systemName: syncMonitor.syncStateSummary.symbolName)
+                                .foregroundColor(syncMonitor.syncStateSummary.symbolColor)
                         }
                     }
                 } label: {
