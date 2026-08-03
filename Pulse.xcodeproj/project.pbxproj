@@ -6,6 +6,10 @@
 	objectVersion = 100;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		2CB838E13021040700C5E0B7 /* CloudKitSyncMonitor in Frameworks */ = {isa = PBXBuildFile; productRef = 2CB838E03021040700C5E0B7 /* CloudKitSyncMonitor */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		2C9CCF1A2F44350000CDAA15 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -95,6 +99,7 @@
 		2C3749852F4308270079D893 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				2CB838E13021040700C5E0B7 /* CloudKitSyncMonitor in Frameworks */,
 			);
 		};
 		2C9CCF112F44350000CDAA15 /* Frameworks */ = {
@@ -150,6 +155,9 @@
 				2C92C5EA2F7FDBDB0048B14D /* landing */,
 			);
 			name = Pulse;
+			packageProductDependencies = (
+				2CB838E03021040700C5E0B7 /* CloudKitSyncMonitor */,
+			);
 			productName = Pulse;
 			productReference = 2C3749882F4308270079D893 /* Pulse.app */;
 			productType = "com.apple.product-type.application";
@@ -229,6 +237,9 @@
 			);
 			mainGroup = 2C37497F2F4308270079D893;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				2CB838DF3021040700C5E0B7 /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */,
+			);
 			preferredProjectObjectVersion = 100;
 			productRefGroup = 2C3749892F4308270079D893 /* Products */;
 			projectDirPath = "";
@@ -638,6 +649,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2CB838DF3021040700C5E0B7 /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ggruen/CloudKitSyncMonitor.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2CB838E03021040700C5E0B7 /* CloudKitSyncMonitor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2CB838DF3021040700C5E0B7 /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */;
+			productName = CloudKitSyncMonitor;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2C3749802F4308270079D893 /* Project object */;
 }

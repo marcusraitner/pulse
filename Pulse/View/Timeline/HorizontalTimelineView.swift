@@ -20,7 +20,6 @@ struct HorizontalTimelineView: View {
     @Binding var scrollToToday: Bool
 
     @State private var entriesByDate: [Date: DailyEntry] = [:]
-//    @State private var position: ScrollPosition = .init(idType: Date.self)
     @State private var position: Date?
     @State private var containerWidth: CGFloat = 0.0
 
@@ -28,7 +27,7 @@ struct HorizontalTimelineView: View {
 
     @Environment(\.featureFlags) private var featureFlags
 
-    private let logger = Logger(subsystem: "de.raitner.pulse", category: "TimeLineView")
+    private let logger = Logger(subsystem: "de.raitner.pulse", category: "HorizontalTimeLineView")
 
     var body: some View {
         let barWidth: CGFloat = 20
