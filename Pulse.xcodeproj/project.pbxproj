@@ -37,18 +37,20 @@
 		2D1F13C92FAB33BD00D19E59 /* Exceptions for "landing" folder in "Pulse" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				"screenshot-aicoach-de.png",
-				"screenshot-aicoach-en.png",
-				"screenshot-metrics-de.png",
-				"screenshot-metrics-en.png",
-				"screenshot-moment-de.png",
-				"screenshot-moment-en.png",
-				"screenshot-reflection-de.png",
-				"screenshot-reflection-en.png",
-				"screenshot-timeline-de.png",
-				"screenshot-timeline-en.png",
-				"screenshot-week-de.png",
-				"screenshot-week-en.png",
+				index.html,
+				"img/AppIcon.png",
+				"img/screens/1-moment-de.png",
+				"img/screens/1-moment-en.png",
+				"img/screens/2-day-de.png",
+				"img/screens/2-day-en.png",
+				"img/screens/3-week-de.png",
+				"img/screens/3-week-en.png",
+				"img/screens/4-privacy-de.png",
+				"img/screens/4-privacy-en.png",
+				"img/screens/6-reflection-de.png",
+				"img/screens/6-reflection-en.png",
+				"img/screens/7-aicoach-de.png",
+				"img/screens/7-aicoach-en.png",
 			);
 			target = 2C3749872F4308270079D893 /* Pulse */;
 		};

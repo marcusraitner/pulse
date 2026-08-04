@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="AppIcon.png" />
-    <link rel="apple-touch-icon" href="AppIcon.png" />
+    <link rel="icon" type="image/png" href="img/AppIcon.png" />
+    <link rel="apple-touch-icon" href="img/AppIcon.png" />
     <title>Pulse — Your Micro-Journal</title>
     <meta
       name="description"
@@ -232,39 +232,19 @@
         }
       }
 
-      .phone-frame {
+      /* Marketing artwork already includes its own background, headline and
+         device bezel — so no extra frame, and never crop it. */
+      .shot {
         width: 100%;
-        background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: 34px;
+        border-radius: 20px;
         overflow: hidden;
-        aspect-ratio: 9 / 19.5;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        gap: 8px;
-        color: var(--text2);
-        font-size: 0.75rem;
-        text-align: center;
-        padding: 16px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
       }
 
-      .phone-frame .ph-icon {
-        font-size: 2rem;
-        opacity: 0.4;
-      }
-      .phone-frame .ph-label {
-        opacity: 0.5;
-      }
-      .phone-frame:has(img) {
-        padding: 0;
-      }
-      .phone-frame img {
+      .shot img {
         width: 100%;
-        height: 100%;
-        object-fit: cover;
+        height: auto;
         display: block;
       }
 
@@ -598,7 +578,13 @@
 
     <!-- ── Hero ── -->
     <section class="hero">
-      <img class="app-icon" src="AppIcon.png" alt="Pulse App Icon" />
+      <img
+        class="app-icon"
+        src="img/AppIcon.png"
+        alt="Pulse App Icon"
+        width="120"
+        height="120"
+      />
 
       <h1 data-lang="en">
         Your <span>Micro-Journal.</span><br />Your Patterns.
@@ -684,41 +670,116 @@
     <!-- ── Screenshots ── -->
     <section class="screenshots">
       <div class="screenshots-grid">
-        <div class="phone-frame" data-lang="de">
-          <img src="screenshot-timeline-de.png" alt="Timeline" />
+        <!-- German -->
+        <div class="shot" data-lang="de">
+          <img
+            src="img/screens/1-moment-de.png"
+            alt="Moment erfassen"
+            width="640"
+            height="1387"
+            loading="lazy"
+          />
         </div>
-        <div class="phone-frame" data-lang="en">
-          <img src="screenshot-timeline-en.png" alt="Timeline" />
+        <div class="shot" data-lang="de">
+          <img
+            src="img/screens/2-day-de.png"
+            alt="Tagesansicht"
+            width="640"
+            height="1387"
+            loading="lazy"
+          />
         </div>
-        <div class="phone-frame" data-lang="de">
-          <img src="screenshot-week-de.png" alt="Week View" />
+        <div class="shot" data-lang="de">
+          <img
+            src="img/screens/3-week-de.png"
+            alt="Wochenansicht"
+            width="640"
+            height="1387"
+            loading="lazy"
+          />
         </div>
-        <div class="phone-frame" data-lang="en">
-          <img src="screenshot-week-en.png" alt="Week View" />
+        <div class="shot" data-lang="de">
+          <img
+            src="img/screens/4-privacy-de.png"
+            alt="Datenschutz"
+            width="640"
+            height="1387"
+            loading="lazy"
+          />
         </div>
-        <div class="phone-frame" data-lang="de">
-          <img src="screenshot-moment-de.png" alt="Moment" />
+        <div class="shot" data-lang="de">
+          <img
+            src="img/screens/6-reflection-de.png"
+            alt="Tagesbilanz"
+            width="640"
+            height="1387"
+            loading="lazy"
+          />
         </div>
-        <div class="phone-frame" data-lang="en">
-          <img src="screenshot-moment-en.png" alt="Moment" />
+        <div class="shot" data-lang="de">
+          <img
+            src="img/screens/7-aicoach-de.png"
+            alt="KI-Coach"
+            width="640"
+            height="1387"
+            loading="lazy"
+          />
         </div>
-        <div class="phone-frame" data-lang="de">
-          <img src="screenshot-reflection-de.png" alt="Reflection" />
+
+        <!-- English -->
+        <div class="shot" data-lang="en">
+          <img
+            src="img/screens/1-moment-en.png"
+            alt="Capture a moment"
+            width="640"
+            height="1387"
+            loading="lazy"
+          />
         </div>
-        <div class="phone-frame" data-lang="en">
-          <img src="screenshot-reflection-en.png" alt="Reflection" />
+        <div class="shot" data-lang="en">
+          <img
+            src="img/screens/2-day-en.png"
+            alt="Day view"
+            width="640"
+            height="1387"
+            loading="lazy"
+          />
         </div>
-        <div class="phone-frame" data-lang="de">
-          <img src="screenshot-metrics-de.png" alt="Metrics" />
+        <div class="shot" data-lang="en">
+          <img
+            src="img/screens/3-week-en.png"
+            alt="Week view"
+            width="640"
+            height="1387"
+            loading="lazy"
+          />
         </div>
-        <div class="phone-frame" data-lang="en">
-          <img src="screenshot-metrics-en.png" alt="Metrics" />
+        <div class="shot" data-lang="en">
+          <img
+            src="img/screens/4-privacy-en.png"
+            alt="Privacy"
+            width="640"
+            height="1387"
+            loading="lazy"
+          />
         </div>
-        <div class="phone-frame" data-lang="de">
-          <img src="screenshot-aicoach-de.png" alt="AI Coach" />
+        <div class="shot" data-lang="en">
+          <img
+            src="img/screens/6-reflection-en.png"
+            alt="Daily reflection"
+            width="640"
+            height="1387"
+            loading="lazy"
+          />
         </div>
-        <div class="phone-frame" data-lang="en">
-          <img src="screenshot-aicoach-en.png" alt="AI Coach" />
+        <div class="shot" data-lang="en">
+          <img
+            src="img/screens/7-aicoach-en.png"
+            alt="AI Coach"
+            width="640"
+            height="1387"
+            loading="lazy"
+          />
         </div>
       </div>
     </section>
@@ -736,8 +797,7 @@
 
       <div class="features">
         <div class="features-grid">
-          <div class="feature-card new">
-            <span class="new-badge">New in 2.2</span>
+          <div class="feature-card">
             <span class="feature-icon">📤</span>
             <h3 data-lang="en">JSON Export</h3>
             <h3 data-lang="de">JSON-Export</h3>
@@ -788,11 +848,13 @@
             <h3 data-lang="de">Momente festhalten</h3>
             <p data-lang="en">
               Log what's happening throughout your day — from a single sentence
-              to a detailed note. Fast, frictionless, always at hand.
+              to a detailed note. Fast, frictionless, and the time stays
+              editable if you write it down later.
             </p>
             <p data-lang="de">
               Halte fest, was passiert — von einem kurzen Satz bis zur
-              ausführlichen Notiz. Schnell, unkompliziert, immer dabei.
+              ausführlichen Notiz. Schnell, unkompliziert, und die Uhrzeit lässt
+              sich nachträglich anpassen.
             </p>
           </div>
 
@@ -852,17 +914,20 @@
             </p>
           </div>
 
-          <div class="feature-card">
+          <div class="feature-card new">
+            <span class="new-badge">New in 2.3</span>
             <span class="feature-icon">☁️</span>
             <h3 data-lang="en">iCloud Sync</h3>
             <h3 data-lang="de">iCloud-Synchronisation</h3>
             <p data-lang="en">
               Your journal syncs seamlessly across all your Apple devices via
-              iCloud — always up to date, everywhere.
+              iCloud. Settings now shows the live sync status, so you always
+              know everything arrived.
             </p>
             <p data-lang="de">
               Dein Journal synchronisiert nahtlos über alle deine Apple-Geräte
-              per iCloud — immer aktuell, überall verfügbar.
+              per iCloud. Die Einstellungen zeigen jetzt den Sync-Status — du
+              siehst immer, ob alles angekommen ist.
             </p>
           </div>
 
