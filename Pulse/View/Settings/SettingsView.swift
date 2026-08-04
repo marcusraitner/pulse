@@ -403,11 +403,37 @@ struct SettingsView: View {
                             Spacer()
                             Text("\(countLogs)")
                         }
-                        HStack {
-                            Text("iCloud Sync Status")
-                            Spacer()
-                            Image(systemName: syncMonitor.syncStateSummary.symbolName)
-                                .foregroundColor(syncMonitor.syncStateSummary.symbolColor)
+                        Section("iCloud Sync") {
+                            VStack(alignment: .leading) {
+                                VStack(alignment: .trailing) {
+                                    HStack {
+                                        Text("Status")
+                                        Spacer()
+                                        Image(systemName: syncMonitor.syncStateSummary.symbolName)
+                                            .foregroundColor(syncMonitor.syncStateSummary.symbolColor)
+                                    }
+                                    Text(syncMonitor.syncStateSummary.description)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                
+                                Group {
+                                    if syncMonitor.hasSyncError {
+                                        if let error = syncMonitor.setupError {
+                                            Text("Unable to set up iCloud sync, changes won't be saved! \(error.localizedDescription)")
+                                        }
+                                        if let error = syncMonitor.importError {
+                                            Text("Import is broken: \(error.localizedDescription)")
+                                        }
+                                        if let error = syncMonitor.exportError {
+                                            Text("Export is broken - your changes aren't being saved! \(error.localizedDescription)")
+                                        }
+                                    } else if syncMonitor.isNotSyncing {
+                                        Text("Sync should be working, but isn't. Look for a badge on Settings or other possible issues.")
+                                    }
+                                }
+                                .foregroundStyle(.accent)
+                            }
                         }
                     }
                 } label: {
