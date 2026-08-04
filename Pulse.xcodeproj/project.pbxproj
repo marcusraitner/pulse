@@ -37,8 +37,7 @@
 		2D1F13C92FAB33BD00D19E59 /* Exceptions for "landing" folder in "Pulse" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				index.html,
-				"img/AppIcon.png",
+				img/AppIcon.png,
 				"img/screens/1-moment-de.png",
 				"img/screens/1-moment-en.png",
 				"img/screens/2-day-de.png",
@@ -51,6 +50,7 @@
 				"img/screens/6-reflection-en.png",
 				"img/screens/7-aicoach-de.png",
 				"img/screens/7-aicoach-en.png",
+				index.html,
 			);
 			target = 2C3749872F4308270079D893 /* Pulse */;
 		};
