@@ -433,6 +433,7 @@ struct SettingsView: View {
                                     }
                                 }
                                 .foregroundStyle(.accent)
+                                .padding(.top, 2)
                             }
                         }
                     }
