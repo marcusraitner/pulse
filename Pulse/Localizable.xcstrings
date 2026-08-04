@@ -724,6 +724,16 @@
         }
       }
     },
+    "Export is broken - your changes aren't being saved! %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Export erzeugt einen Fehler – deine Änderungen werden nicht gesichert! %@"
+          }
+        }
+      }
+    },
     "Feedback" : {
       "localizations" : {
         "de" : {
@@ -776,8 +786,25 @@
         }
       }
     },
-    "iCloud Sync Status" : {
-
+    "iCloud Sync" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "iCloud-Synchronisierung"
+          }
+        }
+      }
+    },
+    "Import is broken: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Import ist erzeugt einen Fehler: %@"
+          }
+        }
+      }
     },
     "Insights" : {
       "comment" : "The title of a view that provides insights into user behavior.",
@@ -1633,6 +1660,16 @@
         }
       }
     },
+    "Status" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Status"
+          }
+        }
+      }
+    },
     "Store location" : {
       "localizations" : {
         "de" : {
@@ -1651,6 +1688,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fasse deinen Tag zusammen"
+          }
+        }
+      }
+    },
+    "Sync should be working, but isn't. Look for a badge on Settings or other possible issues." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Synchronisierung sollte eigentlich funktionieren, tut sie aber nicht. Bitte suche nach einem Badge in den Einstellungen oder nach anderen möglichen Problemen dort."
           }
         }
       }
@@ -1719,6 +1766,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Titel"
+          }
+        }
+      }
+    },
+    "Unable to set up iCloud sync, changes won't be saved! %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "iCloud-Synchronisierung konnte nicht eingerichtet werden, deine Änderungen werden nicht gesichert! %@"
           }
         }
       }
@@ -1858,5 +1915,5 @@
       }
     }
   },
-  "version" : "1.1"
+  "version" : "1.3"
 }
