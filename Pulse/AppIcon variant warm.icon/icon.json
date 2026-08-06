@@ -1,7 +1,4 @@
 {
-  "features" : [
-    "specular-location"
-  ],
   "fill" : {
     "automatic-gradient" : "srgb:0.45098,0.33333,0.34118,1.00000"
   },
@@ -27,7 +24,6 @@
         "kind" : "layer-color",
         "opacity" : 0.5
       },
-      "specular" : "inside",
       "translucency" : {
         "enabled" : false,
         "value" : 0.5
