@@ -24,6 +24,7 @@ struct HorizontalTimelineView: View {
     @State private var containerWidth: CGFloat = 0.0
 
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
+    @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = true
 
     @Environment(\.featureFlags) private var featureFlags
 
@@ -42,13 +43,15 @@ struct HorizontalTimelineView: View {
                     let yOffset: CGFloat = -0.5 * heightScale * avg
 
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(Color.clear)
+                        .fill(.quaternary.opacity(0.5))
                         .frame(width: barWidth, height: totalHeight)
                         .overlay {
-                            RoundedRectangle(cornerRadius: 4)
+                            if !entry.isEmpty {
+                                RoundedRectangle(cornerRadius: 4)
                                 .fill(Theme.named(themeName).gradient(for: avg))
                                 .frame(width: barWidth, height: barHeight)
                                 .offset(y: yOffset)
+                            }
                         }
                         .id(entry.date)
                         .onTapGesture {
@@ -62,6 +65,7 @@ struct HorizontalTimelineView: View {
             .scrollTargetLayout()
         }
         .scrollTargetBehavior(.viewAligned)
+        .defaultScrollAnchor(.trailing, for: .initialOffset)
         .scrollPosition(id: $position, anchor: .center)
         .contentMargins(.horizontal, (containerWidth - barWidth) * 0.5, for: .scrollContent)
         .onGeometryChange(for: CGSize.self) { proxy in

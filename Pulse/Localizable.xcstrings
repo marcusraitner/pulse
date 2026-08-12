@@ -1650,6 +1650,9 @@
         }
       }
     },
+    "Show empty days" : {
+
+    },
     "Statistics" : {
       "localizations" : {
         "de" : {

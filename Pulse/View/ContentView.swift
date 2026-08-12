@@ -31,7 +31,7 @@ struct ContentView: View {
     @Environment(\.featureFlags) private var featureFlags
     @Environment(\.requestReview) private var requestReview
     
-    @Query private var allEntries: [DailyEntry]
+    @Query(sort: \DailyEntry.date, order: .forward) private var allEntries: [DailyEntry]
     @Query private var allLogs: [DailyLogEntry]
     
     private var countLogs: Int { allLogs.count }
@@ -41,6 +41,7 @@ struct ContentView: View {
     @AppStorage(AppStorageKeys.reflectionReminder) private var reflectionReminder: Bool = true
     @AppStorage(AppStorageKeys.reflectionReminderTime) private var reflectionReminderTime: Date?
     @AppStorage(AppStorageKeys.viewMode) private var viewMode: ViewMode = .day
+    @AppStorage(AppStorageKeys.initialSweepDone) private var initialSweepDone: Bool = false
     
     @State private var reviewService = ReviewService()
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
@@ -212,20 +213,58 @@ struct ContentView: View {
     /// Ensures today's `DailyEntry` exists, creating and inserting one if it is missing.
     /// Scrolls the timeline to today after creating a new entry.
     private func updateToday() {
-        var descriptor = FetchDescriptor<DailyEntry>(sortBy: [SortDescriptor(\.date, order: .reverse)])
-        descriptor.fetchLimit = 1
+        addMissingEntries()
+        
+        guard let newToday = allEntries.last else { return }
 
-        if let last = try? context.fetch(descriptor).first,
-           Calendar.current.isDateInToday(last.date) {
-            return
-        }
-
-        let newToday = DailyEntry(date: .now)
-        logger.debug("Creating a new day: \(newToday.date)")
-        context.insert(newToday)
-        context.saveOrLog("Failure while saving new day", logger: logger)
         selectedEntry = newToday
         triggerScrollToToday = true
+    }
+   
+    private func addMissingEntries() {
+        // Determine where to start with filling the gaps
+        guard let firstEntry = allEntries.first else {
+            return
+        }
+        
+        // By default, we start at the beginning unless ...
+        var start = Calendar.current.startOfDay(for: firstEntry.date)
+        
+        
+        // ... we did that already once; then we can ...
+        if initialSweepDone {
+            // ... fill the potential gaps between the previous entry and the last only
+            if allEntries.count > 1 {
+                let previousEntry = allEntries[allEntries.count - 2]
+                start = Calendar.current.startOfDay(for: previousEntry.date)
+            } else {
+                // no gap to fill; just one (or zero) elements
+                return
+            }
+        }
+        
+        let end = Calendar.current.startOfDay(for: .now)
+        var entryDates = Set(allEntries.map { Calendar.current.startOfDay(for: $0.date) })
+        var current = start
+        
+        while current <= end {
+            if !entryDates.contains(current) {
+                let newEntry = DailyEntry(date: current)
+                logger.info("Adding new entry for \(current)")
+                entryDates.insert(current)
+                context.insert(newEntry)
+            }
+            
+            guard let next = Calendar.current.date(byAdding: .day, value: 1, to: current) else {
+                // very unlikely this happens, but if so, we just stop filling
+                logger.warning("adding 1 to \(current) resulted in nil")
+                break
+            }
+            
+            current = next
+        }
+        
+        context.saveOrLog("Error saving missing entries", logger: logger)
     }
 
     /// Performs one-time startup work: applies debug launch arguments and requests
