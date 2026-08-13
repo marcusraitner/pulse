@@ -217,63 +217,73 @@ struct ContentView: View {
         
         guard let newToday = allEntries.last else { return }
 
+        // TODO: We should not scroll every time, but only when today is fresh
         selectedEntry = newToday
         triggerScrollToToday = true
     }
    
     private func addMissingEntries() {
         // add first entry
-        if allEntries.isEmpty {
+        guard !allEntries.isEmpty else {
             context.insert(DailyEntry(date: .now))
             context.saveOrLog("Added first entry", logger: logger)
-        }
-
-        // Determine where to start with filling the gaps
-        guard let firstEntry = allEntries.first else {
-            logger.warning("expected at least one entry, but found none.")
             return
         }
         
-        // By default, we start at the beginning unless ...
-        var start = Calendar.current.startOfDay(for: firstEntry.date)
-        
-        // ... we did that already once; then we can ...
-        if initialSweepDone {
-            // ... fill the potential gaps between the last entry and today
+        if !initialSweepDone {
+            guard let firstEntry = allEntries.first else {
+                logger.warning("expected at least one entry, but found none.")
+                return
+            }
+            
+            let start = Calendar.current.startOfDay(for: firstEntry.date)
+            let end = Calendar.current.startOfDay(for: .now)
+            var entryDates = Set(allEntries.map { Calendar.current.startOfDay(for: $0.date) })
+            var current = end
+            
+            // going backwards from today; start can be excluded as it already exists
+            while current > start {
+                if !entryDates.contains(current) {
+                    let newEntry = DailyEntry(date: current)
+                    logger.info("Adding new entry for \(current)")
+                    entryDates.insert(current)
+                    context.insert(newEntry)
+                }
+                
+                guard let next = Calendar.current.date(byAdding: .day, value: -1, to: current) else {
+                    // very unlikely this happens, but if so, we just stop filling
+                    logger.warning("adding 1 to \(current) resulted in nil")
+                    break
+                }
+                
+                current = next
+            }
+            
+            context.saveOrLog("Error saving missing entries", logger: logger)
+            initialSweepDone = true
+        } else {
             guard let lastEntry = allEntries.last else {
                 logger.warning("expected at least one entry, but found none.")
                 return
             }
             
-            start = Calendar.current.startOfDay(for: lastEntry.date)
-        }
-        
-        let end = Calendar.current.startOfDay(for: .now)
-        var entryDates = Set(allEntries.map { Calendar.current.startOfDay(for: $0.date) })
-        var current = end
-        
-        // going backwards from today; start can be excluded as it already exists
-        while current > start {
-            if !entryDates.contains(current) {
+            let start = Calendar.current.startOfDay(for: lastEntry.date)
+            let end = Calendar.current.startOfDay(for: .now)
+            var current = end
+            
+            while current > start {
                 let newEntry = DailyEntry(date: current)
                 logger.info("Adding new entry for \(current)")
-                entryDates.insert(current)
                 context.insert(newEntry)
+                
+                guard let next = Calendar.current.date(byAdding: .day, value: -1, to: current) else {
+                    logger.warning("adding 1 to \(current) resulted in nil")
+                    break
+                }
+                
+                current = next
             }
-            
-            guard let next = Calendar.current.date(byAdding: .day, value: -1, to: current) else {
-                // very unlikely this happens, but if so, we just stop filling
-                logger.warning("adding 1 to \(current) resulted in nil")
-                break
-            }
-            
-            current = next
         }
-        
-        context.saveOrLog("Error saving missing entries", logger: logger)
-        
-        // mark the initial sweep as done
-        if !initialSweepDone { initialSweepDone = true }
     }
 
     /// Performs one-time startup work: applies debug launch arguments and requests
