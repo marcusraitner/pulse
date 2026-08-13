@@ -37,7 +37,7 @@ struct HorizontalTimelineView: View {
 
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 3) {
-                ForEach(allEntries, id: \.date ) { entry in
+                ForEach(allEntries.filter( { showEmptyDays || !$0.isEmpty || Calendar.current.isDateInToday($0.date) } ) , id: \.date ) { entry in
                     let avg: CGFloat = entry.averageScore
                     let barHeight: CGFloat = max(2, heightScale * avg.magnitude)
                     let yOffset: CGFloat = -0.5 * heightScale * avg
@@ -46,7 +46,7 @@ struct HorizontalTimelineView: View {
                         .fill(.quaternary.opacity(0.5))
                         .frame(width: barWidth, height: totalHeight)
                         .overlay {
-                            if !entry.isEmpty {
+                            if !entry.isEmpty || Calendar.current.isDateInToday(entry.date) {
                                 RoundedRectangle(cornerRadius: 4)
                                 .fill(Theme.named(themeName).gradient(for: avg))
                                 .frame(width: barWidth, height: barHeight)
