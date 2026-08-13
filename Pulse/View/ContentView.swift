@@ -222,32 +222,38 @@ struct ContentView: View {
     }
    
     private func addMissingEntries() {
+        // add first entry
+        if allEntries.isEmpty {
+            context.insert(DailyEntry(date: .now))
+            context.saveOrLog("Added first entry", logger: logger)
+        }
+
         // Determine where to start with filling the gaps
         guard let firstEntry = allEntries.first else {
+            logger.warning("expected at least one entry, but found none.")
             return
         }
         
         // By default, we start at the beginning unless ...
         var start = Calendar.current.startOfDay(for: firstEntry.date)
         
-        
         // ... we did that already once; then we can ...
         if initialSweepDone {
-            // ... fill the potential gaps between the previous entry and the last only
-            if allEntries.count > 1 {
-                let previousEntry = allEntries[allEntries.count - 2]
-                start = Calendar.current.startOfDay(for: previousEntry.date)
-            } else {
-                // no gap to fill; just one (or zero) elements
+            // ... fill the potential gaps between the last entry and today
+            guard let lastEntry = allEntries.last else {
+                logger.warning("expected at least one entry, but found none.")
                 return
             }
+            
+            start = Calendar.current.startOfDay(for: lastEntry.date)
         }
         
         let end = Calendar.current.startOfDay(for: .now)
         var entryDates = Set(allEntries.map { Calendar.current.startOfDay(for: $0.date) })
-        var current = start
+        var current = end
         
-        while current <= end {
+        // going backwards from today; start can be excluded as it already exists
+        while current > start {
             if !entryDates.contains(current) {
                 let newEntry = DailyEntry(date: current)
                 logger.info("Adding new entry for \(current)")
@@ -255,7 +261,7 @@ struct ContentView: View {
                 context.insert(newEntry)
             }
             
-            guard let next = Calendar.current.date(byAdding: .day, value: 1, to: current) else {
+            guard let next = Calendar.current.date(byAdding: .day, value: -1, to: current) else {
                 // very unlikely this happens, but if so, we just stop filling
                 logger.warning("adding 1 to \(current) resulted in nil")
                 break
@@ -265,6 +271,9 @@ struct ContentView: View {
         }
         
         context.saveOrLog("Error saving missing entries", logger: logger)
+        
+        // mark the initial sweep as done
+        if !initialSweepDone { initialSweepDone = true }
     }
 
     /// Performs one-time startup work: applies debug launch arguments and requests
