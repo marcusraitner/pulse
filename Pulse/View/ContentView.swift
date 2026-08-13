@@ -269,12 +269,18 @@ struct ContentView: View {
             
             let start = Calendar.current.startOfDay(for: lastEntry.date)
             let end = Calendar.current.startOfDay(for: .now)
+            var entryDates = Set(allEntries.reversed()
+                .prefix(while: { $0.date > start } )
+                .map { Calendar.current.startOfDay(for: $0.date) })
             var current = end
             
             while current > start {
-                let newEntry = DailyEntry(date: current)
-                logger.info("Adding new entry for \(current)")
-                context.insert(newEntry)
+                if !entryDates.contains(current) {
+                    let newEntry = DailyEntry(date: current)
+                    entryDates.insert(current)
+                    logger.info("Adding new entry for \(current)")
+                    context.insert(newEntry)
+                }
                 
                 guard let next = Calendar.current.date(byAdding: .day, value: -1, to: current) else {
                     logger.warning("adding 1 to \(current) resulted in nil")
@@ -283,6 +289,7 @@ struct ContentView: View {
                 
                 current = next
             }
+            context.saveOrLog("Error saving missing entries", logger: logger)
         }
     }
 
