@@ -25,6 +25,7 @@ struct SettingsView: View {
     @AppStorage(AppStorageKeys.backgroundImageName) private var backgroundImageName: String = "mountain"
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
     @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = true
+    @AppStorage(AppStorageKeys.sortAscending) private var sortAscending: Bool = true
     
     @State private var backgroundImageSelection: PhotosPickerItem?
     @State private var notificationTimes: [Date] = []
@@ -178,11 +179,21 @@ struct SettingsView: View {
                             Text("Customize the overall appearance here.")
                                 .foregroundStyle(.secondary)
                         }
-                        
+                    }
+                    
+                    Section {
                         Toggle(isOn: $showEmptyDays) {
                             Text("Show empty days")
                         }
                         
+                        Picker("Sort Entries", selection: $sortAscending) {
+                            Text("Last entry top").tag(false)
+                            Text("Last entry bottom").tag(true)
+                        }
+                        
+                    }
+                    
+                    Section {
                         Picker(selection: $themeName) {
                             ForEach(Theme.builtIn) { theme in
                                 ThemePreview(theme)

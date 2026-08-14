@@ -14,10 +14,11 @@ struct LogEntriesView: View {
     @State private var entryToEdit: DailyLogEntry? = nil
 
     @AppStorage(AppStorageKeys.theme) var themeName: String = "traffic"
+    @AppStorage(AppStorageKeys.sortAscending) private var sortAscending: Bool = true
 
     var body: some View {
         let logEntries = day.logEntries?.sorted(by: {
-            $0.timestamp < $1.timestamp
+            sortAscending ? $0.timestamp < $1.timestamp : $0.timestamp > $1.timestamp
         }) ?? []
         
         ForEach(logEntries) { entry in

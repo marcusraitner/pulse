@@ -932,6 +932,12 @@
         }
       }
     },
+    "Last entry bottom" : {
+
+    },
+    "Last entry top" : {
+
+    },
     "Location services are disabled. Please open settings to enable location services." : {
       "localizations" : {
         "de" : {
@@ -1651,6 +1657,9 @@
       }
     },
     "Show empty days" : {
+
+    },
+    "Sort Entries" : {
 
     },
     "Statistics" : {
