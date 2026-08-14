@@ -12,7 +12,7 @@ struct PulseRoundedRectangle: View {
     @State private var cursorOpacity: Double = 0.3
     
     private var cursorAnimation: Animation {
-        .easeInOut(duration: 1.2)
+        .easeInOut(duration: 1.0)
         .repeatForever(autoreverses: true)
     }
     

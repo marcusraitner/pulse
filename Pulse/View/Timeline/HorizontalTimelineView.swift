@@ -65,7 +65,7 @@ struct HorizontalTimelineView: View {
             .scrollTargetLayout()
         }
         .scrollTargetBehavior(.viewAligned)
-        .defaultScrollAnchor(.trailing, for: .initialOffset)
+        .defaultScrollAnchor(.trailing)
         .scrollPosition(id: $position, anchor: .center)
         .contentMargins(.horizontal, (containerWidth - barWidth) * 0.5, for: .scrollContent)
         .onGeometryChange(for: CGSize.self) { proxy in
