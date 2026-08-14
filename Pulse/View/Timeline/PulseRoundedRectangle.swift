@@ -12,8 +12,7 @@ struct PulseRoundedRectangle: View {
     @State private var cursorOpacity: Double = 0.3
     
     private var cursorAnimation: Animation {
-        .snappy
-        .speed(0.6)
+        .easeInOut(duration: 1.2)
         .repeatForever(autoreverses: true)
     }
     
@@ -22,8 +21,10 @@ struct PulseRoundedRectangle: View {
             .fill(.tertiary.opacity(cursorOpacity))
             .onAppear() {
                 guard pulse else { return }
-                withAnimation(cursorAnimation) {
-                    cursorOpacity = 1
+                DispatchQueue.main.async {
+                    withAnimation(cursorAnimation) {
+                        cursorOpacity = 1
+                    }
                 }
             }
     }
