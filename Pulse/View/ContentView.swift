@@ -151,9 +151,6 @@ struct ContentView: View {
                            systemImage: showEmptyDays ?
                            "line.3.horizontal.decrease.circle"
                            : "line.3.horizontal.decrease.circle.fill") {
-                        if selectedEntry.isEmpty {
-                            triggerScrollToToday = true
-                        }
                         showEmptyDays.toggle()
                     }
                     .tint(.white)
