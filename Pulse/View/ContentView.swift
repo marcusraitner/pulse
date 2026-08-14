@@ -42,6 +42,7 @@ struct ContentView: View {
     @AppStorage(AppStorageKeys.reflectionReminderTime) private var reflectionReminderTime: Date?
     @AppStorage(AppStorageKeys.viewMode) private var viewMode: ViewMode = .day
     @AppStorage(AppStorageKeys.initialSweepDone) private var initialSweepDone: Bool = false
+    @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = false
     
     @State private var reviewService = ReviewService()
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
@@ -144,6 +145,15 @@ struct ContentView: View {
                             Image(systemName: "sparkles")
                         }
                     }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Settings",
+                           systemImage: showEmptyDays ?
+                           "line.3.horizontal.decrease.circle"
+                           : "line.3.horizontal.decrease.circle.fill") {
+                        showEmptyDays.toggle()
+                    }
+                    .tint(.white)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Settings", systemImage: "gearshape.fill") {
