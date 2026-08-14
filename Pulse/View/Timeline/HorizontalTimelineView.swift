@@ -119,10 +119,14 @@ struct HorizontalTimelineView: View {
             }
         }
         .onChange(of: showEmptyDays) { _, _ in
-            if !selectedEntry.isEmpty || Calendar.current.isDateInToday(selectedEntry.date) {
-                position = selectedEntry.date
-            } else if let last = allEntries.last {
-                position = last.date
+            let target =
+            (!selectedEntry.isEmpty || Calendar.current.isDateInToday(selectedEntry.date)) ?
+            selectedEntry.date : allEntries.last?.date
+            
+            DispatchQueue.main.async {
+                if let target {
+                    position = target
+                }
             }
         }
     }
