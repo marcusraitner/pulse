@@ -26,7 +26,7 @@ struct HorizontalTimelineView: View {
     
     private var cursorAnimation: Animation {
         .snappy
-        .speed(0.8)
+        .speed(0.6)
         .repeatForever(autoreverses: true)
     }
     
@@ -51,13 +51,8 @@ struct HorizontalTimelineView: View {
                     let isToday = Calendar.current.isDateInToday(entry.date)
 
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(.quaternary.opacity(isToday ? cursorOpacity : 0.3))
+                        .fill(.tertiary.opacity(isToday ? cursorOpacity : 0.3))
                         .frame(width: barWidth, height: totalHeight)
-                        .onAppear() {
-                            withAnimation(cursorAnimation) {
-                                cursorOpacity = 1
-                            }
-                        }
                         .overlay {
                             if !entry.isEmpty {
                                 RoundedRectangle(cornerRadius: 4)
@@ -76,6 +71,11 @@ struct HorizontalTimelineView: View {
             }
             .frame(height: totalHeight)
             .scrollTargetLayout()
+            .onAppear() {
+                withAnimation(cursorAnimation) {
+                    cursorOpacity = 1
+                }
+            }
         }
         .scrollTargetBehavior(.viewAligned)
         .defaultScrollAnchor(.trailing, for: .initialOffset)
