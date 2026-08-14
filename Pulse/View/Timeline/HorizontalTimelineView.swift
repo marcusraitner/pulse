@@ -22,7 +22,14 @@ struct HorizontalTimelineView: View {
     @State private var entriesByDate: [Date: DailyEntry] = [:]
     @State private var position: Date?
     @State private var containerWidth: CGFloat = 0.0
-
+    @State private var cursorOpacity: Double = 0.3
+    
+    private var cursorAnimation: Animation {
+        .snappy
+        .speed(0.8)
+        .repeatForever(autoreverses: true)
+    }
+    
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
     @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = true
 
@@ -41,12 +48,18 @@ struct HorizontalTimelineView: View {
                     let avg: CGFloat = entry.averageScore
                     let barHeight: CGFloat = max(2, heightScale * avg.magnitude)
                     let yOffset: CGFloat = -0.5 * heightScale * avg
+                    let isToday = Calendar.current.isDateInToday(entry.date)
 
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(.quaternary.opacity(0.5))
+                        .fill(.quaternary.opacity(isToday ? cursorOpacity : 0.3))
                         .frame(width: barWidth, height: totalHeight)
+                        .onAppear() {
+                            withAnimation(cursorAnimation) {
+                                cursorOpacity = 1
+                            }
+                        }
                         .overlay {
-                            if !entry.isEmpty || Calendar.current.isDateInToday(entry.date) {
+                            if !entry.isEmpty {
                                 RoundedRectangle(cornerRadius: 4)
                                 .fill(Theme.named(themeName).gradient(for: avg))
                                 .frame(width: barWidth, height: barHeight)
@@ -58,7 +71,7 @@ struct HorizontalTimelineView: View {
                             withAnimation(.default) {
                                 position = entry.date
                             }
-                    }
+                        }
                 }
             }
             .frame(height: totalHeight)
