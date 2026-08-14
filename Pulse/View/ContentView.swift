@@ -222,75 +222,46 @@ struct ContentView: View {
         triggerScrollToToday = true
     }
    
+    private func fillGap(from start: Date, to end: Date) {
+        var entryDates = Set(allEntries.map { Calendar.current.startOfDay(for: $0.date) })
+        var current = end
+        
+        // going backwards from today; start can be excluded as it already exists
+        while current > start {
+            if !entryDates.contains(current) {
+                let newEntry = DailyEntry(date: current)
+                logger.info("Adding new entry for \(current)")
+                entryDates.insert(current)
+                context.insert(newEntry)
+            }
+            
+            guard let next = Calendar.current.date(byAdding: .day, value: -1, to: current) else {
+                // very unlikely this happens, but if so, we just stop filling
+                logger.warning("adding 1 to \(current) resulted in nil")
+                break
+            }
+            
+            current = next
+        }
+        
+        context.saveOrLog("Error saving missing entries", logger: logger)
+    }
+    
+    
     private func addMissingEntries() {
         // add first entry
-        guard !allEntries.isEmpty else {
+        guard let lastEntry = allEntries.last else {
             context.insert(DailyEntry(date: .now))
             context.saveOrLog("Added first entry", logger: logger)
             return
         }
         
-        if !initialSweepDone {
-            guard let firstEntry = allEntries.first else {
-                logger.warning("expected at least one entry, but found none.")
-                return
-            }
-            
-            let start = Calendar.current.startOfDay(for: firstEntry.date)
-            let end = Calendar.current.startOfDay(for: .now)
-            var entryDates = Set(allEntries.map { Calendar.current.startOfDay(for: $0.date) })
-            var current = end
-            
-            // going backwards from today; start can be excluded as it already exists
-            while current > start {
-                if !entryDates.contains(current) {
-                    let newEntry = DailyEntry(date: current)
-                    logger.info("Adding new entry for \(current)")
-                    entryDates.insert(current)
-                    context.insert(newEntry)
-                }
-                
-                guard let next = Calendar.current.date(byAdding: .day, value: -1, to: current) else {
-                    // very unlikely this happens, but if so, we just stop filling
-                    logger.warning("adding 1 to \(current) resulted in nil")
-                    break
-                }
-                
-                current = next
-            }
-            
-            context.saveOrLog("Error saving missing entries", logger: logger)
-            initialSweepDone = true
-        } else {
-            guard let lastEntry = allEntries.last else {
-                logger.warning("expected at least one entry, but found none.")
-                return
-            }
-            
-            let start = Calendar.current.startOfDay(for: lastEntry.date)
-            let end = Calendar.current.startOfDay(for: .now)
-            var entryDates = Set(allEntries.reversed()
-                .prefix(while: { $0.date > start } )
-                .map { Calendar.current.startOfDay(for: $0.date) })
-            var current = end
-            
-            while current > start {
-                if !entryDates.contains(current) {
-                    let newEntry = DailyEntry(date: current)
-                    entryDates.insert(current)
-                    logger.info("Adding new entry for \(current)")
-                    context.insert(newEntry)
-                }
-                
-                guard let next = Calendar.current.date(byAdding: .day, value: -1, to: current) else {
-                    logger.warning("adding 1 to \(current) resulted in nil")
-                    break
-                }
-                
-                current = next
-            }
-            context.saveOrLog("Error saving missing entries", logger: logger)
-        }
+        let start = initialSweepDone ? lastEntry.date : allEntries.first!.date
+        let end = Calendar.current.startOfDay(for: .now)
+        
+        fillGap(from: start, to: end)
+        
+        initialSweepDone = true
     }
 
     /// Performs one-time startup work: applies debug launch arguments and requests
