@@ -551,7 +551,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eintrag löschen"
+            "value" : "Moment löschen"
           }
         }
       }
@@ -933,10 +933,24 @@
       }
     },
     "Last entry bottom" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzter Moment unten"
+          }
+        }
+      }
     },
     "Last entry top" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzter Moment oben"
+          }
+        }
+      }
     },
     "Location services are disabled. Please open settings to enable location services." : {
       "localizations" : {
@@ -1657,10 +1671,24 @@
       }
     },
     "Show empty days" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leere Tage zeigen"
+          }
+        }
+      }
     },
     "Sort Entries" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sortierung"
+          }
+        }
+      }
     },
     "Statistics" : {
       "localizations" : {
