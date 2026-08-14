@@ -123,7 +123,7 @@ struct HorizontalTimelineView: View {
             (!selectedEntry.isEmpty || Calendar.current.isDateInToday(selectedEntry.date)) ?
             selectedEntry.date : allEntries.last?.date
             
-            DispatchQueue.main.async {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 if let target {
                     position = target
                 }
