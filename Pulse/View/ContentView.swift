@@ -57,145 +57,165 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            ZStack(alignment: .bottomTrailing) {
-
-                BackgroundImageView()
-
-                if viewMode == .day {
-                    ScrollView {
-                        LazyVStack {
-                            // The currently selected date
-                            SelectedDateView(date: selectedEntry.date)
-                                .padding(.vertical)
-                                .padding(.horizontal)
-
-                            // Delete Button (only admin mode)
-                            if featureFlags.adminEnabled {
-                                Button("Delete Entry", systemImage: "trash") {
-                                    context.delete(selectedEntry)
-                                    context.saveOrLog("Failure saving deleted entry", logger: logger)
+                
+                TabView(selection: $viewMode) {
+                    
+                    Tab("Day", systemImage: "calendar.day", value: .day) {
+                        ZStack(alignment: .bottomTrailing) {
+                            
+                            BackgroundImageView()
+                            ScrollView {
+                                LazyVStack {
+                                    
+                                    
+                                    // Delete Button (only admin mode)
+                                    if featureFlags.adminEnabled {
+                                        Button("Delete Entry", systemImage: "trash") {
+                                            context.delete(selectedEntry)
+                                            context.saveOrLog("Failure saving deleted entry", logger: logger)
+                                        }
+                                        .tint(.white)
+                                    }
+                                    
+                                    
+                                    
+                                    // The daily reflection
+                                    DailyReflectionCard(day: selectedEntry) {
+                                        isPresentingReflection = true
+                                    }
+                                    .padding(.horizontal, 8)
+                                    
+                                    // The log entries for this day
+                                    LogEntriesView(day: selectedEntry)
+                                        .padding(.horizontal, 8)
                                 }
-                                .tint(.white)
                             }
-
-                            // The timeline scroll view
-                            HorizontalTimelineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
-                                .padding(.vertical)
-
-                            // The daily reflection
-                            DailyReflectionCard(day: selectedEntry) {
-                                isPresentingReflection = true
+                            .safeAreaInset(edge: .top) {
+                                VStack {
+                                    // The currently selected date
+                                    SelectedDateView(date: selectedEntry.date)
+                                        .padding(.horizontal)
+                                        .padding(.top)
+                                    
+                                    // The timeline scroll view
+                                    HorizontalTimelineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
+                                        .padding(.vertical)
+                                }
+                                .background(.bar)
                             }
-                            .padding(.horizontal, 8)
-
-                            // The log entries for this day
-                            LogEntriesView(day: selectedEntry)
-                                .padding(.horizontal, 8)
+                            
+                            
+                            // The Add Button (day mode only)
+                            if viewMode == .day && (Calendar.current.isDateInToday(selectedEntry.date) || enableEditingHistory) {
+                                Button(action: { isPresentingNewEntry = true }) {
+                                    Image(systemName: "plus")
+                                        .font(.largeTitle)
+                                        .padding()
+                                        .glassCircle()
+                                        .foregroundStyle(.white)
+                                }
+                                .contentShape(Circle())
+                                .buttonStyle(.plain)
+                                .padding(.trailing, 8)
+                            }
                         }
                     }
-                } else {
-                    AggregatedTimelineView(aggregationLevel: viewMode == .week ? .week : .month)
-                        .id(viewMode)
-                }
-
-                // The Add Button (day mode only)
-                if viewMode == .day && (Calendar.current.isDateInToday(selectedEntry.date) || enableEditingHistory) {
-                    Button(action: { isPresentingNewEntry = true }) {
-                        Image(systemName: "plus")
-                            .font(.largeTitle)
-                            .padding()
-                            .glassCircle()
-                            .foregroundStyle(.white)
+                    
+                    Tab("Week", systemImage: "rectangle.split.3x1", value: .week) {
+                        ZStack(alignment: .bottomTrailing) {
+                            
+                            BackgroundImageView()
+                            
+                            AggregatedTimelineView(aggregationLevel: .week)
+                        }
                     }
-                    .contentShape(Circle())
-                    .buttonStyle(.plain)
-                    .padding(.trailing, 20)
+                    
+                    Tab("Month", systemImage: "calendar", value: .month) {
+                        ZStack(alignment: .bottomTrailing) {
+                            
+                            BackgroundImageView()
+                            
+                            AggregatedTimelineView(aggregationLevel: .month)
+                        }
+                    }
                 }
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $isPresentingSettings,
-                   onDismiss: setNotifications) {
-                settingsSheetStack
-            }
-            .sheet(isPresented: $isPresentingNewEntry) {
-                NavigationStack {
-                    LogEntrySheet(day: selectedEntry)
+                .navigationBarTitleDisplayMode(.inline)
+                .sheet(isPresented: $isPresentingSettings,
+                       onDismiss: setNotifications) {
+                    settingsSheetStack
                 }
-                .presentationDetents([.large])
-            }
-            .sheet(isPresented: $isPresentingReflection) {
-                NavigationStack {
-                    DailyReflectionSheet(day: selectedEntry)
-                }
-            }
-            .sheet(isPresented: $isPresentingInsights) {
-                // #available required by compiler: InsightsView is @available(iOS 26, *)
-                if #available(iOS 26, *) {
+                .sheet(isPresented: $isPresentingNewEntry) {
                     NavigationStack {
-                        InsightsView()
+                        LogEntrySheet(day: selectedEntry)
+                    }
+                    .presentationDetents([.large])
+                }
+                .sheet(isPresented: $isPresentingReflection) {
+                    NavigationStack {
+                        DailyReflectionSheet(day: selectedEntry)
                     }
                 }
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    if featureFlags.foundationModelsAvailable {
-                        Button {
-                            isPresentingInsights = true
-                        } label: {
-                            Image(systemName: "sparkles")
+                .sheet(isPresented: $isPresentingInsights) {
+                    // #available required by compiler: InsightsView is @available(iOS 26, *)
+                    if #available(iOS 26, *) {
+                        NavigationStack {
+                            InsightsView()
                         }
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Settings",
-                           systemImage: showEmptyDays ?
-                           "line.3.horizontal.decrease.circle"
-                           : "line.3.horizontal.decrease.circle.fill") {
-                        showEmptyDays.toggle()
-                    }
-                    .tint(.white)
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Settings", systemImage: "gearshape.fill") {
-                        isPresentingSettings = true
-                    }
-                    .tint(.white)
-                }
-                ToolbarItem(placement: .principal) {
-                    Picker("View Mode", selection: $viewMode) {
-                        ForEach(ViewMode.allCases, id: \.self) { mode in
-                            Image(systemName: mode.systemImage).tag(mode)
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        if featureFlags.foundationModelsAvailable {
+                            Button {
+                                isPresentingInsights = true
+                            } label: {
+                                Image(systemName: "sparkles")
+                            }
                         }
                     }
-                    .pickerStyle(.segmented)
-                    .frame(maxWidth: 160)
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Settings",
+                               systemImage: showEmptyDays ?
+                               "line.3.horizontal.decrease.circle"
+                               : "line.3.horizontal.decrease.circle.fill") {
+                            showEmptyDays.toggle()
+                        }
+                        .tint(.white)
+                    }
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Settings", systemImage: "gearshape.fill") {
+                            isPresentingSettings = true
+                        }
+                        .tint(.white)
+                    }
                 }
-            }
-            .task {
-                await initApplication()
-                updateToday()
-            }
-            .onChange(of: scenePhase) { _, newPhase in
-                if newPhase == .active {
-                    logger.trace("scene is now active. Updating today.")
+                .task {
+                    await initApplication()
                     updateToday()
                 }
-            }
-            .onChange(of: countLogs) { old, new in
-                if new > old {
-                    reviewService.considerRequesting(countLog: countLogs) { requestReview() }
+                .onChange(of: scenePhase) { _, newPhase in
+                    if newPhase == .active {
+                        logger.trace("scene is now active. Updating today.")
+                        updateToday()
+                    }
                 }
-            }
-#if DEBUG
-            // Expose an accessibility identifier
-            .accessibilityIdentifier("dateView")
-            // and a values containing the selectedEntry for UI Tests
-            .accessibilityValue(
-                Text("selectedEntry:\(DateFormatHelper.formatDate(selectedEntry.date))")
-            )
-#endif  // DEBUG only for UI Tests
+                .onChange(of: countLogs) { old, new in
+                    if new > old {
+                        reviewService.considerRequesting(countLog: countLogs) { requestReview() }
+                    }
+                }
+    #if DEBUG
+                // Expose an accessibility identifier
+                .accessibilityIdentifier("dateView")
+                // and a values containing the selectedEntry for UI Tests
+                .accessibilityValue(
+                    Text("selectedEntry:\(DateFormatHelper.formatDate(selectedEntry.date))")
+                )
+    #endif  // DEBUG only for UI Tests
+
+                
+            
         }
-//        .ignoresSafeArea(.keyboard)
         .onOpenURL { url in
             switch url.host() {
             case "log":
