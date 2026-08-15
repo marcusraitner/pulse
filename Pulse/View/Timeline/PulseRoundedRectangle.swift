@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PulseRoundedRectangle: View {
-    let pulse: Bool
+    let date: Date
     @State private var cursorOpacity: Double = 0.3
     
     private var cursorAnimation: Animation {
@@ -20,7 +20,7 @@ struct PulseRoundedRectangle: View {
         RoundedRectangle(cornerRadius: 4)
             .fill(.tertiary.opacity(cursorOpacity))
             .onAppear() {
-                guard pulse else { return }
+                guard Calendar.current.isDateInToday(date) else { return }
                 DispatchQueue.main.async {
                     withAnimation(cursorAnimation) {
                         cursorOpacity = 1
@@ -31,5 +31,5 @@ struct PulseRoundedRectangle: View {
 }
 
 #Preview {
-    PulseRoundedRectangle(pulse: true)
+    PulseRoundedRectangle(date: .now)
 }

@@ -41,9 +41,8 @@ struct HorizontalTimelineView: View {
                     let avg: CGFloat = entry.averageScore
                     let barHeight: CGFloat = max(2, heightScale * avg.magnitude)
                     let yOffset: CGFloat = -0.5 * heightScale * avg
-                    let isToday = Calendar.current.isDateInToday(entry.date)
 
-                    PulseRoundedRectangle(pulse: isToday)
+                    PulseRoundedRectangle(date: entry.date)
                         .frame(width: barWidth, height: totalHeight)
                         .overlay {
                             if !entry.isEmpty {
