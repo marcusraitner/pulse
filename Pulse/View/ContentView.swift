@@ -90,18 +90,18 @@ struct ContentView: View {
                                         .padding(.horizontal, 8)
                                 }
                             }
-                            .safeAreaInset(edge: .top) {
+                            .safeAreaBar(edge: .top) {
                                 VStack {
-                                    // The currently selected date
-                                    SelectedDateView(date: selectedEntry.date)
-                                        .padding(.horizontal)
-                                        .padding(.top)
                                     
                                     // The timeline scroll view
                                     HorizontalTimelineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
-                                        .padding(.vertical)
+                                        .padding(.top)
+                                    Text(selectedEntry.date.formatted(.dateTime.weekday().day().month().year()))
+                                        .font(.default.bold())
+                                        .foregroundStyle(.primary)
+                                        .padding(.bottom)
+                                        .padding(.top, 4)
                                 }
-                                .background(.bar)
                             }
                             
                             

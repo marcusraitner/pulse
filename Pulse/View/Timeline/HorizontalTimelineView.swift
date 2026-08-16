@@ -74,10 +74,6 @@ struct HorizontalTimelineView: View {
         .background {
             // draw baseline and indicator for selected day
             Group {
-                EquilateralTriangle()
-                    .frame(width: 10, height: 10)
-                    .rotationEffect(Angle(degrees: 180))
-                    .offset(y: -totalHeight * 0.5 - 15)
                 Rectangle()
                     .frame(width: 1, height: totalHeight + 12)
                     .foregroundStyle(.white.opacity(1))

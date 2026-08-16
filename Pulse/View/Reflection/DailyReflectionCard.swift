@@ -23,13 +23,12 @@ struct DailyReflectionCard: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Reflection")
-                .bold()
-                .italic()
-                .padding(.bottom, 4)
-
             if !day.summary.isEmpty {
                 Text(day.summary)
+            } else {
+                Text("Reflection")
+                    .foregroundStyle(.secondary)
+                    .italic()
             }
             
             if !topTemplates.isEmpty {
