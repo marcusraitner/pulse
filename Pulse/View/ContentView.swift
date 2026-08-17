@@ -178,7 +178,6 @@ struct ContentView: View {
             }
             .task {
                 await initApplication()
-                updateToday()
             }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
@@ -227,13 +226,17 @@ struct ContentView: View {
     /// Ensures today's `DailyEntry` exists, creating and inserting one if it is missing.
     /// Scrolls the timeline to today after creating a new entry.
     private func updateToday() {
+        let last = allEntries.last
+        
         addMissingEntries()
         
         guard let newToday = allEntries.last else { return }
 
-        // TODO: We should not scroll every time, but only when today is fresh
-        selectedEntry = newToday
-        triggerScrollToToday = true
+        if newToday != last {
+            logger.info("today changed to \(newToday.date)")
+            selectedEntry = newToday
+            triggerScrollToToday = true
+        }
     }
    
     private func fillGap(from start: Date, to end: Date) {

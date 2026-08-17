@@ -70,6 +70,7 @@ struct HorizontalTimelineView: View {
         .onGeometryChange(for: CGSize.self) { proxy in
             proxy.size
         } action: { old, new in
+            logger.info("Setting container width to \(new.width)")
             containerWidth = new.width
         }
         .background {
@@ -99,16 +100,14 @@ struct HorizontalTimelineView: View {
         }
         .onChange(of: allEntries, initial: true) {
             entriesByDate = Dictionary(uniqueKeysWithValues: allEntries.map { ($0.date, $0 ) } )
-            
-            if let last = allEntries.last {
-                position = last.date
-            }
+            logger.info("allEntries changed")
         }
         .sensoryFeedback(.impact, trigger: selectedEntry)
         .onChange(of: scrollToToday) { _, new in
             if new {
                 logger.trace("scroll to today triggered")
                 if let last = allEntries.last {
+                    logger.info("scrolling to today / last")
                     position = last.date
                 }
                 scrollToToday = false
