@@ -42,7 +42,7 @@ struct HorizontalTimelineView: View {
                     let barHeight: CGFloat = max(2, heightScale * avg.magnitude)
                     let yOffset: CGFloat = -0.5 * heightScale * avg
 
-                    PulseRoundedRectangle(date: entry.date)
+                    PulseRoundedRectangle(pulse: entry.date == selectedEntry.date)
                         .frame(width: barWidth, height: totalHeight)
                         .overlay {
                             if !entry.isEmpty {
@@ -72,15 +72,6 @@ struct HorizontalTimelineView: View {
         } action: { old, new in
             logger.info("Setting container width to \(new.width)")
             containerWidth = new.width
-        }
-        .background {
-            // draw baseline and indicator for selected day
-            Group {
-                Rectangle()
-                    .frame(width: 1, height: totalHeight + 12)
-                    .foregroundStyle(.white.opacity(1))
-            }
-            .foregroundStyle(.white.opacity(1))
         }
         .onChange(of: position) { _, new in
             // set selectedEntry on scroll pos change
