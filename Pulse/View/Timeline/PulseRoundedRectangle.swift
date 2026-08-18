@@ -6,11 +6,14 @@
 //
 
 import SwiftUI
+import OSLog
 
 struct PulseRoundedRectangle: View {
     let pulse: Bool
     @State private var cursorOpacity: Double = 0.3
     @State private var generation: Int = 0
+    private let logger = Logger(subsystem: "de.raitner.pulse", category: "PulseRoundedRectangle")
+
 
     private var cursorAnimation: Animation {
         .easeInOut(duration: 1.0)
@@ -20,8 +23,14 @@ struct PulseRoundedRectangle: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 4)
             .fill(.tertiary.opacity(cursorOpacity))
-            .onAppear { updatePulse() }
-            .onChange(of: pulse, initial: true) { _, _ in updatePulse() }
+            .onAppear {
+                updatePulse()
+                logger.info("appear")
+            }
+            .onChange(of: pulse) { _, _ in
+                logger.info("pulse: \(pulse)")
+                updatePulse()
+            }
     }
 
     private func updatePulse() {

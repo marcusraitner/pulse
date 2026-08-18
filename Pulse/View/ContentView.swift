@@ -181,8 +181,8 @@ struct ContentView: View {
             }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
-                    logger.trace("scene is now active. Updating today.")
-                    updateToday()
+                    logger.trace("scene is now active.")
+                    addMissingEntries()
                 }
             }
             .onChange(of: countLogs) { old, new in
@@ -221,22 +221,6 @@ struct ContentView: View {
             notificationTimes: UserDefaults.standard.array(forKey: AppStorageKeys.notificationTimes) as? [Date] ?? [],
             reflectionReminder: reflectionReminder,
             reflectionReminderTime: reflectionReminderTime)
-    }
-
-    /// Ensures today's `DailyEntry` exists, creating and inserting one if it is missing.
-    /// Scrolls the timeline to today after creating a new entry.
-    private func updateToday() {
-        let last = allEntries.last
-        
-        addMissingEntries()
-        
-        guard let newToday = allEntries.last else { return }
-
-        if newToday != last {
-            logger.info("today changed to \(newToday.date)")
-            selectedEntry = newToday
-            triggerScrollToToday = true
-        }
     }
    
     private func fillGap(from start: Date, to end: Date) {
@@ -300,6 +284,8 @@ struct ContentView: View {
         } catch {
             logger.error("Error NotificationCenter: \(error.localizedDescription)")
         }
+        
+        triggerScrollToToday = true
     }
 
     
