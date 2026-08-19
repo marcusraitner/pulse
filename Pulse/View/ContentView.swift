@@ -51,6 +51,7 @@ struct ContentView: View {
     @AppStorage(AppStorageKeys.viewMode) private var viewMode: ViewMode = .day
     @AppStorage(AppStorageKeys.initialSweepDone) private var initialSweepDone: Bool = false
     @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = false
+    @AppStorage(AppStorageKeys.sortAscending) private var sortAscending: Bool = true
     
     @State private var reviewService = ReviewService()
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
@@ -123,7 +124,7 @@ struct ContentView: View {
                     }
                     .contentShape(Circle())
                     .buttonStyle(.plain)
-                    .padding(.trailing, 8)
+                    .padding(.trailing, 12)
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -160,7 +161,7 @@ struct ContentView: View {
                         }
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItemGroup(placement: .topBarTrailing) {
                     Picker("View Mode", selection: $viewMode) {
                         ForEach(ViewMode.allCases, id: \.self) { mode in
                             Label(LocalizedStringKey(mode.title),
@@ -169,16 +170,20 @@ struct ContentView: View {
                     }
                     .pickerStyle(.menu)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Settings",
+                ToolbarItemGroup(placement: .secondaryAction) {
+                    Button(showEmptyDays ? "Hide empty days" : "Show empty days",
                            systemImage: showEmptyDays ?
                            "line.3.horizontal.decrease.circle"
                            : "line.3.horizontal.decrease.circle.fill") {
                         showEmptyDays.toggle()
                     }
                     .tint(.white)
-                }
-                ToolbarItem(placement: .topBarTrailing) {
+                    
+                    Button("Sort Entries",
+                           systemImage: sortAscending ? "chevron.down.2" : "chevron.up.2") {
+                        sortAscending.toggle()
+                    }
+                    
                     Button("Settings", systemImage: "gearshape.fill") {
                         isPresentingSettings = true
                     }
