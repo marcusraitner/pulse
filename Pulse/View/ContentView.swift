@@ -20,6 +20,14 @@ enum ViewMode: String, CaseIterable {
         case .month: return "square.grid.3x3"
         }
     }
+    
+    var title: String {
+        switch self {
+        case .day:   return "Day"
+        case .week:  return "Week"
+        case .month: return "Month"
+        }
+    }
 }
 
 /// Root view that orchestrates the timeline, selected-date display, log entries,
@@ -155,7 +163,8 @@ struct ContentView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Picker("View Mode", selection: $viewMode) {
                         ForEach(ViewMode.allCases, id: \.self) { mode in
-                            Image(systemName: mode.systemImage).tag(mode)
+                            Label(LocalizedStringKey(mode.title),
+                                  systemImage: mode.systemImage).tag(mode)
                         }
                     }
                     .pickerStyle(.menu)
@@ -268,7 +277,7 @@ struct ContentView: View {
     /// Performs one-time startup work: applies debug launch arguments and requests
     /// notification authorisation. Called once from `.task` on first appearance.
     private func initApplication() async {
-
+        
         #if DEBUG
             let args = ProcessInfo.processInfo.arguments
 
@@ -285,6 +294,7 @@ struct ContentView: View {
             logger.error("Error NotificationCenter: \(error.localizedDescription)")
         }
         
+        logger.info("Application initialised; scrolling to today")
         triggerScrollToToday = true
     }
 
