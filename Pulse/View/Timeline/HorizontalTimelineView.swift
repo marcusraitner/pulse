@@ -66,6 +66,7 @@ struct HorizontalTimelineView: View {
         }
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition(id: $position, anchor: .center)
+        .defaultScrollAnchor(.trailing)
         .contentMargins(.horizontal, (containerWidth - barWidth) * 0.5, for: .scrollContent)
         .onGeometryChange(for: CGSize.self) { proxy in
             proxy.size
@@ -109,8 +110,11 @@ struct HorizontalTimelineView: View {
             if new {
                 logger.trace("scroll to today triggered")
                 if let last = allEntries.last {
+                    position = nil
                     logger.info("scrolling to today / last")
-                    position = last.date
+                    withAnimation() {
+                        position = last.date
+                    }
                 }
                 scrollToToday = false
             }
@@ -127,26 +131,6 @@ struct HorizontalTimelineView: View {
                 }
             }
         }
-    }
-}
-
-/// An equilateral triangle `Shape` used as the selection indicator above the timeline bar chart.
-struct EquilateralTriangle: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-
-        // Define the three points of the triangle
-        let top = CGPoint(x: rect.midX, y: rect.minY)
-        let bottomLeft = CGPoint(x: rect.minX, y: rect.maxY)
-        let bottomRight = CGPoint(x: rect.maxX, y: rect.maxY)
-
-        // Draw the lines
-        path.move(to: top)
-        path.addLine(to: bottomLeft)
-        path.addLine(to: bottomRight)
-        path.addLine(to: top)  // Close the path
-
-        return path
     }
 }
 

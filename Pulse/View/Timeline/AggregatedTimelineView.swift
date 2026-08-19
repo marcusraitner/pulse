@@ -24,7 +24,7 @@ struct AggregatedTimelineView: View {
     @State private var containerWidth: CGFloat = 0.0
     @State private var cardWidth: CGFloat = 0.0
     @State private var selectedStartDate: Date = .now
-    @State private var position: ScrollPosition = .init(idType: Date.self)
+    @State private var position: Date?
     
     @Query(sort: \DailyEntry.date) private var allEntries: [DailyEntry]
     
@@ -74,10 +74,12 @@ struct AggregatedTimelineView: View {
         let cardWidth: CGFloat = aggregationLevel == .week ? 7 * (width + 2) : 31 * (width + 2)
         
         ScrollView(.vertical) {
-            VStack(spacing: 0) {
-                SelectedDateView(date: selectedStartDate, level: aggregationLevel)
-                    .padding(.vertical)
-                
+                DaysListView(aggregationLevel: aggregationLevel, date: selectedStartDate)
+                    .padding(.top, 10)
+                    .padding(.horizontal, 8)
+        }
+        .safeAreaBar(edge: .top) {
+            VStack {
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: 8) {
                         ForEach(periodStarts, id: \.self) { periodStart in
@@ -100,16 +102,13 @@ struct AggregatedTimelineView: View {
                                 }
                             }
                             .frame(width: cardWidth, height: totalHeight)
-                            .padding(10)
+                            .padding(.horizontal, 10)
                             .glassBackground()
                             .contentShape(RoundedRectangle(cornerRadius: 10))
                             .id(periodStart)
                             .onTapGesture {
                                 withAnimation(.default) {
-                                    position.scrollTo(
-                                        id: periodStart,
-                                        anchor: .center
-                                    )
+                                    position = periodStart
                                 }
                             }
                         }
@@ -118,11 +117,12 @@ struct AggregatedTimelineView: View {
                     .frame(height: totalHeight + 20)
                 }
                 .scrollTargetBehavior(.viewAligned)
-                .scrollPosition($position, anchor: .center)
+                .scrollPosition(id: $position, anchor: .center)
+                .defaultScrollAnchor(.trailing)
                 .contentMargins(.horizontal, (containerWidth - cardWidth - 20) * 0.5, for: .scrollContent)
                 .onChange(of: periodStarts, initial: true) { _, newPeriods in
                     guard let last = newPeriods.last else { return }
-                    position.scrollTo(id: last, anchor: .center)
+                    position = last
                     selectedStartDate = last
                 }
                 .onGeometryChange(for: CGSize.self) { proxy in
@@ -131,21 +131,21 @@ struct AggregatedTimelineView: View {
                     containerWidth = new.width
                 }
                 .onChange(of: position) { _, new in
-                    guard let date = new.viewID(type: Date.self) else {
+                    guard let new else {
                         logger.warning("Could not find date in scroll position")
                         return
                     }
                     
-                    selectedStartDate = date
-                    logger.trace("New selected date: \(selectedStartDate)")
+                    selectedStartDate = new
+                    logger.trace("New selected start date: \(selectedStartDate)")
                 }
                 .sensoryFeedback(.impact, trigger: selectedStartDate)
-                .padding(.vertical, 20)
+                .padding(.top)
                 
-                DaysListView(aggregationLevel: aggregationLevel, date: selectedStartDate)
-                    .padding(.top, 10)
-                    .padding(.horizontal, 8)
-            } // VStack
+                SelectedDateView(date: selectedStartDate, level: aggregationLevel)
+                    .padding(.top, 4)
+                    .padding(.bottom)
+            }
         }
     }
 }

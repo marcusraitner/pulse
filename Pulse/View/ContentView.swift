@@ -72,9 +72,7 @@ struct ContentView: View {
                 
                 if viewMode == .day {
                     ScrollView {
-                        LazyVStack {
-                            
-                            
+                        VStack {
                             // Delete Button (only admin mode)
                             if featureFlags.adminEnabled {
                                 Button("Delete Entry", systemImage: "trash") {
@@ -99,7 +97,6 @@ struct ContentView: View {
                     }
                     .safeAreaBar(edge: .top) {
                         VStack {
-                            
                             // The timeline scroll view
                             HorizontalTimelineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
                                 .padding(.top)
@@ -204,6 +201,11 @@ struct ContentView: View {
                     reviewService.considerRequesting(countLog: countLogs) { requestReview() }
                 }
             }
+            .onChange(of: viewMode) { _, new in
+                if new == .day {
+                    triggerScrollToToday = true
+                }
+            }
 #if DEBUG
             // Expose an accessibility identifier
             .accessibilityIdentifier("dateView")
@@ -217,9 +219,11 @@ struct ContentView: View {
             switch url.host() {
             case "log":
                 triggerScrollToToday = true
+                viewMode = .day
                 isPresentingNewEntry = true
             case "reflect":
                 triggerScrollToToday = true
+                viewMode = .day
                 isPresentingReflection = true
             default:
                 return
@@ -301,6 +305,7 @@ struct ContentView: View {
         
         logger.info("Application initialised; scrolling to today")
         triggerScrollToToday = true
+        viewMode = .day
     }
 
     
