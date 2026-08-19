@@ -22,6 +22,7 @@ struct HorizontalTimelineView: View {
     @State private var entriesByDate: [Date: DailyEntry] = [:]
     @State private var position: Date?
     @State private var containerWidth: CGFloat = 0.0
+    @State private var hasSetInitialPosition = false
     
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
     @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = true
@@ -91,6 +92,14 @@ struct HorizontalTimelineView: View {
         .onChange(of: allEntries, initial: true) {
             entriesByDate = Dictionary(uniqueKeysWithValues: allEntries.map { ($0.date, $0 ) } )
             logger.info("allEntries changed")
+
+            // skip the initial run; triggerScrollToToday handles the first scroll
+            // once layout has actually settled
+            guard hasSetInitialPosition else {
+                hasSetInitialPosition = true
+                return
+            }
+
             guard let last = allEntries.last else { return }
             logger.info("scrolling to last")
             position = last.date
