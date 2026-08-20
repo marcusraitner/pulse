@@ -315,7 +315,7 @@ struct ContentView: View {
             SettingsView()
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
-                        Compat.confirmButton(String(localized: "Close")) {
+                        Button(role: .confirm) {
                             isPresentingSettings = false
                         }
                     }
