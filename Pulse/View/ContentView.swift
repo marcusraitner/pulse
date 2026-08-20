@@ -116,7 +116,7 @@ struct ContentView: View {
                         Image(systemName: "plus")
                             .font(.largeTitle)
                             .padding()
-                            .glassCircle()
+                            .glassEffect(.regular, in: Circle())
                             .foregroundStyle(.white)
                     }
                     .contentShape(Circle())

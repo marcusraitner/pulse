@@ -194,7 +194,7 @@ struct DailyReflectionSheet: View {
                 }
             }
             ToolbarItem(placement: .cancellationAction) {
-                Compat.closeButton { dismiss() }
+                Button(role: .close) { dismiss() }
             }
             ToolbarItemGroup(placement: .keyboard) {
                 Button {

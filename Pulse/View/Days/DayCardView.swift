@@ -65,7 +65,7 @@ struct DayCardView: View {
             }
         }
         .padding(10)
-        .glassTintedCard(color: avgColor)
+        .glassEffect(.regular.tint(avgColor.opacity(0.45)).interactive(), in: RoundedRectangle(cornerRadius: 10))
         .contentShape(Rectangle())
         .onTapGesture {
             isPresentingDay = true

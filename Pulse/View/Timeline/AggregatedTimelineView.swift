@@ -113,7 +113,7 @@ struct AggregatedTimelineView: View {
                             }
                             .frame(width: cardWidth, height: totalHeight + 20)
                             .padding(.horizontal, 10)
-                            .glassBackground()
+                            .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 10))
                             .contentShape(RoundedRectangle(cornerRadius: 10))
                             .id(periodStart)
                             .onTapGesture {
