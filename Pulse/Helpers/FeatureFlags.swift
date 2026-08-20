@@ -7,9 +7,7 @@
 
 import Foundation
 import SwiftUI
-#if canImport(FoundationModels)
 import FoundationModels
-#endif
 
 /// Feature flags controlling optional or experimental functionality.
 /// Injected into the SwiftUI environment via `\.featureFlags`.
