@@ -29,6 +29,7 @@ struct AggregatedTimelineView: View {
     @Query(sort: \DailyEntry.date) private var allEntries: [DailyEntry]
     
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
+    @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = false
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "AggregatedTimelineView")
     
@@ -68,14 +69,13 @@ struct AggregatedTimelineView: View {
     }
     
     var body: some View {
-        let heightScale: CGFloat = 20
+        let heightScale: CGFloat = 15
         let totalHeight: CGFloat = 4 * heightScale
         let width = aggregationLevel == .week ? 8.0 : 6.0
         let cardWidth: CGFloat = aggregationLevel == .week ? 7 * (width + 2) : 31 * (width + 2)
         
         ScrollView(.vertical) {
                 DaysListView(aggregationLevel: aggregationLevel, date: selectedStartDate)
-                    .padding(.top, 10)
                     .padding(.horizontal, 8)
         }
         .safeAreaBar(edge: .top) {
@@ -90,10 +90,20 @@ struct AggregatedTimelineView: View {
                                         let barHeight: CGFloat = max(2, heightScale * avg.magnitude)
                                         let yOffset: CGFloat = -0.5 * heightScale * avg
                                         
-                                        RoundedRectangle(cornerRadius: 2)
-                                            .fill(Theme.named(themeName).gradient(for: entry.averageScore))
-                                            .frame(width: width, height: barHeight)
-                                            .offset(y: yOffset)
+                                        if !entry.isEmpty {
+                                            RoundedRectangle(cornerRadius: 2)
+                                                .fill(Theme.named(themeName).gradient(for: entry.averageScore))
+                                                .frame(width: width, height: barHeight)
+                                                .offset(y: yOffset)
+                                        } else if showEmptyDays {
+                                            RoundedRectangle(cornerRadius: 2)
+                                                .fill(.secondary)
+                                                .frame(width: width, height: 2)
+                                        } else {
+                                            RoundedRectangle(cornerRadius: 2)
+                                                .fill(.clear)
+                                                .frame(width: width, height: totalHeight)
+                                        }
                                     } else {
                                         RoundedRectangle(cornerRadius: 2)
                                             .fill(.clear)
@@ -101,7 +111,7 @@ struct AggregatedTimelineView: View {
                                     }
                                 }
                             }
-                            .frame(width: cardWidth, height: totalHeight)
+                            .frame(width: cardWidth, height: totalHeight + 20)
                             .padding(.horizontal, 10)
                             .glassBackground()
                             .contentShape(RoundedRectangle(cornerRadius: 10))

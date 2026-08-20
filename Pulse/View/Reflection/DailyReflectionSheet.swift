@@ -167,13 +167,11 @@ struct DailyReflectionSheet: View {
                 }
                 Section {
                     if let logEntries = day.logEntries, !logEntries.isEmpty {
-                        // TODO: Add navigation to LogEntrySheet
                         ForEach(day.logEntries?.sorted(by: { $0.timestamp < $1.timestamp } ) ?? []) { logEntry in
                             NavigationLink {
                                 LogEntrySheet(day: day, entry: logEntry, isModal: false)
                             } label: {
                                 LogEntryText(logEntry: logEntry)
-                                    .padding(.vertical, featureFlags.iOS26 ? 0 : 5)
                             }
                         }
                     }
