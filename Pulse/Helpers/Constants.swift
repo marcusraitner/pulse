@@ -25,9 +25,6 @@ enum AppStorageKeys {
     static let viewMode = "viewMode"
     static let showEmptyDays = "showEmptyDays"
     static let sortAscending = "sortAscending"
-    
-    // MARK: - KPI
-    static let pinnedKPITemplateIDs = "pinnedKPITemplateIDs"
 
     // MARK: - Review
     static let lastReviewRequest = "lastReviewRequest"

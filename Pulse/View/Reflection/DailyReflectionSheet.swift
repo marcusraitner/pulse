@@ -188,13 +188,13 @@ struct DailyReflectionSheet: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Save", role: .confirm) {
+                Button(role: .confirm) {
                     save()
                     dismiss()
                 }
             }
             ToolbarItem(placement: .cancellationAction) {
-                Compat.closeButton { dismiss() }
+                Button(role: .close) { dismiss() }
             }
             ToolbarItemGroup(placement: .keyboard) {
                 Button {

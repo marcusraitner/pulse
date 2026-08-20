@@ -115,9 +115,7 @@ struct LogEntrySheet: View {
 
     /// Updates the location state with the coordinate and reverse-geocoded address from `item`.
     private func setItem(item: MKMapItem) -> Void {
-        var coordinate: CLLocationCoordinate2D = CLLocationCoordinate2D()
-        
-        coordinate = Compat.coordinate(from: item)
+        let coordinate: CLLocationCoordinate2D = item.location.coordinate
 
         latitude = coordinate.latitude
         longitude = coordinate.longitude
@@ -128,7 +126,7 @@ struct LogEntrySheet: View {
         )
         mapPosition = .region(region)
 
-        address = Compat.address(from: item)
+        address = item.addressRepresentations?.fullAddress(includingRegion: false, singleLine: true) ?? "Unknown"
     }
     
     private func save() {
@@ -352,7 +350,7 @@ struct LogEntrySheet: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Save", role: .confirm) {
+                Button(role: .confirm) {
                     save()
                     dismiss()
                 }
@@ -360,7 +358,7 @@ struct LogEntrySheet: View {
             }
             if isModalPresented {
                 ToolbarItem(placement: .cancellationAction) {
-                    Compat.closeButton { dismiss() }
+                    Button(role: .close) { dismiss() }
                 }
             }
         }

@@ -116,7 +116,7 @@ struct ContentView: View {
                         Image(systemName: "plus")
                             .font(.largeTitle)
                             .padding()
-                            .glassCircle()
+                            .glassEffect(.regular, in: Circle())
                             .foregroundStyle(.white)
                     }
                     .contentShape(Circle())
@@ -141,11 +141,8 @@ struct ContentView: View {
                 }
             }
             .sheet(isPresented: $isPresentingInsights) {
-                // #available required by compiler: InsightsView is @available(iOS 26, *)
-                if #available(iOS 26, *) {
-                    NavigationStack {
-                        InsightsView()
-                    }
+                NavigationStack {
+                    InsightsView()
                 }
             }
             .toolbar {

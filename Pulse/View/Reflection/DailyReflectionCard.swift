@@ -37,7 +37,7 @@ struct DailyReflectionCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .glassCard()
+        .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 10))
         .contentShape(Rectangle())
         .onTapGesture(perform: onTap)
     }
