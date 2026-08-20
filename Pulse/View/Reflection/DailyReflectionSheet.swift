@@ -188,7 +188,7 @@ struct DailyReflectionSheet: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Compat.confirmButton(String(localized: "Save")) {
+                Button("Save", role: .confirm) {
                     save()
                     dismiss()
                 }
