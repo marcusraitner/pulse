@@ -81,7 +81,7 @@ struct AggregatedTimelineView: View {
         .safeAreaBar(edge: .top) {
             VStack {
                 ScrollView(.horizontal, showsIndicators: false) {
-                    LazyHStack(spacing: 8) {
+                    HStack(spacing: 8) {
                         ForEach(periodStarts, id: \.self) { periodStart in
                             HStack(spacing: 2) {
                                 ForEach(days(for: periodStart).sorted(by: { $0.key < $1.key }), id: \.key) { (day, entry) in
