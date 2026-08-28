@@ -24,7 +24,7 @@ struct DailyReflectionSheet: View {
     
     @State private var kpiValues: [UUID : String] = [:]
     @State private var reflection: String = ""
-    @State private var coachingQuestion: String? = nil
+    @State private var coachingQuestionIndex: Int = 0
     @FocusState private var focusedField: FocusField?
     
     @Environment(\.dismiss) private var dismiss
@@ -35,32 +35,14 @@ struct DailyReflectionSheet: View {
 
     /// Localization keys for the pool of coaching questions shown below the reflection field.
     private static let questionKeys = [
-        "reflection.question.1",
-        "reflection.question.2",
-        "reflection.question.3",
-        "reflection.question.4",
-        "reflection.question.5",
-        "reflection.question.6",
-        "reflection.question.7",
-        "reflection.question.8",
-        "reflection.question.9",
-        "reflection.question.10",
-        "reflection.question.11",
-        "reflection.question.12",
-        "reflection.question.13",
-        "reflection.question.14",
-        "reflection.question.15",
-        "reflection.question.16",
-        "reflection.question.17",
-        "reflection.question.18",
-        "reflection.question.19",
-        "reflection.question.20"
+        "stoic.reflection.1",
+        "stoic.reflection.2",
+        "stoic.reflection.3",
     ]
 
     /// Replaces the current coaching question with a different randomly selected one.
     private func pickAnotherQuestion() {
-        let others = Self.questionKeys.filter { $0 != coachingQuestion }
-        coachingQuestion = others.randomElement()
+        coachingQuestionIndex = (coachingQuestionIndex + 1) % Self.questionKeys.count
     }
 
     private func kpiBinding(for template: KPITemplate) -> Binding<String> {
@@ -108,22 +90,22 @@ struct DailyReflectionSheet: View {
                 } header: {
                     Text("Reflect Your Day")
                 } footer: {
-                    if let question = coachingQuestion {
-                        VStack(alignment: .leading) {
-                            Text(LocalizedStringKey(question))
-                            HStack {
-                                Spacer()
-                                Button(action: pickAnotherQuestion) {
-                                    Label("New question", systemImage: "arrow.clockwise")
-                                        .font(.footnote)
-                                }
-                                .buttonStyle(.plain)
-                                .foregroundStyle(.tint)
-                                .padding(.top, 2)
-
+                    let question = Self.questionKeys[coachingQuestionIndex]
+                    VStack(alignment: .leading) {
+                        Text(LocalizedStringKey(question))
+                        HStack {
+                            Spacer()
+                            Button(action: pickAnotherQuestion) {
+                                Label("New question", systemImage: "arrow.clockwise")
+                                    .font(.footnote)
                             }
+                            .buttonStyle(.plain)
+                            .foregroundStyle(.tint)
+                            .padding(.top, 2)
+                            
                         }
                     }
+                        
                 }
                 .onAppear() {
                     focusedField = .summary
@@ -211,10 +193,6 @@ struct DailyReflectionSheet: View {
                 if let template = value.template {
                     kpiValues[template.id] = String(value.value)
                 }
-            }
-            
-            if day.summary.isEmpty {
-                coachingQuestion = Self.questionKeys.randomElement()
             }
         }
     }
