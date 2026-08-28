@@ -35,26 +35,9 @@ struct DailyReflectionSheet: View {
 
     /// Localization keys for the pool of coaching questions shown below the reflection field.
     private static let questionKeys = [
-        "reflection.question.1",
-        "reflection.question.2",
-        "reflection.question.3",
-        "reflection.question.4",
-        "reflection.question.5",
-        "reflection.question.6",
-        "reflection.question.7",
-        "reflection.question.8",
-        "reflection.question.9",
-        "reflection.question.10",
-        "reflection.question.11",
-        "reflection.question.12",
-        "reflection.question.13",
-        "reflection.question.14",
-        "reflection.question.15",
-        "reflection.question.16",
-        "reflection.question.17",
-        "reflection.question.18",
-        "reflection.question.19",
-        "reflection.question.20"
+        "stoic.reflection.1",
+        "stoic.reflection.2",
+        "stoic.reflection.3",
     ]
 
     /// Replaces the current coaching question with a different randomly selected one.
