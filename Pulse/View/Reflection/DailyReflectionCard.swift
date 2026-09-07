@@ -23,14 +23,28 @@ struct DailyReflectionCard: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            if !day.summary.isEmpty {
-                Text(day.summary)
-            } else {
-                Text("Reflection")
-                    .foregroundStyle(.secondary)
-                    .italic()
+            Group {
+                if !day.morning.isEmpty {
+                    Text(day.morning)
+                } else {
+                    Text("Forecast")
+                        .foregroundStyle(.tertiary)
+                }
             }
+            .padding(.bottom, 5)
             
+            Divider()
+            
+            Group {
+                if !day.summary.isEmpty {
+                    Text(day.summary)
+                } else {
+                    Text("Reflection")
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .padding(.top, 5)
+
             if !topTemplates.isEmpty {
                 metricsRow
             }
@@ -84,7 +98,7 @@ struct DailyReflectionCard: View {
 }
 
 #Preview("With summary") {
-    DailyReflectionCard(day: DailyEntry(date: .now, summary: "Had a great day overall. Felt productive and calm."), onTap: {})
+    DailyReflectionCard(day: DailyEntry(date: .now, summary: "Had a great day overall. Felt productive and calm.", morning: "I will be distracted."), onTap: {})
         .modelContainer(SampleData.shared.modelContainer)
         .background(.black)
 }

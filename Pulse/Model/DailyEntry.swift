@@ -523,6 +523,135 @@ enum PulseVersionedSchemaV150: VersionedSchema {
     }
 }
 
+// MARK: - Schema V1.6.0
+
+/// Adds `premeditatio` to `DailyEntry` to enable a morning reflection similar to the `summary` in the evening.
+/// Migration from V1.5.0 is lightweight (additive fields/model with defaults).
+enum PulseVersionedSchemaV160: VersionedSchema {
+    static var models: [any PersistentModel.Type] {
+        [DailyEntry.self, DailyLogEntry.self, DailyKPIValue.self, KPITemplate.self, Tag.self]
+    }
+
+    static var versionIdentifier = Schema.Version(1, 6, 0)
+
+    @Model
+    final class DailyEntry {
+        var date: Date = Date.now
+        var summary: String = ""
+        var morning: String = ""
+
+        var averageScore: CGFloat {
+            guard let logEntries, !logEntries.isEmpty else { return 0 }
+            return logEntries.reduce(0) { $0 + CGFloat($1.score) } / CGFloat(logEntries.count)
+        }
+
+        var isEmpty: Bool {
+            guard let logEntries, !logEntries.isEmpty else { return summary.isEmpty }
+            return false
+        }
+        
+        @Relationship(deleteRule: .cascade, inverse: \DailyLogEntry.entry)
+        var logEntries: [DailyLogEntry]? = []
+
+        @Relationship(deleteRule: .cascade, inverse: \DailyKPIValue.entry)
+        var kpiValues: [DailyKPIValue]? = []
+
+        init(date: Date, summary: String = "", morning: String = "", logEntries: [DailyLogEntry] = []) {
+            self.date = date
+            self.summary = summary
+            self.morning = morning
+            self.logEntries = logEntries
+        }
+    }
+
+    @Model
+    class DailyLogEntry: Identifiable {
+        var id = UUID()
+        var timestamp: Date = Date.now
+        var log: String = ""
+        var score: Int = 0
+        var entry: DailyEntry?
+
+        var latitude: Double?
+        var longitude: Double?
+        var address: String?
+        
+        var tagsRaw: String = ""
+        
+        var tags: [String] {
+            tagsRaw.split(separator: ",")
+                .map( { $0.trimmingCharacters(in: .whitespacesAndNewlines) } )
+                .filter( { !$0.isEmpty } )
+        }
+
+        var formattedTimestamp: String {
+            self.timestamp.formatted(.dateTime.hour().minute())
+        }
+
+        init(timestamp: Date, log: String, score: Int, entry: DailyEntry? = nil, latitude: Double? = nil, longitude: Double? = nil, address: String? = nil, tagsRaw: String = "") {
+            self.timestamp = timestamp
+            self.log = log
+            self.score = score
+            self.entry = entry
+            self.latitude = latitude
+            self.longitude = longitude
+            self.address = address
+            self.tagsRaw = tagsRaw
+        }
+    }
+
+    /// A KPI value recorded for a specific day's entry.
+    /// Title, note, and unit are looked up via the `template` relationship.
+    @Model
+    final class DailyKPIValue {
+        var value: Int = 0
+        var template: KPITemplate?
+        var entry: DailyEntry?
+
+        init(value: Int, template: KPITemplate? = nil, entry: DailyEntry? = nil) {
+            self.value = value
+            self.template = template
+            self.entry = entry
+        }
+    }
+
+    /// A reusable KPI definition configured by the user in Settings.
+    /// Synced via CloudKit so templates are available on all devices.
+    /// Cascade delete automatically removes all associated `DailyKPIValue` records.
+    /// `sortOrder` controls display order; the top 3 appear on the ReflectionCard.
+    @Model
+    final class KPITemplate {
+        var id: UUID = UUID()
+        var title: String = ""
+        var note: String?
+        var unit: String?
+        var sortOrder: Int = 0
+
+        @Relationship(deleteRule: .cascade, inverse: \DailyKPIValue.template)
+        var values: [DailyKPIValue]? = []
+
+        init(title: String, note: String? = nil, unit: String? = nil, sortOrder: Int = 0) {
+            self.title = title
+            self.note = note
+            self.unit = unit
+            self.sortOrder = sortOrder
+        }
+    }
+    
+    /// A user-defined custom tag name, synced via CloudKit so the tag palette is
+    /// available across all devices. Not related to `DailyLogEntry` directly —
+    /// entry tags are stored as comma-separated values in `DailyLogEntry.tagsRaw`.
+    @Model
+    final class Tag {
+        var name: String = ""
+
+        init(name: String) {
+            self.name = name
+        }
+    }
+}
+
+
 // MARK: - Migration Plan
 
 /// Defines the ordered migration path across all schema versions.
@@ -533,7 +662,8 @@ enum PulseMigrationPlan: SchemaMigrationPlan {
          PulseVersionedSchemaV120.self,
          PulseVersionedSchemaV130.self,
          PulseVersionedSchemaV140.self,
-         PulseVersionedSchemaV150.self]
+         PulseVersionedSchemaV150.self,
+         PulseVersionedSchemaV160.self]
     }
 
     static let migrateV1toV110 = MigrationStage.custom(
@@ -564,20 +694,28 @@ enum PulseMigrationPlan: SchemaMigrationPlan {
     static let migrateV140toV150: MigrationStage =
         .lightweight(fromVersion: PulseVersionedSchemaV140.self, toVersion: PulseVersionedSchemaV150.self)
 
+    static let migrateV150toV160: MigrationStage =
+        .lightweight(fromVersion: PulseVersionedSchemaV150.self, toVersion: PulseVersionedSchemaV160.self)
+
     static var stages: [MigrationStage] {
-        [migrateV1toV110, migrateV110toV120, migrateV120toV130, migrateV130toV140, migrateV140toV150]
+        [migrateV1toV110,
+         migrateV110toV120,
+         migrateV120toV130,
+         migrateV130toV140,
+         migrateV140toV150,
+        migrateV150toV160]
     }
 }
 
 // MARK: - Current type aliases
 
 /// The current `DailyEntry` model. Always points to the latest schema version.
-typealias DailyEntry = PulseVersionedSchemaV150.DailyEntry
+typealias DailyEntry = PulseVersionedSchemaV160.DailyEntry
 /// The current `DailyLogEntry` model. Always points to the latest schema version.
-typealias DailyLogEntry = PulseVersionedSchemaV150.DailyLogEntry
+typealias DailyLogEntry = PulseVersionedSchemaV160.DailyLogEntry
 /// A KPI value recorded for a specific day's entry.
-typealias DailyKPIValue = PulseVersionedSchemaV150.DailyKPIValue
+typealias DailyKPIValue = PulseVersionedSchemaV160.DailyKPIValue
 /// A reusable KPI definition configured by the user in Settings.
-typealias KPITemplate = PulseVersionedSchemaV150.KPITemplate
+typealias KPITemplate = PulseVersionedSchemaV160.KPITemplate
 /// A user-defined custom tag name synced via CloudKit.
-typealias Tag = PulseVersionedSchemaV150.Tag
+typealias Tag = PulseVersionedSchemaV160.Tag

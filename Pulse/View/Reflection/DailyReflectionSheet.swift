@@ -15,6 +15,7 @@ import OSLog
 struct DailyReflectionSheet: View {
     enum FocusField: Hashable {
         case summary
+        case morning
         case kpi(UUID)
     }
     
@@ -24,6 +25,7 @@ struct DailyReflectionSheet: View {
     
     @State private var kpiValues: [UUID : String] = [:]
     @State private var reflection: String = ""
+    @State private var morning: String = ""
     @State private var coachingQuestionIndex: Int = 0
     @FocusState private var focusedField: FocusField?
     
@@ -53,6 +55,7 @@ struct DailyReflectionSheet: View {
     
     private func save() {
         day.summary = reflection
+        day.morning = morning
 
         for template in kpiTemplates {
             let existing = day.kpiValues?.first(where: { $0.template?.id == template.id })
@@ -82,6 +85,20 @@ struct DailyReflectionSheet: View {
     var body: some View {
         VStack(alignment: .leading) {
             List {
+                Section {
+                    TextField("What do you expect today?", text: $morning, axis: .vertical)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(5...Int.max)
+                        .focused($focusedField, equals: .morning)
+                } header: {
+                    Text("Forecast")
+                } footer: {
+                    Text("What might be hard today — once anticipated, it won't catch you off guard. One sentence is enough.")
+                }
+                .onAppear() {
+                    focusedField = .morning
+                }
+
                 Section {
                     TextField("Summarize your day", text: $reflection, axis: .vertical)
                         .multilineTextAlignment(.leading)
@@ -188,6 +205,7 @@ struct DailyReflectionSheet: View {
         }
         .task {
             reflection = day.summary
+            morning = day.morning
             
             for value in day.kpiValues ?? [] {
                 if let template = value.template {

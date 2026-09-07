@@ -74,6 +74,7 @@ private extension DailyLogEntry {
 
 struct DailyEntryDTO: Codable {
     let date: Date
+    let morning: String
     let summary: String
     let logEntries: [DailyLogEntryDTO]
     let kpiValues: [DailyKPIValueDTO]
@@ -97,6 +98,7 @@ private extension DailyEntry {
         
         return DailyEntryDTO(
             date: date,
+            morning: morning,
             summary: summary,
             logEntries: mappedLogEntries,
             kpiValues: mappedKPIValues
