@@ -146,16 +146,7 @@ struct ContentView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    if featureFlags.foundationModelsAvailable {
-                        Button {
-                            isPresentingInsights = true
-                        } label: {
-                            Image(systemName: "sparkles")
-                        }
-                    }
-                }
-                ToolbarItemGroup(placement: .topBarTrailing) {
+                ToolbarItemGroup(placement: .topBarLeading) {
                     Picker("View Mode", selection: $viewMode) {
                         ForEach(ViewMode.allCases, id: \.self) { mode in
                             Label(LocalizedStringKey(mode.title),
@@ -164,6 +155,7 @@ struct ContentView: View {
                     }
                     .pickerStyle(.menu)
                 }
+                
                 ToolbarItemGroup(placement: .secondaryAction) {
                     Button(showEmptyDays ? "Hide empty days" : "Show empty days",
                            systemImage: showEmptyDays ?
@@ -173,15 +165,23 @@ struct ContentView: View {
                     }
                     .tint(.white)
                     
-                    Button("Sort Entries",
+                    Button(sortAscending ? "Sort Descending" : "Sort Ascending",
                            systemImage: sortAscending ? "chevron.down.2" : "chevron.up.2") {
                         sortAscending.toggle()
                     }
                     
-                    Button("Settings", systemImage: "gearshape.fill") {
+                    Divider()
+                    
+                    Button("Open Settings", systemImage: "gearshape.fill") {
                         isPresentingSettings = true
                     }
                     .tint(.white)
+
+                    if featureFlags.foundationModelsAvailable {
+                        Button("AI Coach", systemImage: "sparkles") {
+                            isPresentingInsights = true
+                        }
+                    }
                 }
             }
             .task {
