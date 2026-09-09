@@ -15,13 +15,25 @@ struct LogEntriesView: View {
 
     @AppStorage(AppStorageKeys.theme) var themeName: String = "traffic"
     @AppStorage(AppStorageKeys.sortAscending) private var sortAscending: Bool = true
+    @AppStorage(AppStorageKeys.selectedTag) private var selectedTag: String?
 
+    var filteredAndSortedEntries: [DailyLogEntry] {
+        if let selectedTag {
+            return day.logEntries?.filter( { $0.tagsRaw.contains(selectedTag) } )
+                .sorted(by: {
+                    sortAscending ? $0.timestamp < $1.timestamp
+                    : $0.timestamp > $1.timestamp
+                } ) ?? []
+        } else {
+            return day.logEntries?.sorted(by: {
+                sortAscending ? $0.timestamp < $1.timestamp
+                : $0.timestamp > $1.timestamp
+            } ) ?? []
+        }
+    }
+    
     var body: some View {
-        let logEntries = day.logEntries?.sorted(by: {
-            sortAscending ? $0.timestamp < $1.timestamp : $0.timestamp > $1.timestamp
-        }) ?? []
-        
-        ForEach(logEntries) { entry in
+        ForEach(filteredAndSortedEntries) { entry in
             LogEntryText(logEntry: entry)
                 .padding(.vertical, 15)
                 .padding(.horizontal)

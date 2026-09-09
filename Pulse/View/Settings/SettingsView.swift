@@ -187,8 +187,8 @@ struct SettingsView: View {
                         }
                         
                         Picker("Sort Entries", selection: $sortAscending) {
-                            Text("Last entry top").tag(false)
-                            Text("Last entry bottom").tag(true)
+                            Text("Newest first").tag(false)
+                            Text("Oldest first").tag(true)
                         }
                         
                     }

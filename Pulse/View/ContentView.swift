@@ -41,6 +41,7 @@ struct ContentView: View {
     
     @Query(sort: \DailyEntry.date, order: .forward) private var allEntries: [DailyEntry]
     @Query private var allLogs: [DailyLogEntry]
+    @Query private var tags: [Tag]
     
     private var countLogs: Int { allLogs.count }
     
@@ -52,6 +53,7 @@ struct ContentView: View {
     @AppStorage(AppStorageKeys.initialSweepDone) private var initialSweepDone: Bool = false
     @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = false
     @AppStorage(AppStorageKeys.sortAscending) private var sortAscending: Bool = true
+    @AppStorage(AppStorageKeys.selectedTag) private var selectedTag: String?
     
     @State private var reviewService = ReviewService()
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
@@ -156,31 +158,68 @@ struct ContentView: View {
                     .pickerStyle(.menu)
                 }
                 
-                ToolbarItemGroup(placement: .secondaryAction) {
-                    Button(showEmptyDays ? "Hide empty days" : "Show empty days",
-                           systemImage: showEmptyDays ?
-                           "line.3.horizontal.decrease.circle"
-                           : "line.3.horizontal.decrease.circle.fill") {
-                        showEmptyDays.toggle()
-                    }
-                    .tint(.white)
-                    
-                    Button(sortAscending ? "Sort Descending" : "Sort Ascending",
-                           systemImage: sortAscending ? "chevron.down.2" : "chevron.up.2") {
-                        sortAscending.toggle()
-                    }
-                    
-                    Divider()
-                    
-                    Button("Open Settings", systemImage: "gearshape.fill") {
-                        isPresentingSettings = true
-                    }
-                    .tint(.white)
-
-                    if featureFlags.foundationModelsAvailable {
-                        Button("AI Coach", systemImage: "sparkles") {
-                            isPresentingInsights = true
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    if let tag = selectedTag {
+                        Button {
+                            selectedTag = nil
+                        } label: {
+                            HStack {
+                                Image(systemName: "xmark.circle.fill")
+                                VStack(alignment: .leading) {
+                                    Text("Filtered Tag")
+                                        .font(.footnote)
+                                        .foregroundStyle(.secondary)
+                                    Text(tag)
+                                        .font(.footnote)
+                                        .foregroundStyle(.primary)
+                                }
+                            }
                         }
+                    }
+                    
+                    Menu {
+                        Section("Appearance") {
+                            Toggle("Show empty days",
+                                   systemImage: "calendar.day",
+                                   isOn: $showEmptyDays)
+                            
+                            Picker(selection: $sortAscending) {
+                                Text("Newest first").tag(false)
+                                Text("Oldest first").tag(true)
+                            } label: {
+                                Label("Order", systemImage: "arrow.up.arrow.down")
+                                Text(sortAscending ? "Oldest first" : "Newest first")
+                            }
+                            .pickerStyle(.menu)
+
+                            Picker(selection: $selectedTag) {
+                                ForEach(tags, id: \.self) { tag in
+                                    Text(tag.name).tag(tag.name)
+                                }
+                                
+                                Divider()
+                                
+                                Text("All").tag(String?.none)
+                            } label: {
+                                Label("Filter by tag", systemImage: "tag")
+                                Text(selectedTag != nil ? selectedTag! : "All")
+                            }
+                            .pickerStyle(.menu)
+                        }
+                        
+                        Section {
+                            Button("Open Settings", systemImage: "gearshape.fill") {
+                                isPresentingSettings = true
+                            }
+                            
+                            if featureFlags.foundationModelsAvailable {
+                                Button("AI Coach", systemImage: "sparkles") {
+                                    isPresentingInsights = true
+                                }
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis")
                     }
                 }
             }
