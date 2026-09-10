@@ -62,6 +62,7 @@ struct ContentView: View {
     @State private var isPresentingNewEntry: Bool = false
     @State private var isPresentingReflection: Bool = false
     @State private var isPresentingInsights: Bool = false
+    @State private var filterActive: Bool = false
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
 
@@ -112,19 +113,6 @@ struct ContentView: View {
                 } else {
                     AggregatedTimelineView(aggregationLevel: viewMode == .week ? .week : .month)
                 }
-                // The Add Button (day mode only)
-                if viewMode == .day && (Calendar.current.isDateInToday(selectedEntry.date) || enableEditingHistory) {
-                    Button(action: { isPresentingNewEntry = true }) {
-                        Image(systemName: "plus")
-                            .font(.largeTitle)
-                            .padding()
-                            .glassEffect(.regular, in: Circle())
-                            .foregroundStyle(.white)
-                    }
-                    .contentShape(Circle())
-                    .buttonStyle(.plain)
-                    .padding(.trailing, 12)
-                }
             }
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $isPresentingSettings,
@@ -148,7 +136,7 @@ struct ContentView: View {
                 }
             }
             .toolbar {
-                ToolbarItemGroup(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarLeading) {
                     Picker("View Mode", selection: $viewMode) {
                         ForEach(ViewMode.allCases, id: \.self) { mode in
                             Label(LocalizedStringKey(mode.title),
@@ -158,25 +146,66 @@ struct ContentView: View {
                     .pickerStyle(.menu)
                 }
                 
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    if let tag = selectedTag {
-                        Button {
-                            selectedTag = nil
-                        } label: {
-                            HStack {
-                                Image(systemName: "xmark.circle.fill")
-                                VStack(alignment: .leading) {
-                                    Text("Filtered Tag")
-                                        .font(.footnote)
-                                        .foregroundStyle(.secondary)
-                                    Text(tag)
-                                        .font(.footnote)
-                                        .foregroundStyle(.primary)
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Button {
+                        withAnimation(.snappy) {
+                            filterActive.toggle()
+                        }
+                        
+                        if !filterActive { selectedTag = nil }
+                        
+                    } label: {
+                        Image(systemName: "line.3.horizontal.decrease")
+                            .fontWeight(.medium)
+                            .foregroundStyle(filterActive ? .black : .white)
+                            .padding(10)
+                            .background {
+                                if filterActive {
+                                    Circle()
+                                        .fill(.accent)
+                                        .transition(.scale)
                                 }
                             }
+                    }
+                    .buttonStyle(.plain)
+                    
+                    if filterActive {
+                        Menu {
+                            Picker("Filter by", selection: $selectedTag) {
+                                ForEach(tags, id: \.self) { tag in
+                                    Text(tag.name).tag(tag.name)
+                                }
+                            }
+                            .pickerStyle(.inline)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text("Filtered by")
+                                    .font(.footnote)
+                                HStack(spacing: 4) {
+                                    Text(selectedTag ?? "All")
+                                        .font(.footnote)
+                                    Image(systemName: "chevron.down")
+                                        .font(.caption2)
+                                }
+                                .foregroundStyle(.accent)
+                            }
+                            .padding(.trailing)
                         }
                     }
-                    
+                }
+                
+                ToolbarSpacer(.flexible, placement: .bottomBar)
+                
+                ToolbarItem(placement: .bottomBar) {
+                    // The Add Button (day mode only)
+                    if viewMode == .day && (Calendar.current.isDateInToday(selectedEntry.date) || enableEditingHistory) {
+                        Button(action: { isPresentingNewEntry = true }) {
+                            Image(systemName: "plus")
+                        }
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Section("Appearance") {
                             Toggle("Show empty days",
@@ -192,19 +221,6 @@ struct ContentView: View {
                             }
                             .pickerStyle(.menu)
 
-                            Picker(selection: $selectedTag) {
-                                ForEach(tags, id: \.self) { tag in
-                                    Text(tag.name).tag(tag.name)
-                                }
-                                
-                                Divider()
-                                
-                                Text("All").tag(String?.none)
-                            } label: {
-                                Label("Filter by tag", systemImage: "tag")
-                                Text(selectedTag != nil ? selectedTag! : "All")
-                            }
-                            .pickerStyle(.menu)
                         }
                         
                         Section {
