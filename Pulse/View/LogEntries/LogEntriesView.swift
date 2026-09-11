@@ -15,10 +15,10 @@ struct LogEntriesView: View {
 
     @AppStorage(AppStorageKeys.theme) var themeName: String = "traffic"
     @AppStorage(AppStorageKeys.sortAscending) private var sortAscending: Bool = true
-    @AppStorage(AppStorageKeys.selectedTag) private var selectedTag: String?
-
+    @Environment(FilterState.self) private var filterState
+    
     var filteredAndSortedEntries: [DailyLogEntry] {
-        if let selectedTag {
+        if filterState.isFilterActive, let selectedTag = filterState.selectedTag {
             return day.logEntries?.filter( { $0.tagsRaw.contains(selectedTag) } )
                 .sorted(by: {
                     sortAscending ? $0.timestamp < $1.timestamp

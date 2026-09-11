@@ -26,11 +26,26 @@ struct HorizontalTimelineView: View {
     
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
     @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = true
-
+    @Environment(FilterState.self) private var filterState
+    
     @Environment(\.featureFlags) private var featureFlags
 
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "HorizontalTimeLineView")
 
+    private func avgScore(for entry: DailyEntry, by tag: String? = nil) -> CGFloat {
+        guard let tag else {
+            return entry.averageScore
+        }
+        
+        let logEntries = entry.logEntries?.filter( { $0.tagsRaw.contains(tag) } ) ?? []
+        
+        guard !logEntries.isEmpty else {
+            return 0
+        }
+        
+        return logEntries.reduce(0, { $0 + CGFloat($1.score) } ) / CGFloat(logEntries.count)
+    }
+    
     var body: some View {
         let barWidth: CGFloat = 20
         let heightScale: CGFloat = 20
@@ -39,7 +54,7 @@ struct HorizontalTimelineView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 3) {
                 ForEach(allEntries.filter( { showEmptyDays || !$0.isEmpty || Calendar.current.isDateInToday($0.date) } ) , id: \.date ) { entry in
-                    let avg: CGFloat = entry.averageScore
+                    let avg: CGFloat = avgScore(for: entry, by: filterState.isFilterActive ? filterState.selectedTag : nil)
                     let barHeight: CGFloat = max(2, heightScale * avg.magnitude)
                     let yOffset: CGFloat = -0.5 * heightScale * avg
 

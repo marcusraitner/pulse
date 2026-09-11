@@ -30,6 +30,7 @@ enum ViewMode: String, CaseIterable {
     }
 }
 
+
 /// Root view that orchestrates the timeline, selected-date display, log entries,
 /// reflection card, and FAB. Also owns sheet presentation for settings, new/edit
 /// entry, and reflection, and handles deep-link URLs (`pulseapp://log`, `pulseapp://reflect`).
@@ -38,6 +39,7 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.featureFlags) private var featureFlags
     @Environment(\.requestReview) private var requestReview
+    @Environment(FilterState.self) private var filterState
     
     @Query(sort: \DailyEntry.date, order: .forward) private var allEntries: [DailyEntry]
     @Query private var allLogs: [DailyLogEntry]
@@ -53,7 +55,6 @@ struct ContentView: View {
     @AppStorage(AppStorageKeys.initialSweepDone) private var initialSweepDone: Bool = false
     @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = false
     @AppStorage(AppStorageKeys.sortAscending) private var sortAscending: Bool = true
-    @AppStorage(AppStorageKeys.selectedTag) private var selectedTag: String?
     
     @State private var reviewService = ReviewService()
     @State private var selectedEntry: DailyEntry = DailyEntry(date: .now)
@@ -62,12 +63,13 @@ struct ContentView: View {
     @State private var isPresentingNewEntry: Bool = false
     @State private var isPresentingReflection: Bool = false
     @State private var isPresentingInsights: Bool = false
-    @State private var filterActive: Bool = false
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
 
     
     var body: some View {
+        @Bindable var filterState = filterState
+        
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
                 
@@ -84,8 +86,6 @@ struct ContentView: View {
                                 }
                                 .tint(.white)
                             }
-                            
-                            
                             
                             // The daily reflection
                             DailyReflectionCard(day: selectedEntry) {
@@ -146,50 +146,58 @@ struct ContentView: View {
                     .pickerStyle(.menu)
                 }
                 
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Button {
-                        withAnimation(.snappy) {
-                            filterActive.toggle()
-                        }
-                        
-                        if !filterActive { selectedTag = nil }
-                        
-                    } label: {
-                        Image(systemName: "line.3.horizontal.decrease")
-                            .fontWeight(.medium)
-                            .foregroundStyle(filterActive ? .black : .white)
-                            .padding(10)
-                            .background {
-                                if filterActive {
-                                    Circle()
-                                        .fill(.accent)
-                                        .transition(.scale)
-                                }
-                            }
-                    }
-                    .buttonStyle(.plain)
-                    
-                    if filterActive {
-                        Menu {
-                            Picker("Filter by", selection: $selectedTag) {
-                                ForEach(tags, id: \.self) { tag in
-                                    Text(tag.name).tag(tag.name)
-                                }
-                            }
-                            .pickerStyle(.inline)
+                ToolbarItem(placement: .bottomBar) {
+                    HStack(spacing: 8) {
+                        Button {
+                            filterState.isFilterActive.toggle()
                         } label: {
-                            VStack(alignment: .leading, spacing: 1) {
-                                Text("Filtered by")
-                                    .font(.footnote)
-                                HStack(spacing: 4) {
-                                    Text(selectedTag ?? "All")
-                                        .font(.footnote)
-                                    Image(systemName: "chevron.down")
-                                        .font(.caption2)
+                            Image(systemName: "line.3.horizontal.decrease")
+                                .fontWeight(.medium)
+                                .foregroundStyle(filterState.isFilterActive ? .black : .white)
+                                .padding(10)
+                                .background {
+                                    if filterState.isFilterActive {
+                                        Circle()
+                                            .fill(.accent)
+                                    }
                                 }
-                                .foregroundStyle(.accent)
+                        }
+                        .buttonStyle(.plain)
+                        
+                        if filterState.isFilterActive {
+                            Menu {
+                                Picker("Filter by", selection: $filterState.selectedTag) {
+                                    Text("All").tag(String?.none)
+                                    Divider()
+                                    ForEach(tags, id: \.self) { tag in
+                                        Text(tag.name).tag(tag.name)
+                                    }
+                                }
+                                .pickerStyle(.inline)
+                            } label: {
+                                if let selectedTag = filterState.selectedTag {
+                                    VStack(alignment: .leading, spacing: 1) {
+                                        Text("Filtered by tag")
+                                            .font(.footnote)
+                                        HStack(spacing: 4) {
+                                            Text(selectedTag)
+                                                .font(.footnote)
+                                            Image(systemName: "chevron.down")
+                                                .font(.caption2)
+                                        }
+                                        .foregroundStyle(.accent)
+                                    }
+                                    .padding(.trailing)
+                                } else {
+                                    HStack(spacing: 4) {
+                                        Text("Filter by tag")
+                                            .font(.footnote)
+                                        Image(systemName: "chevron.down")
+                                            .font(.caption2)
+                                    }
+                                    .padding(.trailing)
+                                }
                             }
-                            .padding(.trailing)
                         }
                     }
                 }

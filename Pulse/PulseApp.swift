@@ -9,12 +9,19 @@ import SwiftUI
 import SwiftData
 import OSLog
 
+@Observable
+final class FilterState {
+    var selectedTag: String? = nil
+    var isFilterActive: Bool = false
+}
+
 /// App entry point. Sets up the SwiftData `ModelContainer` with CloudKit sync
 /// and the versioned migration plan, then injects `FeatureFlags` into the environment.
 @main
 struct PulseApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "PulseApp")
+    @State private var filterState = FilterState()
     
     let modelContainer: ModelContainer
     
@@ -41,6 +48,7 @@ struct PulseApp: App {
         WindowGroup {
             ContentView()
                 .environment(\.featureFlags, FeatureFlags(adminEnabled: false))
+                .environment(filterState)
                 .preferredColorScheme(.dark)
         }
         .modelContainer(modelContainer)
