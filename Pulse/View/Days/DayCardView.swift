@@ -15,16 +15,37 @@ import SwiftUI
 struct DayCardView: View {
     let entry: DailyEntry
     let aggregationLevel: AggregationLevel
-
+    
+    @Environment(FilterState.self) private var filterState
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
     @State private var isPresentingDay: Bool = false
     
-    private var sortedMoments: [DailyLogEntry] {
-        entry.logEntries?.sorted { $0.timestamp < $1.timestamp } ?? []
+    private var sortedAndFilteredMoments: [DailyLogEntry] {
+        entry.logEntries?
+            .filter( {
+                if let selectedTag = filterState.selectedTag, filterState.isFilterActive {
+                    return $0.tagsRaw.contains(selectedTag)
+                } else {
+                    return true
+                }
+            } )
+            .sorted { $0.timestamp < $1.timestamp } ?? []
     }
 
     private var avgColor: Color {
-        Theme.named(themeName).color(for: Int(entry.averageScore.rounded()))
+        var score = entry.averageScore
+        
+        if let tag = filterState.selectedTag, filterState.isFilterActive {
+            let logEntries = entry.logEntries?.filter( { $0.tagsRaw.contains(tag) } ) ?? []
+            
+            if logEntries.isEmpty {
+                score = 0
+            } else {
+               score = logEntries.reduce(0, { $0 + CGFloat($1.score) } ) / CGFloat(logEntries.count)
+            }
+        }
+        
+        return Theme.named(themeName).color(for: Int(score.rounded()))
     }
 
     var body: some View {
@@ -37,13 +58,13 @@ struct DayCardView: View {
                 Spacer()
                 if aggregationLevel == .month {
                     let maxDots = 8
-                    ForEach(Array(sortedMoments.prefix(maxDots))) { moment in
+                    ForEach(Array(sortedAndFilteredMoments.prefix(maxDots))) { moment in
                         Circle()
                             .fill(Theme.named(themeName).color(for: moment.score))
                             .frame(width: 10, height: 10)
                     }
-                    if sortedMoments.count > maxDots {
-                        Text("+\(sortedMoments.count - maxDots)")
+                    if sortedAndFilteredMoments.count > maxDots {
+                        Text("+\(sortedAndFilteredMoments.count - maxDots)")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -58,7 +79,7 @@ struct DayCardView: View {
 
             if aggregationLevel == .week {
                 // Compact moment rows
-                ForEach(sortedMoments) { moment in
+                ForEach(sortedAndFilteredMoments) { moment in
                     CompactMomentRow(logEntry: moment)
                         .contentShape(Rectangle())
                 }

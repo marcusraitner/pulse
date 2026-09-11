@@ -283,6 +283,7 @@
       }
     },
     "All" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -758,6 +759,7 @@
       }
     },
     "Filter by tag" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -768,6 +770,7 @@
       }
     },
     "Filtered by tag" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

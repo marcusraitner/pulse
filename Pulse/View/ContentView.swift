@@ -43,7 +43,7 @@ struct ContentView: View {
     
     @Query(sort: \DailyEntry.date, order: .forward) private var allEntries: [DailyEntry]
     @Query private var allLogs: [DailyLogEntry]
-    @Query private var tags: [Tag]
+    @Query(sort: \Tag.name, order: .reverse) private var tags: [Tag]
     
     private var countLogs: Int { allLogs.count }
     
@@ -136,7 +136,7 @@ struct ContentView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Picker("View Mode", selection: $viewMode) {
                         ForEach(ViewMode.allCases, id: \.self) { mode in
                             Label(LocalizedStringKey(mode.title),
@@ -146,59 +146,51 @@ struct ContentView: View {
                     .pickerStyle(.menu)
                 }
                 
+                ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                
                 ToolbarItem(placement: .bottomBar) {
-                    HStack(spacing: 8) {
-                        Button {
-                            filterState.isFilterActive.toggle()
-                        } label: {
-                            Image(systemName: "line.3.horizontal.decrease")
-                                .fontWeight(.medium)
-                                .foregroundStyle(filterState.isFilterActive ? .black : .white)
-                                .padding(10)
-                                .background {
-                                    if filterState.isFilterActive {
-                                        Circle()
-                                            .fill(.accent)
-                                    }
+                    if !tags.isEmpty {
+                        HStack(spacing: 8) {
+                            Button {
+                                filterState.isFilterActive.toggle()
+                                if filterState.selectedTag == nil {
+                                    filterState.selectedTag = tags.last!.name
                                 }
-                        }
-                        .buttonStyle(.plain)
-                        
-                        if filterState.isFilterActive {
-                            Menu {
-                                Picker("Filter by", selection: $filterState.selectedTag) {
-                                    Text("All").tag(String?.none)
-                                    Divider()
-                                    ForEach(tags, id: \.self) { tag in
-                                        Text(tag.name).tag(tag.name)
-                                    }
-                                }
-                                .pickerStyle(.inline)
                             } label: {
-                                if let selectedTag = filterState.selectedTag {
-                                    VStack(alignment: .leading, spacing: 1) {
-                                        Text("Filtered by tag")
-                                            .font(.footnote)
+                                Image(systemName: "tag")
+                                    .fontWeight(.medium)
+                                    .foregroundStyle(.white)
+                                    .padding(6)
+                                    .background {
+                                        Circle().fill(filterState.isFilterActive ? .accent : .clear)
+                                    }
+                                    .padding(.vertical, 2)
+                            }
+                            .buttonStyle(.plain)
+                            
+                            if filterState.isFilterActive {
+                                Menu {
+                                    Picker("Filter by", selection: $filterState.selectedTag) {
+                                        ForEach(tags, id: \.self) { tag in
+                                            Text(tag.name).tag(tag.name)
+                                        }
+                                    }
+                                    .pickerStyle(.inline)
+                                } label: {
+                                    if let selectedTag = filterState.selectedTag {
                                         HStack(spacing: 4) {
                                             Text(selectedTag)
-                                                .font(.footnote)
+                                                .fontWeight(.semibold)
                                             Image(systemName: "chevron.down")
                                                 .font(.caption2)
                                         }
-                                        .foregroundStyle(.accent)
+                                        .foregroundStyle(.primary)
+                                        .padding(.trailing, 4)
                                     }
-                                    .padding(.trailing)
-                                } else {
-                                    HStack(spacing: 4) {
-                                        Text("Filter by tag")
-                                            .font(.footnote)
-                                        Image(systemName: "chevron.down")
-                                            .font(.caption2)
-                                    }
-                                    .padding(.trailing)
                                 }
                             }
                         }
+                        .geometryGroup()
                     }
                 }
                 
