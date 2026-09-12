@@ -45,7 +45,7 @@ struct DayCardView: View {
             }
         }
         
-        return Theme.named(themeName).color(for: Int(score.rounded()))
+        return Theme.named(themeName).color(for: Int(score.rounded())).mix(with: .black, by: 0.35)
     }
 
     var body: some View {

@@ -141,13 +141,18 @@ struct ContentView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Picker("View Mode", selection: $viewMode) {
-                        ForEach(ViewMode.allCases, id: \.self) { mode in
-                            Label(LocalizedStringKey(mode.title),
-                                  systemImage: mode.systemImage).tag(mode)
+                    Button {
+                        switch viewMode {
+                        case .day:
+                            viewMode = .week
+                        case .week:
+                            viewMode = .month
+                        case .month:
+                            viewMode = .day
                         }
+                    } label: {
+                        Image(systemName: viewMode.systemImage)
                     }
-                    .pickerStyle(.menu)
                 }
                 
                 ToolbarSpacer(.fixed, placement: .topBarTrailing)
@@ -161,13 +166,10 @@ struct ContentView: View {
                                     filterState.selectedTag = tags.last!.name
                                 }
                             } label: {
-                                Image(systemName: "tag")
+                                Image(systemName: filterState.isFilterActive ? "tag.fill" : "tag")
                                     .fontWeight(.medium)
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(filterState.isFilterActive ? .accent : .white)
                                     .padding(6)
-                                    .background {
-                                        Circle().fill(filterState.isFilterActive ? .accent : .clear)
-                                    }
                                     .padding(.vertical, 2)
                             }
                             .buttonStyle(.plain)
@@ -205,7 +207,10 @@ struct ContentView: View {
                     if viewMode == .day && (Calendar.current.isDateInToday(selectedEntry.date) || enableEditingHistory) {
                         Button(action: { isPresentingNewEntry = true }) {
                             Image(systemName: "plus")
+                                .fontWeight(.semibold)
                         }
+                        .buttonStyle(.glassProminent)
+                        .tint(.accent)
                     }
                 }
                 
