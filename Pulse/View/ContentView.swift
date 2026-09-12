@@ -72,9 +72,7 @@ struct ContentView: View {
         
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
-                
-                BackgroundImageView()
-                
+                                
                 if viewMode == .day {
                     ScrollView {
                         VStack {
@@ -110,9 +108,15 @@ struct ContentView: View {
                                 .padding(.top, 4)
                         }
                     }
+                    .contentMargins(.bottom, 12, for: .scrollContent)
+                    .scrollEdgeEffectStyle(.soft, for: .bottom)
                 } else {
                     AggregatedTimelineView(aggregationLevel: viewMode == .week ? .week : .month)
                 }
+                
+                BackgroundImageView()
+                    .zIndex(-1)
+
             }
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $isPresentingSettings,
@@ -239,34 +243,34 @@ struct ContentView: View {
                     }
                 }
             }
-            .task {
-                await initApplication()
-            }
-            .onChange(of: scenePhase) { _, newPhase in
-                if newPhase == .active {
-                    logger.trace("scene is now active.")
-                    addMissingEntries()
-                }
-            }
-            .onChange(of: countLogs) { old, new in
-                if new > old {
-                    reviewService.considerRequesting(countLog: countLogs) { requestReview() }
-                }
-            }
-            .onChange(of: viewMode) { _, new in
-                if new == .day {
-                    triggerScrollToToday = true
-                }
-            }
-#if DEBUG
-            // Expose an accessibility identifier
-            .accessibilityIdentifier("dateView")
-            // and a values containing the selectedEntry for UI Tests
-            .accessibilityValue(
-                Text("selectedEntry:\(DateFormatHelper.formatDate(selectedEntry.date))")
-            )
-#endif  // DEBUG only for UI Tests
         }
+        .task {
+            await initApplication()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                logger.trace("scene is now active.")
+                addMissingEntries()
+            }
+        }
+        .onChange(of: countLogs) { old, new in
+            if new > old {
+                reviewService.considerRequesting(countLog: countLogs) { requestReview() }
+            }
+        }
+        .onChange(of: viewMode) { _, new in
+            if new == .day {
+                triggerScrollToToday = true
+            }
+        }
+#if DEBUG
+        // Expose an accessibility identifier
+        .accessibilityIdentifier("dateView")
+        // and a values containing the selectedEntry for UI Tests
+        .accessibilityValue(
+            Text("selectedEntry:\(DateFormatHelper.formatDate(selectedEntry.date))")
+        )
+#endif  // DEBUG only for UI Tests
         .onOpenURL { url in
             switch url.host() {
             case "log":
