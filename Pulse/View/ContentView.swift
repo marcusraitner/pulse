@@ -30,6 +30,27 @@ enum ViewMode: String, CaseIterable {
     }
 }
 
+/// Day-starts between `start` and `end` that have no entry yet, newest first.
+/// `start` itself is excluded — it already exists.
+func missingEntryDates(existing: [Date], from start: Date, to end: Date,
+                       calendar: Calendar = .current) -> [Date] {
+    let have = Set(existing.map { calendar.startOfDay(for: $0) })
+    let firstDay = calendar.startOfDay(for: start)
+    var missing: [Date] = []
+    var current = calendar.startOfDay(for: end)
+
+    while current > firstDay {
+        if !have.contains(current) { missing.append(current) }
+
+        guard let previous = calendar.date(byAdding: .day, value: -1, to: current) else { break }
+        // re-normalise: day arithmetic lands off midnight where DST shifts at 00:00
+        let previousDay = calendar.startOfDay(for: previous)
+        guard previousDay < current else { break }  // ponytail: paranoia, no hang if it ever stalls
+        current = previousDay
+    }
+
+    return missing
+}
 
 /// Root view that orchestrates the timeline, selected-date display, log entries,
 /// reflection card, and FAB. Also owns sheet presentation for settings, new/edit
@@ -302,45 +323,29 @@ struct ContentView: View {
             reflectionReminderTime: reflectionReminderTime)
     }
    
-    private func fillGap(from start: Date, to end: Date) {
-        var entryDates = Set(allEntries.map { Calendar.current.startOfDay(for: $0.date) })
-        var current = end
-        
-        // going backwards from today; start can be excluded as it already exists
-        while current > start {
-            if !entryDates.contains(current) {
-                let newEntry = DailyEntry(date: current)
-                logger.info("Adding new entry for \(current)")
-                entryDates.insert(current)
-                context.insert(newEntry)
-            }
-            
-            guard let next = Calendar.current.date(byAdding: .day, value: -1, to: current) else {
-                // very unlikely this happens, but if so, we just stop filling
-                logger.warning("adding 1 to \(current) resulted in nil")
-                break
-            }
-            
-            current = next
-        }
-        
-        context.saveOrLog("Error saving missing entries", logger: logger)
-    }
-    
-    
+    /// Creates a `DailyEntry` for every day that has none, so the timeline has no holes.
+    /// Runs on every activation, hence the shortcut: after the one-time sweep over the
+    /// whole history only the tail since the newest entry can be missing.
     private func addMissingEntries() {
-        // add first entry
-        guard let lastEntry = allEntries.last else {
-            context.insert(DailyEntry(date: .now))
+        guard let oldest = allEntries.first, let newest = allEntries.last else {
+            context.insert(DailyEntry(date: Calendar.current.startOfDay(for: .now)))
             context.saveOrLog("Added first entry", logger: logger)
             return
         }
-        
-        let start = initialSweepDone ? lastEntry.date : allEntries.first!.date
-        let end = Calendar.current.startOfDay(for: .now)
-        
-        fillGap(from: start, to: end)
-        
+
+        let missing = initialSweepDone
+            ? missingEntryDates(existing: [newest.date], from: newest.date, to: .now)
+            : missingEntryDates(existing: allEntries.map(\.date), from: oldest.date, to: .now)
+
+        for date in missing {
+            logger.info("Adding new entry for \(date)")
+            context.insert(DailyEntry(date: date))
+        }
+
+        if !missing.isEmpty {
+            context.saveOrLog("Error saving missing entries", logger: logger)
+        }
+
         initialSweepDone = true
     }
 

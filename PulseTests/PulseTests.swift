@@ -238,3 +238,79 @@ struct ExportPayloadMapperTests {
     }
 }
 
+
+// MARK: - missingEntryDates
+
+@Suite("missingEntryDates")
+struct MissingEntryDatesTests {
+
+    private static func calendar(_ identifier: String) -> Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: identifier)!
+        return calendar
+    }
+
+    private let berlin = calendar("Europe/Berlin")
+
+    private func day(_ year: Int, _ month: Int, _ day: Int, hour: Int = 0,
+                     _ calendar: Calendar? = nil) -> Date {
+        (calendar ?? berlin).date(from: DateComponents(year: year, month: month, day: day, hour: hour))!
+    }
+
+    @Test("Fills the gap, newest first, start excluded")
+    func fillsGap() {
+        let missing = missingEntryDates(existing: [day(2026, 3, 1), day(2026, 3, 5)],
+                                        from: day(2026, 3, 1), to: day(2026, 3, 5), calendar: berlin)
+        #expect(missing == [day(2026, 3, 4), day(2026, 3, 3), day(2026, 3, 2)])
+    }
+
+    @Test("Returns nothing when every day exists")
+    func idempotent() {
+        let all = (1...5).map { day(2026, 3, $0) }
+        #expect(missingEntryDates(existing: all, from: all[0], to: all[4], calendar: berlin).isEmpty)
+    }
+
+    @Test("Includes end when today is missing")
+    func endMissing() {
+        let missing = missingEntryDates(existing: [day(2026, 3, 1), day(2026, 3, 2)],
+                                        from: day(2026, 3, 1), to: day(2026, 3, 4), calendar: berlin)
+        #expect(missing == [day(2026, 3, 4), day(2026, 3, 3)])
+    }
+
+    @Test("Ignores the time of day of existing entries")
+    func timeOfDayIrrelevant() {
+        let missing = missingEntryDates(existing: [day(2026, 3, 1, hour: 9), day(2026, 3, 3, hour: 23)],
+                                        from: day(2026, 3, 1, hour: 9), to: day(2026, 3, 3, hour: 23),
+                                        calendar: berlin)
+        #expect(missing == [day(2026, 3, 2)])
+    }
+
+    @Test("Tail path fills a multi-day gap without mapping the history")
+    func tailFillsLongGap() {
+        // app not opened since 3 March, reopened on 12 April
+        let newest = day(2026, 3, 3, hour: 21)
+        let today = day(2026, 4, 12, hour: 8)
+
+        let tail = missingEntryDates(existing: [newest], from: newest, to: today, calendar: berlin)
+        let history = (1...3).map { day(2026, 3, $0, hour: 21) }
+        let sweep = missingEntryDates(existing: history, from: history[0], to: today, calendar: berlin)
+
+        #expect(tail.count == 40)
+        #expect(tail.first == day(2026, 4, 12))
+        #expect(tail.last == day(2026, 3, 4))
+        #expect(tail == sweep)  // the shortcut must not change the result
+    }
+
+    // Santiago has no 00:00 on 2024-09-08; unnormalised day arithmetic drifts to 01:00
+    // and the next sweep inserts those days a second time.
+    @Test("Stays on day boundaries across a midnight DST shift")
+    func dstShiftAtMidnight() {
+        let santiago = Self.calendar("America/Santiago")
+        let missing = missingEntryDates(existing: [day(2024, 9, 5, hour: 12, santiago)],
+                                        from: day(2024, 9, 5, hour: 12, santiago),
+                                        to: day(2024, 9, 10, hour: 12, santiago), calendar: santiago)
+        #expect(missing.count == 5)
+        #expect(Set(missing).count == 5)
+        #expect(missing.allSatisfy { santiago.startOfDay(for: $0) == $0 })
+    }
+}
