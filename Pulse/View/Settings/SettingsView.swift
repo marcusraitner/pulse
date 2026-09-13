@@ -182,18 +182,6 @@ struct SettingsView: View {
                     }
                     
                     Section {
-                        Toggle(isOn: $showEmptyDays) {
-                            Text("Show empty days")
-                        }
-                        
-                        Picker("Sort Entries", selection: $sortAscending) {
-                            Text("Newest first").tag(false)
-                            Text("Oldest first").tag(true)
-                        }
-                        
-                    }
-                    
-                    Section {
                         Picker(selection: $themeName) {
                             ForEach(Theme.builtIn) { theme in
                                 ThemePreview(theme)

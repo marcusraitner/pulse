@@ -41,22 +41,6 @@
         }
       }
     },
-    "%@: %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@: %2$@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@: %2$@"
-          }
-        }
-      }
-    },
     "%lld" : {
       "localizations" : {
         "de" : {
@@ -1707,6 +1691,7 @@
       }
     },
     "Sort Entries" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

@@ -16,8 +16,8 @@ enum ViewMode: String, CaseIterable {
     var systemImage: String {
         switch self {
         case .day:   return "calendar.day.timeline.left"
-        case .week:  return "rectangle.grid.1x2"
-        case .month: return "square.grid.3x3"
+        case .week:  return "rectangle.split.3x1"
+        case .month: return "calendar"
         }
     }
 }

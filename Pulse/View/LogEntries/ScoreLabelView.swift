@@ -13,6 +13,8 @@ enum ScoreLabelStyle {
     case badge
     /// Large outlined circle (72 pt) suitable for score entry forms.
     case outlined
+    /// small inline bade
+    case inline
 }
 
 /// A circular score indicator that displays the numeric score (−2 to +2) with a theme-matched color ring.
@@ -46,6 +48,17 @@ struct ScoreLabelView: View {
                 .frame(width: 72, height: 72)
                 .background(color.opacity(0.2), in: Circle())
                 .overlay(Circle().stroke(color, lineWidth: 7))
+            
+            case .inline:
+            ZStack {
+                Text(Int(-2), format: .number.sign(strategy: .always(includingZero: false))).hidden()
+                Text(score, format: .number.sign(strategy: .always(includingZero: false)))
+            }
+            .font(.subheadline.weight(.bold))
+            .monospacedDigit()
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(Capsule().fill(color))
         }
         
     }
