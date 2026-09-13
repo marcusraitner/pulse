@@ -21,31 +21,19 @@ struct DayCardView: View {
     @State private var isPresentingDay: Bool = false
     
     private var sortedAndFilteredMoments: [DailyLogEntry] {
-        entry.logEntries?
-            .filter( {
-                if let selectedTag = filterState.selectedTag, filterState.isFilterActive {
-                    return $0.tagsRaw.contains(selectedTag)
-                } else {
-                    return true
-                }
-            } )
-            .sorted { $0.timestamp < $1.timestamp } ?? []
+        entry.logEntries(taggedWith: filterState.isFilterActive ?
+                         filterState.selectedTag : nil)
+            .sorted { $0.timestamp < $1.timestamp }
     }
 
     private var avgColor: Color {
-        var score = entry.averageScore
-        
-        if let tag = filterState.selectedTag, filterState.isFilterActive {
-            let logEntries = entry.logEntries?.filter( { $0.tagsRaw.contains(tag) } ) ?? []
-            
-            if logEntries.isEmpty {
-                score = 0
-            } else {
-               score = logEntries.reduce(0, { $0 + CGFloat($1.score) } ) / CGFloat(logEntries.count)
-            }
+        if let score = entry.averageScore(taggedWith: filterState.isFilterActive ?
+                                          filterState.selectedTag : nil) {
+            return Theme.named(themeName)
+                .color(for: Int(score.rounded())).mix(with: .black, by: 0.35)
+        } else {
+            return Color(.tertiaryLabel)
         }
-        
-        return Theme.named(themeName).color(for: Int(score.rounded())).mix(with: .black, by: 0.35)
     }
 
     var body: some View {

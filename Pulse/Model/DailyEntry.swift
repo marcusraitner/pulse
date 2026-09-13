@@ -540,8 +540,8 @@ enum PulseVersionedSchemaV160: VersionedSchema {
         var summary: String = ""
         var morning: String = ""
 
-        var averageScore: CGFloat {
-            guard let logEntries, !logEntries.isEmpty else { return 0 }
+        var averageScore: CGFloat? {
+            guard let logEntries, !logEntries.isEmpty else { return nil }
             return logEntries.reduce(0) { $0 + CGFloat($1.score) } / CGFloat(logEntries.count)
         }
 
@@ -553,6 +553,21 @@ enum PulseVersionedSchemaV160: VersionedSchema {
         @Relationship(deleteRule: .cascade, inverse: \DailyLogEntry.entry)
         var logEntries: [DailyLogEntry]? = []
 
+        func logEntries(taggedWith tag: String?) -> [DailyLogEntry] {
+            guard let tag else { return logEntries ?? [] }
+            
+            return logEntries?.filter( { $0.tags.contains(tag) } ) ?? []
+        }
+        
+        func averageScore(taggedWith tag: String?) -> CGFloat? {
+            let logEntries = logEntries(taggedWith: tag)
+            
+            guard !logEntries.isEmpty else { return nil }
+            
+            return logEntries.reduce(0.0, { $0 + CGFloat($1.score) } )
+            / CGFloat(logEntries.count)
+        }
+        
         @Relationship(deleteRule: .cascade, inverse: \DailyKPIValue.entry)
         var kpiValues: [DailyKPIValue]? = []
 

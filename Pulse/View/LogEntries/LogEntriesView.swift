@@ -18,18 +18,10 @@ struct LogEntriesView: View {
     @Environment(FilterState.self) private var filterState
     
     var filteredAndSortedEntries: [DailyLogEntry] {
-        if filterState.isFilterActive, let selectedTag = filterState.selectedTag {
-            return day.logEntries?.filter( { $0.tagsRaw.contains(selectedTag) } )
-                .sorted(by: {
-                    sortAscending ? $0.timestamp < $1.timestamp
-                    : $0.timestamp > $1.timestamp
-                } ) ?? []
-        } else {
-            return day.logEntries?.sorted(by: {
-                sortAscending ? $0.timestamp < $1.timestamp
-                : $0.timestamp > $1.timestamp
-            } ) ?? []
-        }
+        day.logEntries(taggedWith: filterState.isFilterActive ?
+                       filterState.selectedTag : nil).sorted(by: {
+            sortAscending ? $0.timestamp < $1.timestamp
+            : $0.timestamp > $1.timestamp } )
     }
     
     var body: some View {

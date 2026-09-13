@@ -11,6 +11,8 @@ import OSLog
 
 struct TagSettingsView: View {
     @Environment(\.modelContext) private var context
+    @Environment(FilterState.self) private var filterState
+
     @Query(sort: \Tag.name) private var tags: [Tag]
     @Query private var logs: [DailyLogEntry]
     @State private var tagToDelete: Tag?
@@ -66,6 +68,11 @@ struct TagSettingsView: View {
                     }
                     context.delete(tag)
                     context.saveOrLog("Failed to delete tag", logger: logger)
+                    
+                    if filterState.selectedTag == tag.name {
+                        filterState.selectedTag = nil
+                        filterState.isFilterActive = false
+                    }
                 }
                 tagToDelete = nil
                 isPresentingDeleteAlert = false

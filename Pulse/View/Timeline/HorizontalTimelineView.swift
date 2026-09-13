@@ -25,27 +25,13 @@ struct HorizontalTimelineView: View {
     @State private var hasSetInitialPosition = false
     
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
-    @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = true
+    @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = false
     @Environment(FilterState.self) private var filterState
     
     @Environment(\.featureFlags) private var featureFlags
 
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "HorizontalTimeLineView")
 
-    private func avgScore(for entry: DailyEntry, by tag: String? = nil) -> CGFloat {
-        guard let tag else {
-            return entry.averageScore
-        }
-        
-        let logEntries = entry.logEntries?.filter( { $0.tagsRaw.contains(tag) } ) ?? []
-        
-        guard !logEntries.isEmpty else {
-            return 0
-        }
-        
-        return logEntries.reduce(0, { $0 + CGFloat($1.score) } ) / CGFloat(logEntries.count)
-    }
-    
     var body: some View {
         let barWidth: CGFloat = 20
         let heightScale: CGFloat = 20
@@ -54,14 +40,16 @@ struct HorizontalTimelineView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 3) {
                 ForEach(allEntries.filter( { showEmptyDays || !$0.isEmpty || Calendar.current.isDateInToday($0.date) } ) , id: \.date ) { entry in
-                    let avg: CGFloat = avgScore(for: entry, by: filterState.isFilterActive ? filterState.selectedTag : nil)
-                    let barHeight: CGFloat = max(2, heightScale * avg.magnitude)
-                    let yOffset: CGFloat = -0.5 * heightScale * avg
+                    let avg: CGFloat? = entry.averageScore(
+                        taggedWith: filterState.isFilterActive ?
+                        filterState.selectedTag : nil)
+                    let barHeight: CGFloat = max(2, heightScale * (avg?.magnitude ?? 0))
+                    let yOffset: CGFloat = -0.5 * heightScale * (avg ?? 0)
 
                     PulseRoundedRectangle(pulse: entry.date == selectedEntry.date)
                         .frame(width: barWidth, height: totalHeight)
                         .overlay {
-                            if !entry.isEmpty {
+                            if let avg {
                                 RoundedRectangle(cornerRadius: 4)
                                 .fill(Theme.named(themeName).gradient(for: avg))
                                 .frame(width: barWidth, height: barHeight)
@@ -86,7 +74,7 @@ struct HorizontalTimelineView: View {
         .onGeometryChange(for: CGSize.self) { proxy in
             proxy.size
         } action: { old, new in
-            logger.info("Setting container width to \(new.width)")
+            logger.trace("Setting container width to \(new.width)")
             containerWidth = new.width
         }
         .onChange(of: position) { _, new in
@@ -107,7 +95,7 @@ struct HorizontalTimelineView: View {
         }
         .onChange(of: allEntries, initial: true) {
             entriesByDate = Dictionary(uniqueKeysWithValues: allEntries.map { ($0.date, $0 ) } )
-            logger.info("allEntries changed")
+            logger.trace("allEntries changed")
 
             // skip the initial run; triggerScrollToToday handles the first scroll
             // once layout has actually settled
@@ -117,7 +105,7 @@ struct HorizontalTimelineView: View {
             }
 
             guard let last = allEntries.last else { return }
-            logger.info("scrolling to last")
+            logger.trace("scrolling to last")
             position = last.date
         }
         .sensoryFeedback(.impact, trigger: selectedEntry)
@@ -126,7 +114,7 @@ struct HorizontalTimelineView: View {
                 logger.trace("scroll to today triggered")
                 if let last = allEntries.last {
                     position = nil
-                    logger.info("scrolling to today / last")
+                    logger.trace("scrolling to today / last")
                     withAnimation() {
                         position = last.date
                     }

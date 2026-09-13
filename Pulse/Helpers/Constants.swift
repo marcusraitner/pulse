@@ -22,7 +22,6 @@ enum AppStorageKeys {
     static let theme = "theme"
     static let backgroundImageData = "backgroundImageData"
     static let backgroundImageName = "backgroundImageName"
-    static let viewMode = "viewMode"
     static let showEmptyDays = "showEmptyDays"
     static let sortAscending = "sortAscending"
 

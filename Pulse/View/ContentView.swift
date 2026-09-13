@@ -20,14 +20,6 @@ enum ViewMode: String, CaseIterable {
         case .month: return "square.grid.3x3"
         }
     }
-    
-    var title: String {
-        switch self {
-        case .day:   return "Day"
-        case .week:  return "Week"
-        case .month: return "Month"
-        }
-    }
 }
 
 /// Day-starts between `start` and `end` that have no entry yet, newest first.
@@ -64,7 +56,7 @@ struct ContentView: View {
     
     @Query(sort: \DailyEntry.date, order: .forward) private var allEntries: [DailyEntry]
     @Query private var allLogs: [DailyLogEntry]
-    @Query(sort: \Tag.name, order: .reverse) private var tags: [Tag]
+    @Query(sort: \Tag.name, order: .forward) private var tags: [Tag]
     
     private var countLogs: Int { allLogs.count }
     
@@ -72,7 +64,6 @@ struct ContentView: View {
     @AppStorage(AppStorageKeys.enableEditingHistory) private var enableEditingHistory: Bool = true
     @AppStorage(AppStorageKeys.reflectionReminder) private var reflectionReminder: Bool = true
     @AppStorage(AppStorageKeys.reflectionReminderTime) private var reflectionReminderTime: Date?
-    @AppStorage(AppStorageKeys.viewMode) private var viewMode: ViewMode = .day
     @AppStorage(AppStorageKeys.initialSweepDone) private var initialSweepDone: Bool = false
     @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = false
     @AppStorage(AppStorageKeys.sortAscending) private var sortAscending: Bool = true
@@ -84,7 +75,8 @@ struct ContentView: View {
     @State private var isPresentingNewEntry: Bool = false
     @State private var isPresentingReflection: Bool = false
     @State private var isPresentingInsights: Bool = false
-    
+    @State private var viewMode: ViewMode = .day
+
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
 
     
@@ -173,10 +165,11 @@ struct ContentView: View {
                         }
                     } label: {
                         Image(systemName: viewMode.systemImage)
+                            .fontWeight(.medium)
                     }
                 }
                 
-                ToolbarSpacer(.fixed, placement: .topBarTrailing)
+//                ToolbarSpacer(.fixed, placement: .topBarTrailing)
                 
                 ToolbarItem(placement: .bottomBar) {
                     if !tags.isEmpty {
@@ -184,7 +177,7 @@ struct ContentView: View {
                             Button {
                                 filterState.isFilterActive.toggle()
                                 if filterState.selectedTag == nil {
-                                    filterState.selectedTag = tags.last!.name
+                                    filterState.selectedTag = tags.first!.name
                                 }
                             } label: {
                                 Image(systemName: filterState.isFilterActive ? "tag.fill" : "tag")
@@ -371,7 +364,6 @@ struct ContentView: View {
         
         logger.info("Application initialised; scrolling to today")
         triggerScrollToToday = true
-        viewMode = .day
     }
 
     

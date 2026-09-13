@@ -31,6 +31,8 @@ struct AggregatedTimelineView: View {
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
     @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = false
     
+    @Environment(FilterState.self) private var filterState
+    
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "AggregatedTimelineView")
     
     // One entry per period that has at least one DailyEntry
@@ -86,13 +88,15 @@ struct AggregatedTimelineView: View {
                             HStack(spacing: 2) {
                                 ForEach(days(for: periodStart).sorted(by: { $0.key < $1.key }), id: \.key) { (day, entry) in
                                     if let entry {
-                                        let avg: CGFloat = entry.averageScore
-                                        let barHeight: CGFloat = max(2, heightScale * avg.magnitude)
-                                        let yOffset: CGFloat = -0.5 * heightScale * avg
+                                        let avg = entry.averageScore(
+                                            taggedWith: filterState.isFilterActive ?
+                                            filterState.selectedTag : nil)
+                                        let barHeight: CGFloat = max(2, heightScale * (avg?.magnitude ?? 0))
+                                        let yOffset: CGFloat = -0.5 * heightScale * (avg ?? 0)
                                         
-                                        if !entry.isEmpty {
+                                        if let avg {
                                             RoundedRectangle(cornerRadius: 2)
-                                                .fill(Theme.named(themeName).gradient(for: entry.averageScore))
+                                                .fill(Theme.named(themeName).gradient(for: avg))
                                                 .frame(width: width, height: barHeight)
                                                 .offset(y: yOffset)
                                         } else if showEmptyDays {

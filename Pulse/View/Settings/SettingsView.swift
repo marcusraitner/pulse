@@ -24,7 +24,7 @@ struct SettingsView: View {
     @AppStorage(AppStorageKeys.backgroundImageData) private var backgroundImageData: Data?
     @AppStorage(AppStorageKeys.backgroundImageName) private var backgroundImageName: String = "mountain"
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
-    @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = true
+    @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = false
     @AppStorage(AppStorageKeys.sortAscending) private var sortAscending: Bool = true
     
     @State private var backgroundImageSelection: PhotosPickerItem?
