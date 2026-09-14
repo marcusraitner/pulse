@@ -89,8 +89,7 @@ struct AggregatedTimelineView: View {
                                 ForEach(days(for: periodStart).sorted(by: { $0.key < $1.key }), id: \.key) { (day, entry) in
                                     if let entry {
                                         let avg = entry.averageScore(
-                                            taggedWith: filterState.isFilterActive ?
-                                            filterState.selectedTag : nil)
+                                            taggedWith: filterState.activeFilter)
                                         let barHeight: CGFloat = max(2, heightScale * (avg?.magnitude ?? 0))
                                         let yOffset: CGFloat = -0.5 * heightScale * (avg ?? 0)
                                         

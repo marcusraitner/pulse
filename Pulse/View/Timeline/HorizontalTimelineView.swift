@@ -19,7 +19,6 @@ struct HorizontalTimelineView: View {
     /// Set to `true` to programmatically scroll the timeline to today's entry.
     @Binding var scrollToToday: Bool
 
-    @State private var entriesByDate: [Date: DailyEntry] = [:]
     @State private var position: Date?
     @State private var containerWidth: CGFloat = 0.0
     @State private var hasSetInitialPosition = false
@@ -30,6 +29,10 @@ struct HorizontalTimelineView: View {
     
     @Environment(\.featureFlags) private var featureFlags
 
+    private var entriesByDate: [Date:DailyEntry] {
+        Dictionary(allEntries.map( { ($0.date, $0) } ), uniquingKeysWith: { first, _ in first } )
+    }
+    
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "HorizontalTimeLineView")
 
     var body: some View {
@@ -41,8 +44,7 @@ struct HorizontalTimelineView: View {
             LazyHStack(spacing: 3) {
                 ForEach(allEntries.filter( { showEmptyDays || !$0.isEmpty || Calendar.current.isDateInToday($0.date) } ) , id: \.date ) { entry in
                     let avg: CGFloat? = entry.averageScore(
-                        taggedWith: filterState.isFilterActive ?
-                        filterState.selectedTag : nil)
+                        taggedWith: filterState.activeFilter)
                     let barHeight: CGFloat = max(2, heightScale * (avg?.magnitude ?? 0))
                     let yOffset: CGFloat = -0.5 * heightScale * (avg ?? 0)
 
@@ -94,7 +96,6 @@ struct HorizontalTimelineView: View {
             logger.trace("New selected date: \(selectedEntry.date)")
         }
         .onChange(of: allEntries, initial: true) {
-            entriesByDate = Dictionary(uniqueKeysWithValues: allEntries.map { ($0.date, $0 ) } )
             logger.trace("allEntries changed")
 
             // skip the initial run; triggerScrollToToday handles the first scroll

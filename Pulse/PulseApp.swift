@@ -13,6 +13,7 @@ import OSLog
 final class FilterState {
     var selectedTag: String? = nil
     var isFilterActive: Bool = false
+    var activeFilter: String? { isFilterActive ? selectedTag : nil }
 }
 
 /// App entry point. Sets up the SwiftData `ModelContainer` with CloudKit sync

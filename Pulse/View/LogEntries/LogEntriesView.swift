@@ -18,8 +18,7 @@ struct LogEntriesView: View {
     @Environment(FilterState.self) private var filterState
     
     var filteredAndSortedEntries: [DailyLogEntry] {
-        day.logEntries(taggedWith: filterState.isFilterActive ?
-                       filterState.selectedTag : nil).sorted(by: {
+        day.logEntries(taggedWith: filterState.activeFilter).sorted(by: {
             sortAscending ? $0.timestamp < $1.timestamp
             : $0.timestamp > $1.timestamp } )
     }
