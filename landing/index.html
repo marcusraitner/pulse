@@ -325,7 +325,8 @@
         border-color: rgba(100, 210, 255, 0.35);
       }
 
-      .new-badge {
+      .new-badge,
+      span.new-badge[data-lang].visible {
         display: inline-block;
         font-size: 0.65rem;
         font-weight: 800;
@@ -607,13 +608,29 @@
         <a
           class="announcement-pill"
           data-lang="en"
+          href="https://github.com/marcusraitner/pulse/releases"
+          target="_blank"
+          rel="noopener"
+          >✨ New in 2.4: Morning Forecast</a
+        >
+        <a
+          class="announcement-pill"
+          data-lang="de"
+          href="https://github.com/marcusraitner/pulse/releases"
+          target="_blank"
+          rel="noopener"
+          >✨ Neu in 2.4: Wetterbericht am Morgen</a
+        >
+        <a
+          class="announcement-pill secondary"
+          data-lang="en"
           href="https://github.com/marcusraitner/pulse"
           target="_blank"
           rel="noopener"
           >🧡 Now Free &amp; Open Source</a
         >
         <a
-          class="announcement-pill"
+          class="announcement-pill secondary"
           data-lang="de"
           href="https://github.com/marcusraitner/pulse"
           target="_blank"
@@ -797,6 +814,58 @@
 
       <div class="features">
         <div class="features-grid">
+          <div class="feature-card new">
+            <span class="new-badge" data-lang="en">New in 2.4</span>
+            <span class="new-badge" data-lang="de">Neu in 2.4</span>
+            <span class="feature-icon">🌤️</span>
+            <h3 data-lang="en">Morning Forecast</h3>
+            <h3 data-lang="de">Wetterbericht am Morgen</h3>
+            <p data-lang="en">
+              What might be hard today? One sentence is enough. Name it in
+              advance and it won't catch you off guard.
+            </p>
+            <p data-lang="de">
+              Was könnte heute schwierig werden? Ein Satz genügt. Wer es vorher
+              benannt hat, wird davon nicht überrascht.
+            </p>
+          </div>
+
+          <div class="feature-card new">
+            <span class="new-badge" data-lang="en">New in 2.4</span>
+            <span class="new-badge" data-lang="de">Neu in 2.4</span>
+            <span class="feature-icon">🔎</span>
+            <h3 data-lang="en">Filter by Tag</h3>
+            <h3 data-lang="de">Filtern nach Tag</h3>
+            <p data-lang="en">
+              Pick a tag and the whole timeline recomputes: only moments from
+              that part of your life, with their own daily averages. See what
+              "work" or "family" is actually doing to your days.
+            </p>
+            <p data-lang="de">
+              Wähle einen Tag, und die gesamte Zeitleiste rechnet neu: nur
+              Momente aus diesem Lebensbereich, mit eigenen Tagesdurchschnitten.
+              So siehst du, was „Arbeit" oder „Familie" wirklich mit deinen
+              Tagen macht.
+            </p>
+          </div>
+
+          <div class="feature-card new">
+            <span class="new-badge" data-lang="en">New in 2.4</span>
+            <span class="new-badge" data-lang="de">Neu in 2.4</span>
+            <span class="feature-icon">📆</span>
+            <h3 data-lang="en">No Gaps in Your Timeline</h3>
+            <h3 data-lang="de">Keine Lücken in deiner Zeitleiste</h3>
+            <p data-lang="en">
+              Missing days are filled in automatically, even after a long break.
+              Your timeline stays continuous — nothing to backfill by hand.
+            </p>
+            <p data-lang="de">
+              Fehlende Tage werden automatisch ergänzt, auch nach längerer
+              Pause. Deine Zeitleiste bleibt durchgehend — ohne dass du etwas
+              nachtragen musst.
+            </p>
+          </div>
+
           <div class="feature-card">
             <span class="feature-icon">📤</span>
             <h3 data-lang="en">JSON Export</h3>
@@ -831,14 +900,17 @@
             <h3 data-lang="en">Week &amp; Month Views</h3>
             <h3 data-lang="de">Wochen- &amp; Monatsansicht</h3>
             <p data-lang="en">
-              Zoom out and see the bigger picture. Browse your journal week by
-              week or month by month — mini score charts and day cards give you
-              the full story at every level.
+              Zoom out and see the bigger picture. One toolbar button cycles
+              day, week, and month — mini score charts and day cards give you
+              the full story at every level. Show or hide empty days, and sort
+              moments oldest or newest first.
             </p>
             <p data-lang="de">
-              Zoome heraus und sieh das große Ganze. Blättere durch dein Journal
-              Woche für Woche oder Monat für Monat — Mini-Score-Diagramme und
-              Tageskarten zeigen dir das vollständige Bild auf jeder Ebene.
+              Zoome heraus und sieh das große Ganze. Ein Knopf in der
+              Symbolleiste wechselt durch Tag, Woche und Monat —
+              Mini-Score-Diagramme und Tageskarten zeigen dir das vollständige
+              Bild auf jeder Ebene. Leere Tage ein- oder ausblenden, Momente
+              auf- oder absteigend sortieren.
             </p>
           </div>
 
@@ -878,11 +950,16 @@
             <h3 data-lang="de">Tägliche Reflexion</h3>
             <p data-lang="en">
               End each day with a brief reflection. Review your moments, write a
-              summary, and track what mattered most.
+              summary, and let a Stoic question take you further than "how was
+              your day?" — your roles, what was never in your control, one thing
+              to do differently tomorrow.
             </p>
             <p data-lang="de">
               Beende jeden Tag mit einer kurzen Reflexion. Überblicke deine
-              Momente, schreibe eine Zusammenfassung.
+              Momente, schreibe eine Zusammenfassung — und lass dich von einer
+              stoischen Frage weiterbringen als „Wie war dein Tag?": deine
+              Rollen, das was nicht in deiner Macht lag, die eine Sache, die du
+              morgen anders machst.
             </p>
           </div>
 
@@ -914,8 +991,7 @@
             </p>
           </div>
 
-          <div class="feature-card new">
-            <span class="new-badge">New in 2.3</span>
+          <div class="feature-card">
             <span class="feature-icon">☁️</span>
             <h3 data-lang="en">iCloud Sync</h3>
             <h3 data-lang="de">iCloud-Synchronisation</h3>
