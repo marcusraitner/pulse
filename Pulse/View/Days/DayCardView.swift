@@ -28,7 +28,7 @@ struct DayCardView: View {
     private var avgColor: Color {
         if let score = entry.averageScore(taggedWith: filterState.activeFilter) {
             return Theme.named(themeName)
-                .color(for: Int(score.rounded())).mix(with: .black, by: 0.35)
+                .cardColor(for: Int(score.rounded()))
         } else {
             return Color(.tertiaryLabel)
         }
@@ -72,7 +72,7 @@ struct DayCardView: View {
             }
         }
         .padding(10)
-        .glassEffect(.regular.tint(avgColor.opacity(0.45)).interactive(), in: RoundedRectangle(cornerRadius: 10))
+        .glassTintedCard(avgColor)
         .contentShape(Rectangle())
         .onTapGesture {
             isPresentingDay = true

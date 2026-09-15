@@ -31,6 +31,11 @@ struct Theme: Identifiable {
         }
     }
     
+    /// Score color darkened for use as a glass tint
+    func cardColor(for score: Int) -> Color {
+        color(for: score).mix(with: .black, by: 0.35)
+    }
+    
     /// Returns a gradient derived from the color mapped to the nearest integer score.
     func gradient(for score: CGFloat) -> AnyGradient {
         return color(for: Int(round(score))).gradient

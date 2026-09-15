@@ -87,26 +87,15 @@ struct AggregatedTimelineView: View {
                         ForEach(periodStarts, id: \.self) { periodStart in
                             HStack(spacing: 2) {
                                 ForEach(days(for: periodStart).sorted(by: { $0.key < $1.key }), id: \.key) { (day, entry) in
-                                    if let entry {
-                                        let avg = entry.averageScore(
-                                            taggedWith: filterState.activeFilter)
-                                        let barHeight: CGFloat = max(2, heightScale * (avg?.magnitude ?? 0))
-                                        let yOffset: CGFloat = -0.5 * heightScale * (avg ?? 0)
-                                        
-                                        if let avg {
-                                            RoundedRectangle(cornerRadius: 2)
-                                                .fill(Theme.named(themeName).gradient(for: avg))
-                                                .frame(width: width, height: barHeight)
-                                                .offset(y: yOffset)
-                                        } else if showEmptyDays {
-                                            RoundedRectangle(cornerRadius: 2)
-                                                .fill(.secondary)
-                                                .frame(width: width, height: 2)
-                                        } else {
-                                            RoundedRectangle(cornerRadius: 2)
-                                                .fill(.clear)
-                                                .frame(width: width, height: totalHeight)
-                                        }
+                                    if let avg = entry?.averageScore(taggedWith: filterState.activeFilter) {
+                                        RoundedRectangle(cornerRadius: 2)
+                                            .fill(Theme.named(themeName).gradient(for: avg))
+                                            .frame(width: width, height: max(2, heightScale * avg.magnitude))
+                                            .offset(y: -0.5 * heightScale * avg)
+                                    } else if entry != nil, showEmptyDays {
+                                        RoundedRectangle(cornerRadius: 2)
+                                            .fill(.secondary)
+                                            .frame(width: width, height: 2)
                                     } else {
                                         RoundedRectangle(cornerRadius: 2)
                                             .fill(.clear)

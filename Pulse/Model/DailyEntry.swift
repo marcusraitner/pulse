@@ -417,11 +417,6 @@ enum PulseVersionedSchemaV150: VersionedSchema {
             guard let logEntries, !logEntries.isEmpty else { return 0 }
             return logEntries.reduce(0) { $0 + CGFloat($1.score) } / CGFloat(logEntries.count)
         }
-
-        var isEmpty: Bool {
-            guard let logEntries, !logEntries.isEmpty else { return summary.isEmpty }
-            return false
-        }
         
         @Relationship(deleteRule: .cascade, inverse: \DailyLogEntry.entry)
         var logEntries: [DailyLogEntry]? = []

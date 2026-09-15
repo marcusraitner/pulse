@@ -114,15 +114,11 @@ struct ContentView: View {
                             // The timeline scroll view
                             HorizontalTimelineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
                                 .padding(.top)
-                            Text(selectedEntry.date.formatted(.dateTime.weekday().day().month().year()))
-                                .font(.default.bold())
-                                .foregroundStyle(.primary)
+                            SelectedDateView(date: selectedEntry.date)
                                 .padding(.bottom)
                                 .padding(.top, 4)
                         }
                     }
-                    .contentMargins(.bottom, 12, for: .scrollContent)
-                    .scrollEdgeEffectStyle(.soft, for: .bottom)
                 } else {
                     AggregatedTimelineView(aggregationLevel: viewMode == .week ? .week : .month)
                 }
@@ -164,12 +160,19 @@ struct ContentView: View {
                             viewMode = .day
                         }
                     } label: {
-                        Image(systemName: viewMode.systemImage)
-                            .fontWeight(.medium)
+                        ZStack {
+                            ForEach(ViewMode.allCases, id: \.self) { mode in
+                                Image(systemName: mode.systemImage)
+                                    .hidden()
+                            }
+                            
+                            Image(systemName: viewMode.systemImage)
+                                .fontWeight(.medium)
+                                .contentTransition(.symbolEffect(.replace))
+                        }
+                        .animation(.snappy(duration: 0.25), value: viewMode)
                     }
                 }
-                
-//                ToolbarSpacer(.fixed, placement: .topBarTrailing)
                 
                 ToolbarItem(placement: .bottomBar) {
                     if !tags.isEmpty {

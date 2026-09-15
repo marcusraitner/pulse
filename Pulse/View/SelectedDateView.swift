@@ -22,15 +22,14 @@ struct SelectedDateView: View {
                     let end = cal.date(byAdding: .day, value: 6, to: start) ?? start
                     
                     Text("Week \(date.formatted(.dateTime.week())): \(start.formatted(.dateTime.day().month(.defaultDigits).year(.twoDigits))) – \(end.formatted(.dateTime.day().month(.defaultDigits).year(.twoDigits)))")
-                        .font(.default.bold())
                 case .month:
                     Text(date.formatted(.dateTime.month(.wide).year()))
-                        .font(.default.bold())
                 }
             } else {
                 Text(date.formatted(.dateTime.weekday().day().month().year()))
             }
         }
+        .font(.body.bold())
     }
 }
 

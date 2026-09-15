@@ -29,10 +29,7 @@ extension Color {
     }
 
     func contrastingTextColor(in env: EnvironmentValues) -> Color {
-        let L = luminance(in: env)
-        let contrastWithWhite = 1.05 / (L + 0.05)
-        let contrastWithBlack = (L + 0.05) / 0.05
-        return contrastWithBlack >= contrastWithWhite ? .black : .white
+        luminance(in: env) >= 0.179 ? .black : .white
     }
 }
 
