@@ -32,20 +32,20 @@ private func makeEntry(scores: [Int], in context: ModelContext) -> DailyEntry {
 @Suite("DailyEntry.averageScore")
 struct AverageScoreTests {
 
-    @Test("Returns 0 for empty logEntries")
+    @Test("Returns nil for empty logEntries")
     func emptyEntries() throws {
         let context = try makeContext()
         let entry = makeEntry(scores: [], in: context)
-        #expect(entry.averageScore == 0.0)
+        #expect(entry.averageScore == nil)
     }
 
-    @Test("Returns 0 for nil logEntries")
+    @Test("Returns nil for nil logEntries")
     func nilEntries() throws {
         let context = try makeContext()
         let entry = DailyEntry(date: .now)
         entry.logEntries = nil
         context.insert(entry)
-        #expect(entry.averageScore == 0.0)
+        #expect(entry.averageScore == nil)
     }
 
     @Test("Returns the score of a single entry")
@@ -67,7 +67,7 @@ struct AverageScoreTests {
         let context = try makeContext()
         // (2 + -2 + 1) / 3 = 1/3
         let entry = makeEntry(scores: [2, -2, 1], in: context)
-        #expect(abs(entry.averageScore - CGFloat(1) / CGFloat(3)) < 0.001)
+        #expect(abs(try #require(entry.averageScore) - CGFloat(1) / CGFloat(3)) < 0.001)
     }
 
     @Test("Returns correct mean for all-positive scores")
@@ -75,7 +75,7 @@ struct AverageScoreTests {
         let context = try makeContext()
         // (1 + 2 + 1) / 3 = 1.333…
         let entry = makeEntry(scores: [1, 2, 1], in: context)
-        #expect(abs(entry.averageScore - CGFloat(4) / CGFloat(3)) < 0.001)
+        #expect(abs(try #require(entry.averageScore) - CGFloat(4) / CGFloat(3)) < 0.001)
     }
 
     @Test("Returns correct mean for all-negative scores")
