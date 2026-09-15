@@ -18,7 +18,7 @@ enum ScoreLabelStyle {
 }
 
 extension Color {
-    /// Relative luminance WCAG (0 = schwarz, 1 = weiß)
+    /// Relative luminance WCAG (0 = black, 1 = white)
     private func luminance(in env: EnvironmentValues) -> Double {
         let r = resolve(in: env)
         func lin(_ c: Float) -> Double {
@@ -29,6 +29,7 @@ extension Color {
     }
 
     func contrastingTextColor(in env: EnvironmentValues) -> Color {
+        // 0.179 is where contrast-vs-black equals contrast-vs-white: sqrt(0.05 * 1.05) - 0.05
         luminance(in: env) >= 0.179 ? .black : .white
     }
 }

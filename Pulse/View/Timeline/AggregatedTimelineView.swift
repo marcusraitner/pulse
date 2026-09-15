@@ -22,7 +22,6 @@ struct AggregatedTimelineView: View {
     }
     
     @State private var containerWidth: CGFloat = 0.0
-    @State private var cardWidth: CGFloat = 0.0
     @State private var selectedStartDate: Date = .now
     @State private var position: Date?
     
