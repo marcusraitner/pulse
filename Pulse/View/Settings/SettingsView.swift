@@ -24,6 +24,8 @@ struct SettingsView: View {
     @AppStorage(AppStorageKeys.backgroundImageData) private var backgroundImageData: Data?
     @AppStorage(AppStorageKeys.backgroundImageName) private var backgroundImageName: String = "mountain"
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
+    @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = false
+    @AppStorage(AppStorageKeys.sortAscending) private var sortAscending: Bool = true
     
     @State private var backgroundImageSelection: PhotosPickerItem?
     @State private var notificationTimes: [Date] = []
@@ -177,6 +179,9 @@ struct SettingsView: View {
                             Text("Customize the overall appearance here.")
                                 .foregroundStyle(.secondary)
                         }
+                    }
+                    
+                    Section {
                         Picker(selection: $themeName) {
                             ForEach(Theme.builtIn) { theme in
                                 ThemePreview(theme)
@@ -338,7 +343,6 @@ struct SettingsView: View {
                                 DatePicker("Every day at",
                                            selection: $notificationTimes[index],
                                            displayedComponents: [.hourAndMinute])
-                                .padding(.vertical, featureFlags.iOS26 ? 0 : 5)
                                 .swipeActions(edge: .trailing) {
                                     Button(role: .destructive) {
                                         notificationTimes.remove(at: index)

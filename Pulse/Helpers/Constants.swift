@@ -22,12 +22,13 @@ enum AppStorageKeys {
     static let theme = "theme"
     static let backgroundImageData = "backgroundImageData"
     static let backgroundImageName = "backgroundImageName"
-    static let viewMode = "viewMode"
-
-    // MARK: - KPI
-    static let pinnedKPITemplateIDs = "pinnedKPITemplateIDs"
+    static let showEmptyDays = "showEmptyDays"
+    static let sortAscending = "sortAscending"
 
     // MARK: - Review
     static let lastReviewRequest = "lastReviewRequest"
     static let numberOfRequests = "numberOfRequests"
+    
+    // MARK: - Other
+    static let initialSweepDone = "initialSweepDone"
 }

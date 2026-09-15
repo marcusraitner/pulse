@@ -19,14 +19,20 @@ struct HorizontalTimelineView: View {
     /// Set to `true` to programmatically scroll the timeline to today's entry.
     @Binding var scrollToToday: Bool
 
-    @State private var entriesByDate: [Date: DailyEntry] = [:]
     @State private var position: Date?
     @State private var containerWidth: CGFloat = 0.0
-
+    @State private var hasSetInitialPosition = false
+    
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
-
+    @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = false
+    @Environment(FilterState.self) private var filterState
+    
     @Environment(\.featureFlags) private var featureFlags
 
+    private var entriesByDate: [Date:DailyEntry] {
+        Dictionary(allEntries.map( { ($0.date, $0) } ), uniquingKeysWith: { first, _ in first } )
+    }
+    
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "HorizontalTimeLineView")
 
     var body: some View {
@@ -36,26 +42,28 @@ struct HorizontalTimelineView: View {
 
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 3) {
-                ForEach(allEntries, id: \.date ) { entry in
-                    let avg: CGFloat = entry.averageScore
-                    let barHeight: CGFloat = max(2, heightScale * avg.magnitude)
-                    let yOffset: CGFloat = -0.5 * heightScale * avg
+                ForEach(allEntries.filter( { showEmptyDays || !$0.isEmpty || Calendar.current.isDateInToday($0.date) } ) , id: \.date ) { entry in
+                    let avg: CGFloat? = entry.averageScore(
+                        taggedWith: filterState.activeFilter)
+                    let barHeight: CGFloat = max(2, heightScale * (avg?.magnitude ?? 0))
+                    let yOffset: CGFloat = -0.5 * heightScale * (avg ?? 0)
 
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(Color.clear)
+                    PulseRoundedRectangle(pulse: entry.date == selectedEntry.date)
                         .frame(width: barWidth, height: totalHeight)
                         .overlay {
-                            RoundedRectangle(cornerRadius: 4)
+                            if let avg {
+                                RoundedRectangle(cornerRadius: 4)
                                 .fill(Theme.named(themeName).gradient(for: avg))
                                 .frame(width: barWidth, height: barHeight)
                                 .offset(y: yOffset)
+                            }
                         }
                         .id(entry.date)
                         .onTapGesture {
                             withAnimation(.default) {
                                 position = entry.date
                             }
-                    }
+                        }
                 }
             }
             .frame(height: totalHeight)
@@ -63,24 +71,13 @@ struct HorizontalTimelineView: View {
         }
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition(id: $position, anchor: .center)
+        .defaultScrollAnchor(.trailing)
         .contentMargins(.horizontal, (containerWidth - barWidth) * 0.5, for: .scrollContent)
         .onGeometryChange(for: CGSize.self) { proxy in
             proxy.size
         } action: { old, new in
+            logger.trace("Setting container width to \(new.width)")
             containerWidth = new.width
-        }
-        .background {
-            // draw baseline and indicator for selected day
-            Group {
-                EquilateralTriangle()
-                    .frame(width: 10, height: 10)
-                    .rotationEffect(Angle(degrees: 180))
-                    .offset(y: -totalHeight * 0.5 - 15)
-                Rectangle()
-                    .frame(width: 1, height: totalHeight + 12)
-                    .foregroundStyle(.white.opacity(1))
-            }
-            .foregroundStyle(.white.opacity(1))
         }
         .onChange(of: position) { _, new in
             // set selectedEntry on scroll pos change
@@ -99,42 +96,45 @@ struct HorizontalTimelineView: View {
             logger.trace("New selected date: \(selectedEntry.date)")
         }
         .onChange(of: allEntries, initial: true) {
-            entriesByDate = Dictionary(uniqueKeysWithValues: allEntries.map { ($0.date, $0 ) } )
-            
-            if let last = allEntries.last {
-                position = last.date
+            logger.trace("allEntries changed")
+
+            // skip the initial run; triggerScrollToToday handles the first scroll
+            // once layout has actually settled
+            guard hasSetInitialPosition else {
+                hasSetInitialPosition = true
+                return
             }
+
+            guard let last = allEntries.last else { return }
+            logger.trace("scrolling to last")
+            position = last.date
         }
         .sensoryFeedback(.impact, trigger: selectedEntry)
         .onChange(of: scrollToToday) { _, new in
             if new {
                 logger.trace("scroll to today triggered")
                 if let last = allEntries.last {
-                    position = last.date
+                    position = nil
+                    logger.trace("scrolling to today / last")
+                    withAnimation() {
+                        position = last.date
+                    }
                 }
                 scrollToToday = false
             }
         }
-    }
-}
-
-/// An equilateral triangle `Shape` used as the selection indicator above the timeline bar chart.
-struct EquilateralTriangle: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-
-        // Define the three points of the triangle
-        let top = CGPoint(x: rect.midX, y: rect.minY)
-        let bottomLeft = CGPoint(x: rect.minX, y: rect.maxY)
-        let bottomRight = CGPoint(x: rect.maxX, y: rect.maxY)
-
-        // Draw the lines
-        path.move(to: top)
-        path.addLine(to: bottomLeft)
-        path.addLine(to: bottomRight)
-        path.addLine(to: top)  // Close the path
-
-        return path
+        .onChange(of: showEmptyDays) { _, _ in
+            let target =
+            (!selectedEntry.isEmpty || Calendar.current.isDateInToday(selectedEntry.date)) ?
+            selectedEntry.date : allEntries.last?.date
+           
+            position = nil
+            DispatchQueue.main.async() {
+                if let target {
+                    position = target
+                }
+            }
+        }
     }
 }
 

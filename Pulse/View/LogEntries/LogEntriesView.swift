@@ -14,17 +14,21 @@ struct LogEntriesView: View {
     @State private var entryToEdit: DailyLogEntry? = nil
 
     @AppStorage(AppStorageKeys.theme) var themeName: String = "traffic"
-
+    @AppStorage(AppStorageKeys.sortAscending) private var sortAscending: Bool = true
+    @Environment(FilterState.self) private var filterState
+    
+    var filteredAndSortedEntries: [DailyLogEntry] {
+        day.logEntries(taggedWith: filterState.activeFilter).sorted(by: {
+            sortAscending ? $0.timestamp < $1.timestamp
+            : $0.timestamp > $1.timestamp } )
+    }
+    
     var body: some View {
-        let logEntries = day.logEntries?.sorted(by: {
-            $0.timestamp < $1.timestamp
-        }) ?? []
-        
-        ForEach(logEntries) { entry in
+        ForEach(filteredAndSortedEntries) { entry in
             LogEntryText(logEntry: entry)
                 .padding(.vertical, 15)
                 .padding(.horizontal)
-                .glassTintedCard(color: Theme.named(themeName).color(for: entry.score))
+                .glassTintedCard(Theme.named(themeName).cardColor(for: entry.score))
                 .contentShape(Rectangle())
                 .onTapGesture {
                     entryToEdit = entry

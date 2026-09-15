@@ -11,7 +11,7 @@ import CoreLocation
 import OSLog
 
 /// Wraps CoreLocation permission requests and one-shot coordinate capture.
-/// Once a location fix is obtained it is automatically reverse-geocoded via `Compat.reverseGeocode`.
+/// Once a location fix is obtained it is automatically reverse-geocoded via `MKReverseGeocodingRequest`.
 /// Consumers react to new locations by assigning a closure to `setItem`.
 @Observable
 class LocationManager: NSObject, CLLocationManagerDelegate {
@@ -72,7 +72,8 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         Task { [weak self] in
             guard let self else { return }
             do {
-                let items = try await Compat.reverseGeocode(location: location)
+                guard let request = MKReverseGeocodingRequest(location: location) else { return }
+                let items = try await request.mapItems
                 await MainActor.run { self.mapItems = items }
             } catch {
                 logger.error("Error reverse geocoding location: \(error.localizedDescription)")

@@ -21,18 +21,15 @@ struct SelectedDateView: View {
                     let start = cal.dateInterval(of: .weekOfYear, for: date)?.start ?? date
                     let end = cal.date(byAdding: .day, value: 6, to: start) ?? start
                     
-                    Text("Week \(date.formatted(.dateTime.week()))")
-                    Text("\(start.formatted(.dateTime.day().month(.defaultDigits).year())) – \(end.formatted(.dateTime.day().month(.defaultDigits).year()))")
+                    Text("Week \(date.formatted(.dateTime.week())): \(start.formatted(.dateTime.day().month(.defaultDigits).year(.twoDigits))) – \(end.formatted(.dateTime.day().month(.defaultDigits).year(.twoDigits)))")
                 case .month:
-                    Text(date.formatted(.dateTime.month(.wide)))
-                    Text(date.formatted(.dateTime.year()))
+                    Text(date.formatted(.dateTime.month(.wide).year()))
                 }
             } else {
-                Text(date.formatted(.dateTime.weekday(.wide)))
-                Text(date.formatted(.dateTime.day().month(.wide).year()))
+                Text(date.formatted(.dateTime.weekday().day().month().year()))
             }
         }
-        .font(.system(.title, design: .serif).bold())
+        .font(.body.bold())
     }
 }
 

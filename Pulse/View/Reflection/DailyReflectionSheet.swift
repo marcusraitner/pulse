@@ -15,6 +15,7 @@ import OSLog
 struct DailyReflectionSheet: View {
     enum FocusField: Hashable {
         case summary
+        case morning
         case kpi(UUID)
     }
     
@@ -24,7 +25,8 @@ struct DailyReflectionSheet: View {
     
     @State private var kpiValues: [UUID : String] = [:]
     @State private var reflection: String = ""
-    @State private var coachingQuestion: String? = nil
+    @State private var morning: String = ""
+    @State private var coachingQuestionIndex: Int = 0
     @FocusState private var focusedField: FocusField?
     
     @Environment(\.dismiss) private var dismiss
@@ -35,32 +37,14 @@ struct DailyReflectionSheet: View {
 
     /// Localization keys for the pool of coaching questions shown below the reflection field.
     private static let questionKeys = [
-        "reflection.question.1",
-        "reflection.question.2",
-        "reflection.question.3",
-        "reflection.question.4",
-        "reflection.question.5",
-        "reflection.question.6",
-        "reflection.question.7",
-        "reflection.question.8",
-        "reflection.question.9",
-        "reflection.question.10",
-        "reflection.question.11",
-        "reflection.question.12",
-        "reflection.question.13",
-        "reflection.question.14",
-        "reflection.question.15",
-        "reflection.question.16",
-        "reflection.question.17",
-        "reflection.question.18",
-        "reflection.question.19",
-        "reflection.question.20"
+        "stoic.reflection.1",
+        "stoic.reflection.2",
+        "stoic.reflection.3",
     ]
 
     /// Replaces the current coaching question with a different randomly selected one.
     private func pickAnotherQuestion() {
-        let others = Self.questionKeys.filter { $0 != coachingQuestion }
-        coachingQuestion = others.randomElement()
+        coachingQuestionIndex = (coachingQuestionIndex + 1) % Self.questionKeys.count
     }
 
     private func kpiBinding(for template: KPITemplate) -> Binding<String> {
@@ -71,6 +55,7 @@ struct DailyReflectionSheet: View {
     
     private func save() {
         day.summary = reflection
+        day.morning = morning
 
         for template in kpiTemplates {
             let existing = day.kpiValues?.first(where: { $0.template?.id == template.id })
@@ -101,6 +86,20 @@ struct DailyReflectionSheet: View {
         VStack(alignment: .leading) {
             List {
                 Section {
+                    TextField("What do you expect today?", text: $morning, axis: .vertical)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(5...Int.max)
+                        .focused($focusedField, equals: .morning)
+                } header: {
+                    Text("Forecast")
+                } footer: {
+                    Text("What might be hard today — once anticipated, it won't catch you off guard. One sentence is enough.")
+                }
+                .onAppear() {
+                    focusedField = .morning
+                }
+
+                Section {
                     TextField("Summarize your day", text: $reflection, axis: .vertical)
                         .multilineTextAlignment(.leading)
                         .lineLimit(5...Int.max)
@@ -108,22 +107,22 @@ struct DailyReflectionSheet: View {
                 } header: {
                     Text("Reflect Your Day")
                 } footer: {
-                    if let question = coachingQuestion {
-                        VStack(alignment: .leading) {
-                            Text(LocalizedStringKey(question))
-                            HStack {
-                                Spacer()
-                                Button(action: pickAnotherQuestion) {
-                                    Label("New question", systemImage: "arrow.clockwise")
-                                        .font(.footnote)
-                                }
-                                .buttonStyle(.plain)
-                                .foregroundStyle(.tint)
-                                .padding(.top, 2)
-
+                    let question = Self.questionKeys[coachingQuestionIndex]
+                    VStack(alignment: .leading) {
+                        Text(LocalizedStringKey(question))
+                        HStack {
+                            Spacer()
+                            Button(action: pickAnotherQuestion) {
+                                Label("New question", systemImage: "arrow.clockwise")
+                                    .font(.footnote)
                             }
+                            .buttonStyle(.plain)
+                            .foregroundStyle(.tint)
+                            .padding(.top, 2)
+                            
                         }
                     }
+                        
                 }
                 .onAppear() {
                     focusedField = .summary
@@ -167,13 +166,11 @@ struct DailyReflectionSheet: View {
                 }
                 Section {
                     if let logEntries = day.logEntries, !logEntries.isEmpty {
-                        // TODO: Add navigation to LogEntrySheet
                         ForEach(day.logEntries?.sorted(by: { $0.timestamp < $1.timestamp } ) ?? []) { logEntry in
                             NavigationLink {
                                 LogEntrySheet(day: day, entry: logEntry, isModal: false)
                             } label: {
                                 LogEntryText(logEntry: logEntry)
-                                    .padding(.vertical, featureFlags.iOS26 ? 0 : 5)
                             }
                         }
                     }
@@ -190,13 +187,13 @@ struct DailyReflectionSheet: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Compat.confirmButton(String(localized: "Save")) {
+                Button(role: .confirm) {
                     save()
                     dismiss()
                 }
             }
             ToolbarItem(placement: .cancellationAction) {
-                Compat.closeButton { dismiss() }
+                Button(role: .close) { dismiss() }
             }
             ToolbarItemGroup(placement: .keyboard) {
                 Button {
@@ -208,15 +205,12 @@ struct DailyReflectionSheet: View {
         }
         .task {
             reflection = day.summary
+            morning = day.morning
             
             for value in day.kpiValues ?? [] {
                 if let template = value.template {
                     kpiValues[template.id] = String(value.value)
                 }
-            }
-            
-            if day.summary.isEmpty {
-                coachingQuestion = Self.questionKeys.randomElement()
             }
         }
     }

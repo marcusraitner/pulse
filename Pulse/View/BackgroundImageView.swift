@@ -23,14 +23,12 @@ struct BackgroundImageView: View {
                     .resizable()
                     .scaledToFill()
                     .frame(minWidth: 0, maxWidth: .infinity)
-                    .ignoresSafeArea()
             } else {
                 // load the image from assets
                 Image(backgroundImageName)
                     .resizable()
                     .scaledToFill()
                     .frame(minWidth: 0, maxWidth: .infinity)
-                    .ignoresSafeArea()
             }
         }
         .onChange(of: backgroundImageData, initial: true) {
@@ -41,7 +39,18 @@ struct BackgroundImageView: View {
             
             self.uiImage = uiImage
         }
-
+        .overlay {
+            LinearGradient (
+                stops: [
+                    .init(color: .black.opacity(0.3), location: 0),
+                    .init(color: .clear, location: 0.5),
+                    .init(color: .clear, location: 0.8),
+                    .init(color: .black.opacity(0.45), location: 1)
+                ],
+                startPoint: .top, endPoint: .bottom
+                )
+        }
+        .ignoresSafeArea()
     }
 }
 

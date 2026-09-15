@@ -22,13 +22,15 @@ struct AggregatedTimelineView: View {
     }
     
     @State private var containerWidth: CGFloat = 0.0
-    @State private var cardWidth: CGFloat = 0.0
     @State private var selectedStartDate: Date = .now
-    @State private var position: ScrollPosition = .init(idType: Date.self)
+    @State private var position: Date?
     
     @Query(sort: \DailyEntry.date) private var allEntries: [DailyEntry]
     
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
+    @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = false
+    
+    @Environment(FilterState.self) private var filterState
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "AggregatedTimelineView")
     
@@ -68,30 +70,31 @@ struct AggregatedTimelineView: View {
     }
     
     var body: some View {
-        let heightScale: CGFloat = 20
+        let heightScale: CGFloat = 15
         let totalHeight: CGFloat = 4 * heightScale
         let width = aggregationLevel == .week ? 8.0 : 6.0
         let cardWidth: CGFloat = aggregationLevel == .week ? 7 * (width + 2) : 31 * (width + 2)
         
         ScrollView(.vertical) {
-            VStack(spacing: 0) {
-                SelectedDateView(date: selectedStartDate, level: aggregationLevel)
-                    .padding(.vertical)
-                
+                DaysListView(aggregationLevel: aggregationLevel, date: selectedStartDate)
+                    .padding(.horizontal, 8)
+        }
+        .safeAreaBar(edge: .top) {
+            VStack {
                 ScrollView(.horizontal, showsIndicators: false) {
-                    LazyHStack(spacing: 8) {
+                    HStack(spacing: 8) {
                         ForEach(periodStarts, id: \.self) { periodStart in
                             HStack(spacing: 2) {
-                                ForEach(days(for: periodStart).sorted(by: { $0.key < $1.key }), id: \.key) { (day, entry) in
-                                    if let entry {
-                                        let avg: CGFloat = entry.averageScore
-                                        let barHeight: CGFloat = max(2, heightScale * avg.magnitude)
-                                        let yOffset: CGFloat = -0.5 * heightScale * avg
-                                        
+                                ForEach(days(for: periodStart).sorted(by: { $0.key < $1.key }), id: \.key) { ( _, entry ) in
+                                    if let avg = entry?.averageScore(taggedWith: filterState.activeFilter) {
                                         RoundedRectangle(cornerRadius: 2)
-                                            .fill(Theme.named(themeName).gradient(for: entry.averageScore))
-                                            .frame(width: width, height: barHeight)
-                                            .offset(y: yOffset)
+                                            .fill(Theme.named(themeName).gradient(for: avg))
+                                            .frame(width: width, height: max(2, heightScale * avg.magnitude))
+                                            .offset(y: -0.5 * heightScale * avg)
+                                    } else if entry != nil, showEmptyDays {
+                                        RoundedRectangle(cornerRadius: 2)
+                                            .fill(.secondary)
+                                            .frame(width: width, height: 2)
                                     } else {
                                         RoundedRectangle(cornerRadius: 2)
                                             .fill(.clear)
@@ -99,17 +102,14 @@ struct AggregatedTimelineView: View {
                                     }
                                 }
                             }
-                            .frame(width: cardWidth, height: totalHeight)
-                            .padding(10)
-                            .glassBackground()
+                            .frame(width: cardWidth, height: totalHeight + 20)
+                            .padding(.horizontal, 10)
+                            .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 10))
                             .contentShape(RoundedRectangle(cornerRadius: 10))
                             .id(periodStart)
                             .onTapGesture {
                                 withAnimation(.default) {
-                                    position.scrollTo(
-                                        id: periodStart,
-                                        anchor: .center
-                                    )
+                                    position = periodStart
                                 }
                             }
                         }
@@ -118,11 +118,12 @@ struct AggregatedTimelineView: View {
                     .frame(height: totalHeight + 20)
                 }
                 .scrollTargetBehavior(.viewAligned)
-                .scrollPosition($position, anchor: .center)
+                .scrollPosition(id: $position, anchor: .center)
+                .defaultScrollAnchor(.trailing)
                 .contentMargins(.horizontal, (containerWidth - cardWidth - 20) * 0.5, for: .scrollContent)
                 .onChange(of: periodStarts, initial: true) { _, newPeriods in
                     guard let last = newPeriods.last else { return }
-                    position.scrollTo(id: last, anchor: .center)
+                    position = last
                     selectedStartDate = last
                 }
                 .onGeometryChange(for: CGSize.self) { proxy in
@@ -131,21 +132,21 @@ struct AggregatedTimelineView: View {
                     containerWidth = new.width
                 }
                 .onChange(of: position) { _, new in
-                    guard let date = new.viewID(type: Date.self) else {
+                    guard let new else {
                         logger.warning("Could not find date in scroll position")
                         return
                     }
                     
-                    selectedStartDate = date
-                    logger.trace("New selected date: \(selectedStartDate)")
+                    selectedStartDate = new
+                    logger.trace("New selected start date: \(selectedStartDate)")
                 }
                 .sensoryFeedback(.impact, trigger: selectedStartDate)
-                .padding(.vertical, 20)
+                .padding(.top)
                 
-                DaysListView(aggregationLevel: aggregationLevel, date: selectedStartDate)
-                    .padding(.top, 10)
-                    .padding(.horizontal, 8)
-            } // VStack
+                SelectedDateView(date: selectedStartDate, level: aggregationLevel)
+                    .padding(.top, 4)
+                    .padding(.bottom)
+            }
         }
     }
 }

@@ -1,0 +1,59 @@
+//
+//  PulseRoundedRectangle.swift
+//  Pulse
+//
+//  Created by Marcus Raitner on 14.08.26.
+//
+
+import SwiftUI
+import OSLog
+
+struct PulseRoundedRectangle: View {
+    let pulse: Bool
+    @State private var cursorOpacity: Double = 0.3
+    @State private var generation: Int = 0
+    private let logger = Logger(subsystem: "de.raitner.pulse", category: "PulseRoundedRectangle")
+
+
+    private var cursorAnimation: Animation {
+        .easeInOut(duration: 1.0)
+        .repeatForever(autoreverses: true)
+    }
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 4)
+            .fill(.tertiary.opacity(cursorOpacity))
+            .onAppear {
+                updatePulse()
+                logger.info("appear")
+            }
+            .onChange(of: pulse) { _, _ in
+                logger.info("pulse: \(pulse)")
+                updatePulse()
+            }
+    }
+
+    private func updatePulse() {
+        generation += 1
+        let requestedGeneration = generation
+
+        guard pulse else {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                cursorOpacity = 0.3
+            }
+            return
+        }
+
+        // pulse may flip again before this runs; only apply if still the latest request
+        DispatchQueue.main.async {
+            guard generation == requestedGeneration else { return }
+            withAnimation(cursorAnimation) {
+                cursorOpacity = 1
+            }
+        }
+    }
+}
+
+#Preview {
+    PulseRoundedRectangle(pulse: true)
+}
