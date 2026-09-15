@@ -40,9 +40,9 @@ SO FUNKTIONIERT'S
 
 • Momente festhalten: Ein kurzer Gedanke, eine Bewertung von −2 (schlecht) bis +2 (gut), optional Tags und Ort. In Sekunden erledigt.
 
-• Bilanz ziehen: Am Abend fasst du deinen Tag zusammen – mit eigenen Metriken wie Schlaf, Deep Work, Sport oder Familienzeit. Eine wechselnde Reflexionsfrage hilft beim Einstieg.
+• Bilanz ziehen: Morgens ein Satz Vorschau, abends die Zusammenfassung – mit eigenen Metriken wie Schlaf, Deep Work, Sport oder Familienzeit. Stoische Reflexionsfragen helfen beim Einstieg.
 
-• Muster erkennen: Tages- und Wochenansichten zeigen dir, was dir guttut – und was nicht. Gute Tage haben Gründe.
+• Muster erkennen: Tages-, Wochen- und Monatsansichten zeigen dir, was dir guttut – und was nicht. Filtere nach einem Tag, um einen einzelnen Lebensbereich isoliert zu betrachten. Gute Tage haben Gründe.
 
 • AI-Coach: Auf Wunsch analysiert Apple Intelligence deine Einträge und liefert Erkenntnisse über deine Muster – zu 100 % auf deinem iPhone, ohne Cloud.
 
@@ -59,6 +59,32 @@ Was Nutzer sagen: „Endlich mal eine schlichte und schnelle App" – ★★★�
 Fragen oder Wünsche? Pulse wird aktiv weiterentwickelt – dein Feedback fließt direkt ein.
 ```
 *(ca. 1.400 Zeichen — bewusst kompakt; Versionshinweise wie „Neu in 2.2" gehören in „Was ist neu", nicht in die Beschreibung.)*
+
+### Was ist neu in 2.4 (max. 4.000 Zeichen)
+```
+Version 2.4 macht aus dem Tagebuch eine Tagesklammer: morgens ein Blick voraus, abends die Bilanz.
+
+WETTERBERICHT AM MORGEN
+Was könnte heute schwierig werden? Ein Satz genügt. Wer es vorher benannt hat, wird davon nicht überrascht.
+
+STOISCHE REFLEXIONSFRAGEN
+Drei Fragen für den Abend, die weiterbringen als „Wie war dein Tag?" – zu deinen Rollen, zu dem, was nicht in deiner Macht lag, und zu der einen Sache, die du morgen anders machst. Tippe, um zur nächsten zu wechseln.
+
+FILTERN NACH TAG
+Wähle einen Tag aus, und die gesamte Zeitleiste rechnet neu: Nur Momente aus diesem Lebensbereich, mit eigenen Tagesdurchschnitten. So siehst du, was „Arbeit" oder „Familie" wirklich mit deinen Tagen macht.
+
+TAG, WOCHE, MONAT – EIN TIPP
+Ein Knopf in der Symbolleiste wechselt durch alle drei Ansichten. Leere Tage kannst du ein- oder ausblenden, Momente nach Uhrzeit auf- oder absteigend sortieren.
+
+KEINE LÜCKEN MEHR
+Fehlende Tage werden automatisch ergänzt, auch nach längerer Pause. Deine Zeitleiste bleibt durchgehend – ohne dass du etwas nachtragen musst.
+
+FRISCHERE OBERFLÄCHE
+Neu gestaltete Momentkarten mit Uhrzeit und Bewertung auf einen Blick, bessere Lesbarkeit über jedem Hintergrundbild, ruhigeres Scrollen und eine Bewertungsanzeige, die ihre Textfarbe automatisch an den Untergrund anpasst.
+
+Pulse 2.4 ist vollständig auf iOS 26 gebaut und für iOS 27 getestet.
+```
+*(ca. 1.370 Zeichen)*
 
 ---
 
@@ -97,9 +123,9 @@ HOW IT WORKS
 
 • Capture moments: a short thought, a rating from −2 (bad) to +2 (good), optional tags and location. Done in seconds.
 
-• Reflect on your day: wrap up each evening with your own metrics like sleep, deep work, exercise, or family time. A rotating reflection question gets you started.
+• Reflect on your day: one sentence of forecast in the morning, the summary in the evening — with your own metrics like sleep, deep work, exercise, or family time. Stoic reflection questions get you started.
 
-• Discover patterns: daily and weekly views show you what lifts you up — and what doesn't. Good days have reasons.
+• Discover patterns: daily, weekly, and monthly views show you what lifts you up — and what doesn't. Filter by a single tag to look at one area of your life on its own. Good days have reasons.
 
 • AI coach: on request, Apple Intelligence analyzes your entries and surfaces insights about your patterns — running entirely on your iPhone, no cloud.
 
@@ -114,3 +140,29 @@ For everyone who has failed at classic journaling: no long entries, no pressure,
 Questions or ideas? Pulse is actively developed — your feedback shapes the roadmap.
 ```
 *(approx. 1,250 characters. Note: the German testimonial is deliberately omitted here — add an English review quote once the US storefront has ratings.)*
+
+### What's New in 2.4 (max. 4,000 characters)
+```
+Version 2.4 turns the journal into a bracket around your day: a look ahead in the morning, the reckoning at night.
+
+MORNING FORECAST
+What might be hard today? One sentence is enough. Name it in advance and it won't catch you off guard.
+
+STOIC REFLECTION QUESTIONS
+Three evening questions that get further than "how was your day?" — about the roles you filled, about what was never in your control, and about the one thing you'll do differently tomorrow. Tap to move to the next one.
+
+FILTER BY TAG
+Pick a tag and the whole timeline recomputes: only moments from that part of your life, with their own daily averages. See what "work" or "family" is actually doing to your days.
+
+DAY, WEEK, MONTH — ONE TAP
+A single toolbar button cycles through all three views. Show or hide empty days, and sort moments by time ascending or descending.
+
+NO MORE GAPS
+Missing days are filled in automatically, even after a long break. Your timeline stays continuous — nothing to backfill by hand.
+
+A CLEANER SURFACE
+Redesigned moment cards with time and rating at a glance, better legibility over any background image, calmer scrolling, and a score badge that picks its own text color to stay readable on every shade.
+
+Pulse 2.4 is built entirely on iOS 26 and tested for iOS 27.
+```
+*(approx. 1,260 characters)*
