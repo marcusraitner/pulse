@@ -520,7 +520,7 @@ enum PulseVersionedSchemaV150: VersionedSchema {
 
 // MARK: - Schema V1.6.0
 
-/// Adds `premeditatio` to `DailyEntry` to enable a morning reflection similar to the `summary` in the evening.
+/// Adds `morning` to `DailyEntry` to enable a morning reflection similar to the `summary` in the evening.
 /// Migration from V1.5.0 is lightweight (additive fields/model with defaults).
 enum PulseVersionedSchemaV160: VersionedSchema {
     static var models: [any PersistentModel.Type] {

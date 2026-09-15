@@ -86,7 +86,7 @@ struct AggregatedTimelineView: View {
                     HStack(spacing: 8) {
                         ForEach(periodStarts, id: \.self) { periodStart in
                             HStack(spacing: 2) {
-                                ForEach(days(for: periodStart).sorted(by: { $0.key < $1.key }), id: \.key) { (day, entry) in
+                                ForEach(days(for: periodStart).sorted(by: { $0.key < $1.key }), id: \.key) { ( _, entry ) in
                                     if let avg = entry?.averageScore(taggedWith: filterState.activeFilter) {
                                         RoundedRectangle(cornerRadius: 2)
                                             .fill(Theme.named(themeName).gradient(for: avg))
