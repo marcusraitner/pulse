@@ -44,6 +44,22 @@ func missingEntryDates(existing: [Date], from start: Date, to end: Date,
     return missing
 }
 
+/// Entries safe to delete because a same-day sibling holds the only real content —
+/// or because none of the siblings have any. CloudKit sync can create these:
+/// two devices both fill in "today" before either has seen the other's write, and
+/// there's no unique constraint on `date` (CloudKit-backed SwiftData can't have one).
+/// Days with more than one entry that actually has content are left alone; that's
+/// a genuine conflict, not something to resolve by guessing.
+func duplicateEntriesToDelete(in entries: [DailyEntry], calendar: Calendar = .current) -> [DailyEntry] {
+    let byDay = Dictionary(grouping: entries) { calendar.startOfDay(for: $0.date) }
+    return byDay.values.filter { $0.count > 1 }.flatMap { dupes -> [DailyEntry] in
+        let withContent = dupes.filter { !$0.hasNoContent }
+        guard withContent.count <= 1 else { return [] }
+        let survivor = withContent.first ?? dupes[0]
+        return dupes.filter { $0 !== survivor }
+    }
+}
+
 /// Root view that orchestrates the timeline, selected-date display, log entries,
 /// reflection card, and FAB. Also owns sheet presentation for settings, new/edit
 /// entry, and reflection, and handles deep-link URLs (`pulseapp://log`, `pulseapp://reflect`).
@@ -272,6 +288,7 @@ struct ContentView: View {
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 logger.trace("scene is now active.")
+                pruneDuplicateEntries()
                 addMissingEntries()
             }
         }
@@ -343,6 +360,25 @@ struct ContentView: View {
         }
 
         initialSweepDone = true
+    }
+
+    /// Deletes duplicate-day entries that CloudKit sync created (see
+    /// `duplicateEntriesToDelete`) and that carry no content of their own.
+    private func pruneDuplicateEntries() {
+        let duplicates = duplicateEntriesToDelete(in: allEntries)
+        guard !duplicates.isEmpty else { return }
+
+        for entry in duplicates {
+            logger.info("Deleting empty duplicate entry for \(entry.date)")
+            if selectedEntry === entry {
+                selectedEntry = allEntries.first {
+                    Calendar.current.isDate($0.date, inSameDayAs: entry.date) && $0 !== entry
+                } ?? selectedEntry
+            }
+            context.delete(entry)
+        }
+
+        context.saveOrLog("Error pruning duplicate entries", logger: logger)
     }
 
     /// Performs one-time startup work: applies debug launch arguments and requests

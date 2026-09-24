@@ -314,3 +314,61 @@ struct MissingEntryDatesTests {
         #expect(missing.allSatisfy { santiago.startOfDay(for: $0) == $0 })
     }
 }
+
+// MARK: - duplicateEntriesToDelete
+
+@Suite("duplicateEntriesToDelete")
+struct DuplicateEntriesToDeleteTests {
+
+    @Test("Returns nothing when every day is unique")
+    func noDuplicates() throws {
+        let context = try makeContext()
+        let a = makeEntry(scores: [1], in: context)
+        let b = DailyEntry(date: .now.addingTimeInterval(-86_400))
+        context.insert(b)
+        #expect(duplicateEntriesToDelete(in: [a, b]).isEmpty)
+    }
+
+    @Test("Deletes the empty twin, keeps the one with log entries")
+    func keepsTheOneWithContent() throws {
+        let context = try makeContext()
+        let empty = DailyEntry(date: .now)
+        context.insert(empty)
+        let withContent = makeEntry(scores: [2], in: context)
+
+        let toDelete = duplicateEntriesToDelete(in: [empty, withContent])
+        #expect(toDelete == [empty])
+    }
+
+    @Test("Morning forecast alone counts as content")
+    func morningCountsAsContent() throws {
+        let context = try makeContext()
+        let empty = DailyEntry(date: .now)
+        context.insert(empty)
+        let withForecast = DailyEntry(date: .now, morning: "Expecting a rough afternoon.")
+        context.insert(withForecast)
+
+        let toDelete = duplicateEntriesToDelete(in: [empty, withForecast])
+        #expect(toDelete == [empty])
+    }
+
+    @Test("Leaves both alone when both have content — not a guess to make")
+    func ambiguousWhenBothHaveContent() throws {
+        let context = try makeContext()
+        let a = makeEntry(scores: [1], in: context)
+        let b = makeEntry(scores: [-1], in: context)
+        #expect(duplicateEntriesToDelete(in: [a, b]).isEmpty)
+    }
+
+    @Test("Prunes down to exactly one when all duplicates are empty")
+    func allEmptyKeepsOne() throws {
+        let context = try makeContext()
+        let a = DailyEntry(date: .now)
+        let b = DailyEntry(date: .now)
+        context.insert(a)
+        context.insert(b)
+
+        let toDelete = duplicateEntriesToDelete(in: [a, b])
+        #expect(toDelete.count == 1)
+    }
+}

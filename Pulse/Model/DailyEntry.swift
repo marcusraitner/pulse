@@ -541,10 +541,20 @@ enum PulseVersionedSchemaV160: VersionedSchema {
         }
 
         var isEmpty: Bool {
-            guard let logEntries, !logEntries.isEmpty else { return summary.isEmpty }
+            guard let logEntries, !logEntries.isEmpty else { return summary.isEmpty && morning.isEmpty }
             return false
         }
-        
+
+        /// True only if deleting this entry loses nothing: no reflection, no
+        /// forecast, no logged moments, no KPI values. Used to auto-resolve
+        /// duplicate-day entries CloudKit sync can create; deliberately stricter
+        /// than `isEmpty`, which doesn't look at `kpiValues`.
+        var hasNoContent: Bool {
+            summary.isEmpty && morning.isEmpty
+                && (logEntries?.isEmpty ?? true)
+                && (kpiValues?.isEmpty ?? true)
+        }
+
         @Relationship(deleteRule: .cascade, inverse: \DailyLogEntry.entry)
         var logEntries: [DailyLogEntry]? = []
 
