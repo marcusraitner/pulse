@@ -14,7 +14,7 @@ internal import Foundation
 // MARK: - Helpers
 
 private func makeContext() throws -> ModelContext {
-    let schema = Schema([DailyEntry.self, DailyLogEntry.self])
+    let schema = Schema([DailyEntry.self, DailyLogEntry.self, DailyKPIValue.self, KPITemplate.self])
     let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
     let container = try ModelContainer(for: schema, configurations: config)
     return ModelContext(container)
@@ -238,6 +238,135 @@ struct ExportPayloadMapperTests {
     }
 }
 
+
+// MARK: - mergeAndPruneDuplicateEntries
+
+@Suite("mergeAndPruneDuplicateEntries")
+struct MergeAndPruneDuplicateEntriesTests {
+
+    @Test("Leaves entries on distinct days untouched")
+    func noDuplicates() throws {
+        let context = try makeContext()
+        let day1 = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "one")
+        let day2 = DailyEntry(date: Date(timeIntervalSince1970: 86_400), summary: "two")
+        context.insert(day1)
+        context.insert(day2)
+
+        mergeAndPruneDuplicateEntries([day1, day2], context: context)
+
+        #expect(try context.fetch(FetchDescriptor<DailyEntry>()).count == 2)
+    }
+
+    @Test("Concatenates summary and morning with a newline, keeps the first entry")
+    func mergesTextFields() throws {
+        let context = try makeContext()
+        let survivor = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "Went well", morning: "Slept ok")
+        let duplicate = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "Also good", morning: "Woke early")
+        context.insert(survivor)
+        context.insert(duplicate)
+
+        mergeAndPruneDuplicateEntries([survivor, duplicate], context: context)
+
+        #expect(survivor.summary == "Went well\nAlso good")
+        #expect(survivor.morning == "Slept ok\nWoke early")
+        #expect(try context.fetch(FetchDescriptor<DailyEntry>()) == [survivor])
+    }
+
+    @Test("Skips an empty duplicate field instead of leaving a stray newline")
+    func skipsEmptyTextFields() throws {
+        let context = try makeContext()
+        let survivor = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "Went well")
+        let duplicate = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "")
+        context.insert(survivor)
+        context.insert(duplicate)
+
+        mergeAndPruneDuplicateEntries([survivor, duplicate], context: context)
+
+        #expect(survivor.summary == "Went well")
+    }
+
+    @Test("Reassigns duplicate's log entries to the survivor and deletes the duplicate")
+    func reassignsLogEntries() throws {
+        let context = try makeContext()
+        let survivorLog = DailyLogEntry(timestamp: .now, log: "a", score: 1)
+        let duplicateLog = DailyLogEntry(timestamp: .now, log: "b", score: 2)
+        let survivor = DailyEntry(date: Date(timeIntervalSince1970: 0), logEntries: [survivorLog])
+        let duplicate = DailyEntry(date: Date(timeIntervalSince1970: 0), logEntries: [duplicateLog])
+        context.insert(survivor)
+        context.insert(duplicate)
+        try context.save()
+
+        mergeAndPruneDuplicateEntries([survivor, duplicate], context: context)
+
+        #expect(Set(survivor.logEntries?.map(\.log) ?? []) == ["a", "b"])
+        #expect(try context.fetch(FetchDescriptor<DailyEntry>()).count == 1)
+        #expect(try context.fetch(FetchDescriptor<DailyLogEntry>()).count == 2)
+    }
+
+    @Test("Sums KPI values sharing a template and deletes the now-redundant duplicate row")
+    func sumsMatchingKPITemplate() throws {
+        let context = try makeContext()
+        let template = KPITemplate(title: "Steps")
+        context.insert(template)
+
+        let survivor = DailyEntry(date: Date(timeIntervalSince1970: 0))
+        let duplicate = DailyEntry(date: Date(timeIntervalSince1970: 0))
+        context.insert(survivor)
+        context.insert(duplicate)
+
+        let survivorKPI = DailyKPIValue(value: 100, template: template, entry: survivor)
+        let duplicateKPI = DailyKPIValue(value: 50, template: template, entry: duplicate)
+        survivor.kpiValues = [survivorKPI]
+        duplicate.kpiValues = [duplicateKPI]
+        try context.save()
+
+        mergeAndPruneDuplicateEntries([survivor, duplicate], context: context)
+
+        #expect(survivor.kpiValues?.map(\.value) == [150])
+        // the merged-away duplicate's KPI row must not linger as an orphan
+        #expect(try context.fetch(FetchDescriptor<DailyKPIValue>()).count == 1)
+    }
+
+    @Test("Keeps KPI values for templates the survivor doesn't have yet")
+    func movesNonMatchingKPITemplate() throws {
+        let context = try makeContext()
+        let steps = KPITemplate(title: "Steps")
+        let sleep = KPITemplate(title: "Sleep")
+        context.insert(steps)
+        context.insert(sleep)
+
+        let survivor = DailyEntry(date: Date(timeIntervalSince1970: 0))
+        let duplicate = DailyEntry(date: Date(timeIntervalSince1970: 0))
+        context.insert(survivor)
+        context.insert(duplicate)
+
+        let survivorKPI = DailyKPIValue(value: 100, template: steps, entry: survivor)
+        let duplicateKPI = DailyKPIValue(value: 8, template: sleep, entry: duplicate)
+        survivor.kpiValues = [survivorKPI]
+        duplicate.kpiValues = [duplicateKPI]
+        try context.save()
+
+        mergeAndPruneDuplicateEntries([survivor, duplicate], context: context)
+
+        #expect(Set(survivor.kpiValues?.map(\.template?.title) ?? []) == ["Steps", "Sleep"])
+        #expect(try context.fetch(FetchDescriptor<DailyKPIValue>()).count == 2)
+    }
+
+    @Test("Merges three same-day duplicates into one survivor")
+    func mergesMoreThanTwoDuplicates() throws {
+        let context = try makeContext()
+        let a = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "a")
+        let b = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "b")
+        let c = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "c")
+        context.insert(a)
+        context.insert(b)
+        context.insert(c)
+
+        mergeAndPruneDuplicateEntries([a, b, c], context: context)
+
+        #expect(try context.fetch(FetchDescriptor<DailyEntry>()).count == 1)
+    }
+}
 
 // MARK: - missingEntryDates
 
