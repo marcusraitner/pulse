@@ -273,6 +273,7 @@ struct ContentView: View {
             if newPhase == .active {
                 logger.trace("scene is now active.")
                 addMissingEntries()
+                mergeAndPruneDuplicateEntries()
             }
         }
         .onChange(of: countLogs) { old, new in
@@ -319,6 +320,19 @@ struct ContentView: View {
             reflectionReminderTime: reflectionReminderTime)
     }
    
+    /// Removes duplicate entries
+    private func mergeAndPruneDuplicateEntries() {
+        let groupedEntries = Dictionary(grouping: allEntries) {
+            Calendar.current.startOfDay(for: $0.date) }
+        
+        for (_, entries) in groupedEntries {
+            if entries.count > 1 {
+                merge(sources: Array(entries.dropFirst()),
+                      into: entries.first!)
+            }
+        }
+    }
+    
     /// Creates a `DailyEntry` for every day that has none, so the timeline has no holes.
     /// Runs on every activation, hence the shortcut: after the one-time sweep over the
     /// whole history only the tail since the newest entry can be missing.
@@ -345,6 +359,38 @@ struct ContentView: View {
         initialSweepDone = true
     }
 
+    /// This is used when errorneously two entries for one day are inserted because
+    /// of CloudKit sync issues. All `sources` are merged into `target` and then deleted
+    private func merge(sources: [DailyEntry], into target: DailyEntry) {
+        for source in sources {
+            target.summary.append(source.summary)
+            target.morning.append(source.morning)
+            
+            if let logEntries = source.logEntries, !logEntries.isEmpty {
+                for logEntry in logEntries {
+                    logEntry.entry = target
+                }
+                
+                source.logEntries = nil
+            }
+            
+            if let kpiValues = source.kpiValues, !kpiValues.isEmpty {
+                for kpi in kpiValues {
+                    if let targetKpi = target.kpiValues?.first(where: { $0.template == kpi.template } ) {
+                        targetKpi.value += kpi.value
+                    } else {
+                        kpi.entry = target
+                    }
+                }
+                
+                source.kpiValues = nil
+            }
+            
+            context.delete(source)
+            context.saveOrLog("Failed to save after merge", logger: logger)
+        }
+    }
+    
     /// Performs one-time startup work: applies debug launch arguments and requests
     /// notification authorisation. Called once from `.task` on first appearance.
     private func initApplication() async {

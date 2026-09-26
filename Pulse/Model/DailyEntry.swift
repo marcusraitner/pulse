@@ -541,7 +541,8 @@ enum PulseVersionedSchemaV160: VersionedSchema {
         }
 
         var isEmpty: Bool {
-            guard let logEntries, !logEntries.isEmpty else { return summary.isEmpty }
+            guard let logEntries, !logEntries.isEmpty else {
+                return summary.isEmpty && morning.isEmpty }
             return false
         }
         

@@ -25,7 +25,7 @@ struct DailyReflectionCard: View {
         VStack(alignment: .leading) {
             Group {
                 if !day.morning.isEmpty {
-                    Text(day.morning)
+                    Text("\(Image(systemName: "sunrise")) \(day.morning)" )
                 } else {
                     Text("Forecast")
                         .foregroundStyle(.tertiary)
