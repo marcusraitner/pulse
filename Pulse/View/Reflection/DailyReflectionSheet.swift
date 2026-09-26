@@ -91,7 +91,7 @@ struct DailyReflectionSheet: View {
                         .lineLimit(5...Int.max)
                         .focused($focusedField, equals: .morning)
                 } header: {
-                    Text("Forecast")
+                    Text("\(Image(systemName: "sunrise")) Forecast")
                 } footer: {
                     Text("What might be hard today — once anticipated, it won't catch you off guard. One sentence is enough.")
                 }
@@ -105,7 +105,7 @@ struct DailyReflectionSheet: View {
                         .lineLimit(5...Int.max)
                         .focused($focusedField, equals: .summary)
                 } header: {
-                    Text("Reflect Your Day")
+                    Text("\(Image(systemName: "sunset")) Reflect Your Day")
                 } footer: {
                     let question = Self.questionKeys[coachingQuestionIndex]
                     VStack(alignment: .leading) {
@@ -161,7 +161,7 @@ struct DailyReflectionSheet: View {
                             }
                         }
                     } header: {
-                        Text("Metrics")
+                        Text("\(Image(systemName: "chart.line.uptrend.xyaxis")) Metrics")
                     }
                 }
                 Section {
@@ -175,7 +175,7 @@ struct DailyReflectionSheet: View {
                         }
                     }
                 } header: {
-                    Text("Moments")
+                    Text("\(Image(systemName: "list.bullet")) Moments")
                 } footer: {
                     if day.logEntries?.isEmpty ?? true {
                         Text("No moments logged for this day.")

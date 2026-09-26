@@ -11,13 +11,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		2C9CCF1A2F44350000CDAA15 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2C3749802F4308270079D893 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 2C3749872F4308270079D893;
-			remoteInfo = Pulse;
-		};
 		2D40E6292F73FC3B0001D250 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2C3749802F4308270079D893 /* Project object */;
@@ -29,7 +22,6 @@
 
 /* Begin PBXFileReference section */
 		2C3749882F4308270079D893 /* Pulse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pulse.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		2C9CCF142F44350000CDAA15 /* PulseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PulseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D40E6252F73FC3B0001D250 /* PulseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PulseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -80,11 +72,6 @@
 			path = landing;
 			sourceTree = "<group>";
 		};
-		2C9CCF152F44350000CDAA15 /* PulseUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = PulseUITests;
-			sourceTree = "<group>";
-		};
 		2D40E6262F73FC3B0001D250 /* PulseTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = PulseTests;
@@ -104,11 +91,6 @@
 				2CB839FB3021CB4100C5E0B7 /* CloudKitSyncMonitor in Frameworks */,
 			);
 		};
-		2C9CCF112F44350000CDAA15 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			files = (
-			);
-		};
 		2D40E6222F73FC3B0001D250 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
@@ -123,7 +105,6 @@
 				2D5025282F8BF571006623FE /* App-Store */,
 				2C92C5EA2F7FDBDB0048B14D /* landing */,
 				2C37498A2F4308270079D893 /* Pulse */,
-				2C9CCF152F44350000CDAA15 /* PulseUITests */,
 				2D40E6262F73FC3B0001D250 /* PulseTests */,
 				2C3749892F4308270079D893 /* Products */,
 			);
@@ -133,7 +114,6 @@
 			isa = PBXGroup;
 			children = (
 				2C3749882F4308270079D893 /* Pulse.app */,
-				2C9CCF142F44350000CDAA15 /* PulseUITests.xctest */,
 				2D40E6252F73FC3B0001D250 /* PulseTests.xctest */,
 			);
 			name = Products;
@@ -163,27 +143,6 @@
 			productName = Pulse;
 			productReference = 2C3749882F4308270079D893 /* Pulse.app */;
 			productType = "com.apple.product-type.application";
-		};
-		2C9CCF132F44350000CDAA15 /* PulseUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 2C9CCF1C2F44350000CDAA15 /* Build configuration list for PBXNativeTarget "PulseUITests" */;
-			buildPhases = (
-				2C9CCF102F44350000CDAA15 /* Sources */,
-				2C9CCF112F44350000CDAA15 /* Frameworks */,
-				2C9CCF122F44350000CDAA15 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				2C9CCF1B2F44350000CDAA15 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				2C9CCF152F44350000CDAA15 /* PulseUITests */,
-			);
-			name = PulseUITests;
-			productName = PulseUITests;
-			productReference = 2C9CCF142F44350000CDAA15 /* PulseUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 		2D40E6242F73FC3B0001D250 /* PulseTests */ = {
 			isa = PBXNativeTarget;
@@ -219,10 +178,6 @@
 					2C3749872F4308270079D893 = {
 						CreatedOnToolsVersion = 26.2;
 					};
-					2C9CCF132F44350000CDAA15 = {
-						CreatedOnToolsVersion = 26.2;
-						TestTargetID = 2C3749872F4308270079D893;
-					};
 					2D40E6242F73FC3B0001D250 = {
 						CreatedOnToolsVersion = 26.4;
 						TestTargetID = 2C3749872F4308270079D893;
@@ -248,7 +203,6 @@
 			projectRoot = "";
 			targets = (
 				2C3749872F4308270079D893 /* Pulse */,
-				2C9CCF132F44350000CDAA15 /* PulseUITests */,
 				2D40E6242F73FC3B0001D250 /* PulseTests */,
 			);
 		};
@@ -256,11 +210,6 @@
 
 /* Begin PBXResourcesBuildPhase section */
 		2C3749862F4308270079D893 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			files = (
-			);
-		};
-		2C9CCF122F44350000CDAA15 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 			);
@@ -278,11 +227,6 @@
 			files = (
 			);
 		};
-		2C9CCF102F44350000CDAA15 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			files = (
-			);
-		};
 		2D40E6212F73FC3B0001D250 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -291,11 +235,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		2C9CCF1B2F44350000CDAA15 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 2C3749872F4308270079D893 /* Pulse */;
-			targetProxy = 2C9CCF1A2F44350000CDAA15 /* PBXContainerItemProxy */;
-		};
 		2D40E62A2F73FC3B0001D250 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 2C3749872F4308270079D893 /* Pulse */;
@@ -523,56 +462,6 @@
 			};
 			name = Release;
 		};
-		2C9CCF1D2F44350000CDAA15 /* Debug configuration for PBXNativeTarget "PulseUITests" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Q6A247NX82;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.6;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = de.raitner.PulseUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				TEST_TARGET_NAME = Pulse;
-			};
-			name = Debug;
-		};
-		2C9CCF1E2F44350000CDAA15 /* Release configuration for PBXNativeTarget "PulseUITests" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Q6A247NX82;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.6;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = de.raitner.PulseUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				TEST_TARGET_NAME = Pulse;
-			};
-			name = Release;
-		};
 		2D40E62B2F73FC3B0001D250 /* Debug configuration for PBXNativeTarget "PulseTests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -633,14 +522,6 @@
 			buildConfigurations = (
 				2C3749962F4308280079D893 /* Debug configuration for PBXNativeTarget "Pulse" */,
 				2C3749972F4308280079D893 /* Release configuration for PBXNativeTarget "Pulse" */,
-			);
-			defaultConfigurationName = Release;
-		};
-		2C9CCF1C2F44350000CDAA15 /* Build configuration list for PBXNativeTarget "PulseUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				2C9CCF1D2F44350000CDAA15 /* Debug configuration for PBXNativeTarget "PulseUITests" */,
-				2C9CCF1E2F44350000CDAA15 /* Release configuration for PBXNativeTarget "PulseUITests" */,
 			);
 			defaultConfigurationName = Release;
 		};

@@ -27,7 +27,7 @@ struct DailyReflectionCard: View {
                 if !day.morning.isEmpty {
                     Text("\(Image(systemName: "sunrise")) \(day.morning)" )
                 } else {
-                    Text("Forecast")
+                    Text("\(Image(systemName: "sunrise")) Forecast")
                         .foregroundStyle(.tertiary)
                 }
             }
@@ -37,9 +37,9 @@ struct DailyReflectionCard: View {
             
             Group {
                 if !day.summary.isEmpty {
-                    Text(day.summary)
+                    Text("\(Image(systemName: "sunset")) \(day.summary)")
                 } else {
-                    Text("Reflection")
+                    Text("\(Image(systemName: "sunset")) Reflection")
                         .foregroundStyle(.tertiary)
                 }
             }
