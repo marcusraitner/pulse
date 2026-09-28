@@ -31,16 +31,12 @@ xcodebuild build -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 
 
 # Unit tests
 xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:PulseTests
-
-# UI tests
-xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:PulseUITests
 ```
 
 ## Repository structure
 
 - `Pulse/` - App source code
 - `PulseTests/` - Unit tests
-- `PulseUITests/` - UI tests
 - `landing/` - Landing page
 - `App-Store/` - App Store assets and copy
 

@@ -25,9 +25,9 @@ struct DailyReflectionCard: View {
         VStack(alignment: .leading) {
             Group {
                 if !day.morning.isEmpty {
-                    Text("\(Image(systemName: "sunrise")) \(day.morning)" )
+                    Text("\(Text(Image(systemName: "sunrise")).foregroundStyle(.secondary).font(.system(size: 15))) \(day.morning)")
                 } else {
-                    Text("\(Image(systemName: "sunrise")) Forecast")
+                    Text("\(Text(Image(systemName: "sunrise")).foregroundStyle(.secondary).font(.system(size: 15))) Forecast")
                         .foregroundStyle(.tertiary)
                 }
             }
@@ -37,9 +37,9 @@ struct DailyReflectionCard: View {
             
             Group {
                 if !day.summary.isEmpty {
-                    Text("\(Image(systemName: "sunset")) \(day.summary)")
+                    Text("\(Text(Image(systemName: "moon.stars")).foregroundStyle(.secondary).font(.system(size: 16))) \(day.summary)")
                 } else {
-                    Text("\(Image(systemName: "sunset")) Reflection")
+                    Text("\(Text(Image(systemName: "moon.stars")).foregroundStyle(.secondary).font(.system(size: 16))) Reflection")
                         .foregroundStyle(.tertiary)
                 }
             }
@@ -98,7 +98,7 @@ struct DailyReflectionCard: View {
 }
 
 #Preview("With summary") {
-    DailyReflectionCard(day: DailyEntry(date: .now, summary: "Had a great day overall. Felt productive and calm.", morning: "I will be distracted."), onTap: {})
+    DailyReflectionCard(day: DailyEntry(date: .now, summary: "Had a great day overall. Felt productive and calm. Was awesome. Now tired. Will go sleeping soon. Next day better", morning: "I will be distracted."), onTap: {})
         .modelContainer(SampleData.shared.modelContainer)
         .background(.black)
 }
