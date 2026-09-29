@@ -778,6 +778,16 @@
         }
       }
     },
+    "Export options" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Exportoptionen"
+          }
+        }
+      }
+    },
     "Feedback" : {
       "localizations" : {
         "de" : {
@@ -794,6 +804,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Filtern nach"
+          }
+        }
+      }
+    },
+    "From" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Von"
           }
         }
       }
@@ -1633,6 +1653,16 @@
         }
       }
     },
+    "Restrict to date range" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Auf Zeitraum beschränken"
+          }
+        }
+      }
+    },
     "Review" : {
       "localizations" : {
         "de" : {
@@ -1870,6 +1900,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Titel"
+          }
+        }
+      }
+    },
+    "To" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Bis"
           }
         }
       }

@@ -36,6 +36,10 @@ struct SettingsView: View {
     @State private var exportDocument: ExportJSONDocument?
     @State private var exportFilename: String = "pulse-export.json"
     @State private var exportErrorMessage: String?
+    @State private var exportDateFilterEnabled: Bool = false
+    @State private var exportStartDate: Date = Calendar.current.date(byAdding: .month, value: -1, to: .now) ?? .now
+    @State private var exportEndDate: Date = .now
+    @State private var exportSelectedTags: Set<String> = []
     
     @StateObject private var syncMonitor = SyncMonitor.default
     
@@ -59,6 +63,34 @@ struct SettingsView: View {
     private var backgroundImage: Image? {
         guard let data = backgroundImageData, let uiImage = UIImage(data: data) else { return nil }
         return Image(uiImage: uiImage)
+    }
+
+    private var exportDateRange: ClosedRange<Date>? {
+        guard exportDateFilterEnabled else { return nil }
+        let calendar = Calendar.current
+        let start = calendar.startOfDay(for: min(exportStartDate, exportEndDate))
+        let endOfEndDay = calendar.date(
+            byAdding: DateComponents(day: 1, second: -1),
+            to: calendar.startOfDay(for: max(exportStartDate, exportEndDate))
+        ) ?? max(exportStartDate, exportEndDate)
+        return start...endOfEndDay
+    }
+
+    private var exportTagsFilter: Set<String>? {
+        exportSelectedTags.count == allTags.count ? nil : exportSelectedTags
+    }
+
+    private func exportTagBinding(for tagName: String) -> Binding<Bool> {
+        Binding(
+            get: { exportSelectedTags.contains(tagName) },
+            set: { isSelected in
+                if isSelected {
+                    exportSelectedTags.insert(tagName)
+                } else {
+                    exportSelectedTags.remove(tagName)
+                }
+            }
+        )
     }
     
     @Query private var allEntries: [DailyEntry]
@@ -95,39 +127,66 @@ struct SettingsView: View {
                             
                         }
                         
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text("Backup")
-                                Text("Download your data in a JSON file.")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                            }
-                            
-                            Spacer()
-                            
-                            Button {
-                                do {
-                                    let payload = ExportPayloadMapper.exportPayload(from: allEntries, kpiTemplates: allKPIs)
-                                    let encoder = JSONEncoder()
-                                    encoder.dateEncodingStrategy = .iso8601
-                                    encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-                                    
-                                    let data = try encoder.encode(payload)
-                                    
-                                    exportDocument = .init(data: data)
-                                    exportFilename = "pulse-export-\(DateFormatHelper.formatDate(.now)).json"
-                                    isPresentingExport = true
-                                    
-                                } catch {
-                                    logger.error("Failed to create export payload: \(error.localizedDescription)")
-                                    exportErrorMessage = "Could not create data for download. Please try again."
-                                    isPresentingExport = false
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text("Backup")
+                                    Text("Download your data in a JSON file.")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
                                 }
-                            } label: {
-                                Text("Download")
+
+                                Spacer()
+
+                                Button {
+                                    do {
+                                        let payload = ExportPayloadMapper.exportPayload(
+                                            from: allEntries,
+                                            kpiTemplates: allKPIs,
+                                            dateRange: exportDateRange,
+                                            tags: exportTagsFilter
+                                        )
+                                        let encoder = JSONEncoder()
+                                        encoder.dateEncodingStrategy = .iso8601
+                                        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+
+                                        let data = try encoder.encode(payload)
+
+                                        exportDocument = .init(data: data)
+                                        exportFilename = "pulse-export-\(DateFormatHelper.formatDate(.now)).json"
+                                        isPresentingExport = true
+
+                                    } catch {
+                                        logger.error("Failed to create export payload: \(error.localizedDescription)")
+                                        exportErrorMessage = "Could not create data for download. Please try again."
+                                        isPresentingExport = false
+                                    }
+                                } label: {
+                                    Text("Download")
+                                }
+                                .buttonStyle(.bordered)
+                                .padding(.leading, 10)
                             }
-                            .buttonStyle(.bordered)
-                            .padding(.leading, 10)
+
+                            DisclosureGroup("Export options") {
+                                Toggle(isOn: $exportDateFilterEnabled) {
+                                    Text("Restrict to date range")
+                                }
+                                if exportDateFilterEnabled {
+                                    DatePicker("From", selection: $exportStartDate, displayedComponents: .date)
+                                    DatePicker("To", selection: $exportEndDate, displayedComponents: .date)
+                                }
+
+                                if !allTags.isEmpty {
+                                    Text("Tags")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                        .padding(.top, exportDateFilterEnabled ? 4 : 0)
+                                    ForEach(allTags) { tag in
+                                        Toggle(tag.name, isOn: exportTagBinding(for: tag.name))
+                                    }
+                                }
+                            }
                         }
                     }
                     .task {
@@ -136,6 +195,13 @@ struct SettingsView: View {
                             enableEditingHistory = !(freezeHistory as! Bool)
                             UserDefaults.standard.removeObject(forKey: AppStorageKeys.freezeHistory)
                         }
+                        // Default the export tag filter to "everything selected"
+                        exportSelectedTags = Set(allTags.map(\.name))
+                    }
+                    .onChange(of: allTags) { _, newTags in
+                        // Keep newly created tags selected by default so the filter still behaves as "no filter" until the user deselects one
+                        exportSelectedTags.formUnion(newTags.map(\.name))
+                        exportSelectedTags.formIntersection(newTags.map(\.name))
                     }
                     .alert("Download Failed", isPresented: isShowingExportError) {
                         Button("OK") {
