@@ -23,34 +23,34 @@ struct DailyReflectionCard: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            HStack(alignment: .top, spacing: 6) {
-                Image(systemName: "sunrise")
-                    .font(.system(size: 15))
-                    .foregroundStyle(.secondary)
-                    .frame(width: 16, alignment: .leading)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
+                    Image(systemName: "sunrise")
+                        .font(.system(size: 15))
+                        .frame(width: 18, alignment: .leading)
+                    Text("Forecast")
+                }
+                .foregroundStyle(.secondary)
 
                 if !day.morning.isEmpty {
                     Text(day.morning)
-                } else {
-                    Text("Forecast")
-                        .foregroundStyle(.tertiary)
                 }
             }
             .padding(.bottom, 5)
-            
+
             Divider()
-            
-            HStack(alignment: .top, spacing: 6) {
-                Image(systemName: "moon.stars")
-                    .font(.system(size: 16))
-                    .foregroundStyle(.secondary)
-                    .frame(width: 16, alignment: .leading)
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
+                    Image(systemName: "moon.stars")
+                        .font(.system(size: 16))
+                        .frame(width: 18, alignment: .leading)
+                    Text("Reflection")
+                }
+                .foregroundStyle(.secondary)
 
                 if !day.summary.isEmpty {
                     Text(day.summary)
-                } else {
-                    Text("Reflection")
-                        .foregroundStyle(.tertiary)
                 }
             }
             .padding(.top, 5)
