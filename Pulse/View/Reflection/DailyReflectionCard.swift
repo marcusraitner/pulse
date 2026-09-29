@@ -23,11 +23,16 @@ struct DailyReflectionCard: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Group {
+            HStack(alignment: .top, spacing: 6) {
+                Image(systemName: "sunrise")
+                    .font(.system(size: 15))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 16, alignment: .leading)
+
                 if !day.morning.isEmpty {
-                    Text("\(Text(Image(systemName: "sunrise")).foregroundStyle(.secondary).font(.system(size: 15))) \(day.morning)")
+                    Text(day.morning)
                 } else {
-                    Text("\(Text(Image(systemName: "sunrise")).foregroundStyle(.secondary).font(.system(size: 15))) Forecast")
+                    Text("Forecast")
                         .foregroundStyle(.tertiary)
                 }
             }
@@ -35,11 +40,16 @@ struct DailyReflectionCard: View {
             
             Divider()
             
-            Group {
+            HStack(alignment: .top, spacing: 6) {
+                Image(systemName: "moon.stars")
+                    .font(.system(size: 16))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 16, alignment: .leading)
+
                 if !day.summary.isEmpty {
-                    Text("\(Text(Image(systemName: "moon.stars")).foregroundStyle(.secondary).font(.system(size: 16))) \(day.summary)")
+                    Text(day.summary)
                 } else {
-                    Text("\(Text(Image(systemName: "moon.stars")).foregroundStyle(.secondary).font(.system(size: 16))) Reflection")
+                    Text("Reflection")
                         .foregroundStyle(.tertiary)
                 }
             }
