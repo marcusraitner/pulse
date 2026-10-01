@@ -132,7 +132,7 @@ struct ContentView: View {
     
     var body: some View {
         @Bindable var filterState = filterState
-        
+
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
                                 
@@ -164,6 +164,7 @@ struct ContentView: View {
                             // The timeline scroll view
                             HorizontalTimelineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
                                 .padding(.top)
+                                .accessibilityIdentifier("HorizontalTimelineView")
                             SelectedDateView(date: selectedEntry.date)
                                 .padding(.bottom)
                                 .padding(.top, 4)
@@ -172,10 +173,10 @@ struct ContentView: View {
                 } else {
                     AggregatedTimelineView(aggregationLevel: viewMode == .week ? .week : .month)
                 }
-                
-                BackgroundImageView()
-                    .zIndex(-1)
 
+            }
+            .background {
+                BackgroundImageView()
             }
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $isPresentingSettings,
@@ -192,6 +193,7 @@ struct ContentView: View {
                 NavigationStack {
                     DailyReflectionSheet(day: selectedEntry)
                 }
+                .presentationDetents([.large])
             }
             .sheet(isPresented: $isPresentingInsights) {
                 NavigationStack {
@@ -359,7 +361,7 @@ struct ContentView: View {
             }
         }
     }
-    
+
     /// Re-schedules local notifications from current `AppStorage` values.
     /// Called when the settings sheet is dismissed.
     private func setNotifications() {
