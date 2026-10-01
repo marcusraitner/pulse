@@ -81,6 +81,7 @@ struct DayCardView: View {
             NavigationStack {
                 DailyReflectionSheet(day: entry)
             }
+            .presentationDetents([.large])
         }
     }
 }
