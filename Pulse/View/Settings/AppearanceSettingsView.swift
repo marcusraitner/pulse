@@ -63,7 +63,8 @@ struct AppearanceSettingsView: View {
 
 
                     LazyVGrid(columns: columns, spacing: 8) {
-                        let presets = ["mountain", "mountain-dark", "clouds", "moon", "stars"]
+                        let presets = ["mountain", "mountain-dark", "clouds", "moon", "stars",
+                                       "fuji", "overland", "ridges", "embers"]
 
                         ForEach(presets, id: \.self) { imageName in
                             Image("\(imageName)-thumb")
