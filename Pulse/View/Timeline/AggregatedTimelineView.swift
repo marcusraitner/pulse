@@ -78,6 +78,8 @@ struct AggregatedTimelineView: View {
         ScrollView(.vertical) {
                 DaysListView(aggregationLevel: aggregationLevel, date: selectedStartDate)
                     .padding(.horizontal, 8)
+                    .frame(maxWidth: 700)
+                    .frame(maxWidth: .infinity)
         }
         .safeAreaBar(edge: .top) {
             VStack {
