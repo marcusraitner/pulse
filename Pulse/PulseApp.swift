@@ -56,19 +56,19 @@ struct PulseApp: App {
     }
 }
 
-/// Wraps `ContentView` with the optional Face ID / Touch ID app lock. Locks
+/// Wraps `ContentView` with the optional Face ID / Touch ID app lock, shown in a
+/// separate window so it also covers sheets. Locks
 /// whenever the scene leaves `.active` and re-authenticates on return.
 private struct RootView: View {
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage(AppStorageKeys.appLockEnabled) private var appLockEnabled: Bool = false
     @State private var isUnlocked = false
+    @State private var lockWindow = AppLockWindow()
 
     var body: some View {
         ContentView()
-            .overlay {
-                if appLockEnabled && !isUnlocked {
-                    AppLockView(onUnlock: unlock)
-                }
+            .onChange(of: appLockEnabled && !isUnlocked, initial: true) { _, isLocked in
+                lockWindow.setVisible(isLocked, onUnlock: unlock)
             }
             .onChange(of: scenePhase, initial: true) { _, newPhase in
                 guard appLockEnabled else {
