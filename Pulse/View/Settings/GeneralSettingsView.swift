@@ -10,10 +10,12 @@ import SwiftUI
 import SwiftData
 import OSLog
 import UniformTypeIdentifiers
+import LocalAuthentication
 
 struct GeneralSettingsView: View {
 
     @AppStorage(AppStorageKeys.enableEditingHistory) private var enableEditingHistory: Bool = false
+    @AppStorage(AppStorageKeys.appLockEnabled) private var appLockEnabled: Bool = false
 
     // Export data
     @State private var isPresentingExport: Bool = false
@@ -58,6 +60,18 @@ struct GeneralSettingsView: View {
         exportSelectedTags.count == allTags.count ? nil : exportSelectedTags
     }
 
+    private var appLockToggleTitle: LocalizedStringKey {
+        let context = LAContext()
+        // biometryType is only populated after canEvaluatePolicy has run at least once
+        _ = context.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
+
+        switch context.biometryType {
+        case .faceID: return "Require Face ID to open Pulse"
+        case .touchID: return "Require Touch ID to open Pulse"
+        default: return "Require your device passcode to open Pulse"
+        }
+    }
+
     private func exportTagBinding(for tagName: String) -> Binding<Bool> {
         Binding(
             get: { exportSelectedTags.contains(tagName) },
@@ -89,6 +103,11 @@ struct GeneralSettingsView: View {
                     Text("Edit past days and moments")
                     Text("Enable this option to be able to add, delete, or edit moments for past days.")
 
+                }
+
+                Toggle(isOn: $appLockEnabled) {
+                    Text(appLockToggleTitle)
+                    Text("Pulse will lock whenever you leave the app and ask you to unlock it again.")
                 }
 
                 HStack {
