@@ -126,6 +126,7 @@ struct ContentView: View {
     @State private var isPresentingReflection: Bool = false
     @State private var isPresentingInsights: Bool = false
     @State private var viewMode: ViewMode = .day
+    @State private var scrollPosition = ScrollPosition()
 
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
 
@@ -160,6 +161,11 @@ struct ContentView: View {
                         }
                         .frame(maxWidth: 700)
                         .frame(maxWidth: .infinity)
+                    }
+                    .scrollPosition($scrollPosition)
+                    .onChange(of: selectedEntry.date) {
+                        // each day starts at the top instead of inheriting the previous day's offset
+                        scrollPosition.scrollTo(edge: .top)
                     }
                     .safeAreaBar(edge: .top) {
                         VStack {

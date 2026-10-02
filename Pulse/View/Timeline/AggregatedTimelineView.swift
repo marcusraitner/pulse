@@ -24,6 +24,7 @@ struct AggregatedTimelineView: View {
     @State private var containerWidth: CGFloat = 0.0
     @State private var selectedStartDate: Date = .now
     @State private var position: Date?
+    @State private var scrollPosition = ScrollPosition()
     
     @Query(sort: \DailyEntry.date) private var allEntries: [DailyEntry]
     
@@ -80,6 +81,11 @@ struct AggregatedTimelineView: View {
                     .padding(.horizontal, 8)
                     .frame(maxWidth: 700)
                     .frame(maxWidth: .infinity)
+        }
+        .scrollPosition($scrollPosition)
+        .onChange(of: selectedStartDate) {
+            // each period starts at the top instead of inheriting the previous period's offset
+            scrollPosition.scrollTo(edge: .top)
         }
         .safeAreaBar(edge: .top) {
             VStack {
