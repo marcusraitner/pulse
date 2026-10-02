@@ -47,12 +47,48 @@ struct PulseApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
                 .environment(\.featureFlags, FeatureFlags(adminEnabled: false))
                 .environment(filterState)
                 .preferredColorScheme(.dark)
         }
         .modelContainer(modelContainer)
+    }
+}
+
+/// Wraps `ContentView` with the optional Face ID / Touch ID app lock. Locks
+/// whenever the scene leaves `.active` and re-authenticates on return.
+private struct RootView: View {
+    @Environment(\.scenePhase) private var scenePhase
+    @AppStorage(AppStorageKeys.appLockEnabled) private var appLockEnabled: Bool = false
+    @State private var isUnlocked = false
+
+    var body: some View {
+        ContentView()
+            .overlay {
+                if appLockEnabled && !isUnlocked {
+                    AppLockView(onUnlock: unlock)
+                }
+            }
+            .onChange(of: scenePhase, initial: true) { _, newPhase in
+                guard appLockEnabled else {
+                    isUnlocked = true
+                    return
+                }
+
+                switch newPhase {
+                case .active:
+                    if !isUnlocked { Task { await unlock() } }
+                case .background:
+                    isUnlocked = false
+                default:
+                    break
+                }
+            }
+    }
+
+    private func unlock() async {
+        isUnlocked = await authenticateDeviceOwner()
     }
 }
 

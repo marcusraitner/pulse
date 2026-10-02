@@ -2091,6 +2091,76 @@
           }
         }
       }
+    },
+    "Require Face ID to open Pulse" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face ID zum Öffnen von Pulse verlangen"
+          }
+        }
+      }
+    },
+    "Require Touch ID to open Pulse" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID zum Öffnen von Pulse verlangen"
+          }
+        }
+      }
+    },
+    "Require your device passcode to open Pulse" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerätecode zum Öffnen von Pulse verlangen"
+          }
+        }
+      }
+    },
+    "Pulse will lock whenever you leave the app and ask you to unlock it again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulse sperrt sich, sobald du die App verlässt, und verlangt beim Zurückkehren eine erneute Entsperrung."
+          }
+        }
+      }
+    },
+    "Pulse is locked" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulse ist gesperrt"
+          }
+        }
+      }
+    },
+    "Unlock" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entsperren"
+          }
+        }
+      }
+    },
+    "Unlock Pulse to continue" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entsperre Pulse, um fortzufahren"
+          }
+        }
+      }
     }
   },
   "version" : "1.3"
