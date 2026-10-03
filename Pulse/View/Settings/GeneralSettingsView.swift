@@ -54,7 +54,11 @@ struct GeneralSettingsView: View {
     private var exportTagsFilter: Set<String>? {
         exportSelectedTags.count == allTags.count ? nil : exportSelectedTags
     }
-    
+
+    private func toggleExportTag(_ tagName: String) {
+        exportSelectedTags.formSymmetricDifference([tagName])
+    }
+
     private var appLockToggleTitle: LocalizedStringKey {
         let context = LAContext()
         // biometryType is only populated after canEvaluatePolicy has run at least once
@@ -65,19 +69,6 @@ struct GeneralSettingsView: View {
         case .touchID: return "Require Touch ID to open Pulse"
         default: return "Require your device passcode to open Pulse"
         }
-    }
-    
-    private func exportTagBinding(for tagName: String) -> Binding<Bool> {
-        Binding(
-            get: { exportSelectedTags.contains(tagName) },
-            set: { isSelected in
-                if isSelected {
-                    exportSelectedTags.insert(tagName)
-                } else {
-                    exportSelectedTags.remove(tagName)
-                }
-            }
-        )
     }
     
     var body: some View {
@@ -142,6 +133,7 @@ struct GeneralSettingsView: View {
                     } label: {
                         Text("Download")
                     }
+                    .disabled(exportSelectedTags.isEmpty)
                     .buttonStyle(.bordered)
                     .padding(.leading, 10)
                 }
@@ -153,6 +145,10 @@ struct GeneralSettingsView: View {
                                 Text(range.label)
                             }
                         }
+                        // Reserves space for the widest option so the menu-style value label doesn't
+                        // reflow (and briefly render at the wrong position) when switching between
+                        // options of very different widths, e.g. "This week" vs. "Custom range".
+                        .frame(minWidth: 150, alignment: .trailing)
                         .padding(.bottom, 4)
                         
                         if exportTimeRange == .custom {
@@ -160,19 +156,27 @@ struct GeneralSettingsView: View {
                             DatePicker("To", selection: $exportEndDate, displayedComponents: .date)
                         }
                     }
-                        if !allTags.isEmpty {
-                            VStack(alignment: .leading) {
-                                Text("Filter by tag")
-                                FlowLayout {
-                                    ForEach(allTags) { tag in
-                                        TagChipView(label: tag.name,
-                                                    style: .selectable(isSelected: exportSelectedTags.contains(tag.name), onTap: { if exportSelectedTags.contains(tag.name) { exportSelectedTags.remove(tag.name) } else { exportSelectedTags.insert(tag.name) } } ))
-                                    }
+                    if !allTags.isEmpty {
+                        VStack(alignment: .leading) {
+                            Text("Filter by tag")
+                            FlowLayout {
+                                ForEach(allTags) { tag in
+                                    TagChipView(
+                                        label: tag.name,
+                                        style: .selectable(
+                                            isSelected: exportSelectedTags.contains(tag.name),
+                                            onTap: { toggleExportTag(tag.name) } ))
                                 }
                             }
+                            if exportSelectedTags.isEmpty {
+                                Text("Select at least one tag.")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
-                    
+                    }
                 }
+                .animation(.default, value: isExportOptionsExpanded)
             }
         }
         .task {
