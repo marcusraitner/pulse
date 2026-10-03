@@ -522,16 +522,6 @@
         }
       }
     },
-    "Backup" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Backup"
-          }
-        }
-      }
-    },
     "Cancel" : {
       "localizations" : {
         "de" : {
@@ -803,6 +793,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Beispiel: Titel „Deep Work“, Beschreibung „Zeit für konzentriertes Arbeiten“, Einheit „min“"
+          }
+        }
+      }
+    },
+    "Export" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export"
           }
         }
       }

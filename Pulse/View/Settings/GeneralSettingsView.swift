@@ -107,7 +107,7 @@ struct GeneralSettingsView: View {
 
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("Backup")
+                        Text("Export")
                         Text("Download your data in a JSON file.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
