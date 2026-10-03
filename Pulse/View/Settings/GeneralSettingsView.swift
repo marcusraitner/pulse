@@ -152,11 +152,8 @@ struct GeneralSettingsView: View {
                         }
                     }
                     if exportTimeRange == .custom {
-                        // no animation: a compact picker measured mid-insert falls back to the short date format
                         DatePicker("From", selection: $exportStartDate, displayedComponents: .date)
-                            .transaction { $0.animation = nil }
                         DatePicker("To", selection: $exportEndDate, displayedComponents: .date)
-                            .transaction { $0.animation = nil }
                     }
 
                     if !allTags.isEmpty {
