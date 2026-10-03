@@ -22,7 +22,7 @@ struct GeneralSettingsView: View {
     @State private var exportDocument: ExportJSONDocument?
     @State private var exportFilename: String = "pulse-export.json"
     @State private var exportErrorMessage: String?
-    @State private var exportDateFilterEnabled: Bool = false
+    @State private var exportTimeRange: ExportTimeRange = .allTime
     @State private var exportStartDate: Date = Calendar.current.date(byAdding: .month, value: -1, to: .now) ?? .now
     @State private var exportEndDate: Date = .now
     @State private var exportSelectedTags: Set<String> = []
@@ -45,15 +45,10 @@ struct GeneralSettingsView: View {
         )
     }
 
+    /// Resolved on each access, so tapping Download always uses the range relative to now.
     private var exportDateRange: ClosedRange<Date>? {
-        guard exportDateFilterEnabled else { return nil }
-        let calendar = Calendar.current
-        let start = calendar.startOfDay(for: min(exportStartDate, exportEndDate))
-        let endOfEndDay = calendar.date(
-            byAdding: DateComponents(day: 1, second: -1),
-            to: calendar.startOfDay(for: max(exportStartDate, exportEndDate))
-        ) ?? max(exportStartDate, exportEndDate)
-        return start...endOfEndDay
+        exportTimeRange.dateRange(now: .now, calendar: .current,
+                                  customFrom: exportStartDate, customTo: exportEndDate)
     }
 
     private var exportTagsFilter: Set<String>? {
@@ -151,10 +146,12 @@ struct GeneralSettingsView: View {
                 }
 
                 DisclosureGroup("Export options", isExpanded: $isExportOptionsExpanded) {
-                    Toggle(isOn: $exportDateFilterEnabled) {
-                        Text("Restrict to date range")
+                    Picker("Time range", selection: $exportTimeRange) {
+                        ForEach(ExportTimeRange.allCases, id: \.self) { range in
+                            Text(range.label)
+                        }
                     }
-                    if exportDateFilterEnabled {
+                    if exportTimeRange == .custom {
                         DatePicker("From", selection: $exportStartDate, displayedComponents: .date)
                         DatePicker("To", selection: $exportEndDate, displayedComponents: .date)
                     }
@@ -163,7 +160,7 @@ struct GeneralSettingsView: View {
                         Text("Tags")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                            .padding(.top, exportDateFilterEnabled ? 4 : 0)
+                            .padding(.top, exportTimeRange == .custom ? 4 : 0)
                         ForEach(allTags) { tag in
                             Toggle(tag.name, isOn: exportTagBinding(for: tag.name))
                         }

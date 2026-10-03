@@ -21,6 +21,56 @@
         }
       }
     },
+    "Custom range" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eigener Zeitraum"
+          }
+        }
+      }
+    },
+    "Last month" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzter Monat"
+          }
+        }
+      }
+    },
+    "Last week" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzte Woche"
+          }
+        }
+      }
+    },
+    "This month" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Monat"
+          }
+        }
+      }
+    },
+    "This week" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Woche"
+          }
+        }
+      }
+    },
     "—" : {
       "localizations" : {
         "de" : {
@@ -1662,16 +1712,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erinnerungen"
-          }
-        }
-      }
-    },
-    "Restrict to date range" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Auf Zeitraum beschränken"
           }
         }
       }
