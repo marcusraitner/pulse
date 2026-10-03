@@ -13,10 +13,10 @@ import UniformTypeIdentifiers
 import LocalAuthentication
 
 struct GeneralSettingsView: View {
-
+    
     @AppStorage(AppStorageKeys.enableEditingHistory) private var enableEditingHistory: Bool = false
     @AppStorage(AppStorageKeys.appLockEnabled) private var appLockEnabled: Bool = false
-
+    
     // Export data
     @State private var isPresentingExport: Bool = false
     @State private var exportDocument: ExportJSONDocument?
@@ -27,13 +27,13 @@ struct GeneralSettingsView: View {
     @State private var exportEndDate: Date = .now
     @State private var exportSelectedTags: Set<String> = []
     @State private var isExportOptionsExpanded: Bool = false
-
+    
     @Query private var allEntries: [DailyEntry]
     @Query private var allTags: [Tag]
     @Query private var allKPIs: [KPITemplate]
-
+    
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "GeneralSettingsView")
-
+    
     private var isShowingExportError: Binding<Bool> {
         Binding(
             get: { exportErrorMessage != nil },
@@ -44,29 +44,29 @@ struct GeneralSettingsView: View {
             }
         )
     }
-
+    
     /// Resolved on each access, so tapping Download always uses the range relative to now.
     private var exportDateRange: ClosedRange<Date>? {
         exportTimeRange.dateRange(now: .now, calendar: .current,
                                   customFrom: exportStartDate, customTo: exportEndDate)
     }
-
+    
     private var exportTagsFilter: Set<String>? {
         exportSelectedTags.count == allTags.count ? nil : exportSelectedTags
     }
-
+    
     private var appLockToggleTitle: LocalizedStringKey {
         let context = LAContext()
         // biometryType is only populated after canEvaluatePolicy has run at least once
         _ = context.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
-
+        
         switch context.biometryType {
         case .faceID: return "Require Face ID to open Pulse"
         case .touchID: return "Require Touch ID to open Pulse"
         default: return "Require your device passcode to open Pulse"
         }
     }
-
+    
     private func exportTagBinding(for tagName: String) -> Binding<Bool> {
         Binding(
             get: { exportSelectedTags.contains(tagName) },
@@ -79,7 +79,7 @@ struct GeneralSettingsView: View {
             }
         )
     }
-
+    
     var body: some View {
         Form {
             Section {
@@ -91,20 +91,21 @@ struct GeneralSettingsView: View {
                         .padding(.top, 4)
                     Text("Adjust general settings here.")
                         .foregroundStyle(.secondary)
-
+                    
                 }
-
+                
                 Toggle(isOn: $enableEditingHistory) {
                     Text("Edit past days and moments")
                     Text("Enable this option to be able to add, delete, or edit moments for past days.")
-
+                    
                 }
-
+                
                 Toggle(isOn: $appLockEnabled) {
                     Text(appLockToggleTitle)
                     Text("Pulse will lock whenever you leave the app and ask you to unlock it again.")
                 }
-
+            }
+            Section {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("Export")
@@ -112,9 +113,9 @@ struct GeneralSettingsView: View {
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
-
+                    
                     Spacer()
-
+                    
                     Button {
                         do {
                             let payload = ExportPayloadMapper.exportPayload(
@@ -126,13 +127,13 @@ struct GeneralSettingsView: View {
                             let encoder = JSONEncoder()
                             encoder.dateEncodingStrategy = .iso8601
                             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-
+                            
                             let data = try encoder.encode(payload)
-
+                            
                             exportDocument = .init(data: data)
                             exportFilename = "pulse-export-\(DateFormatHelper.formatDate(.now)).json"
                             isPresentingExport = true
-
+                            
                         } catch {
                             logger.error("Failed to create export payload: \(error.localizedDescription)")
                             exportErrorMessage = "Could not create data for download. Please try again."
@@ -144,29 +145,34 @@ struct GeneralSettingsView: View {
                     .buttonStyle(.bordered)
                     .padding(.leading, 10)
                 }
-
+                
                 DisclosureGroup("Export options", isExpanded: $isExportOptionsExpanded) {
-                    Picker("Time range", selection: $exportTimeRange) {
-                        ForEach(ExportTimeRange.allCases, id: \.self) { range in
-                            Text(range.label)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Picker("Time range", selection: $exportTimeRange) {
+                            ForEach(ExportTimeRange.allCases, id: \.self) { range in
+                                Text(range.label)
+                            }
+                        }
+                        .padding(.bottom, 4)
+                        
+                        if exportTimeRange == .custom {
+                            DatePicker("From", selection: $exportStartDate, displayedComponents: .date)
+                            DatePicker("To", selection: $exportEndDate, displayedComponents: .date)
                         }
                     }
-                    if exportTimeRange == .custom {
-                        DatePicker("From", selection: $exportStartDate, displayedComponents: .date)
-                        DatePicker("To", selection: $exportEndDate, displayedComponents: .date)
-                    }
-
-                    if !allTags.isEmpty {
-                        Text("Tags")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .padding(.top, exportTimeRange == .custom ? 4 : 0)
-                        ForEach(allTags) { tag in
-                            Toggle(tag.name, isOn: exportTagBinding(for: tag.name))
+                        if !allTags.isEmpty {
+                            VStack(alignment: .leading) {
+                                Text("Filter by tag")
+                                FlowLayout {
+                                    ForEach(allTags) { tag in
+                                        TagChipView(label: tag.name,
+                                                    style: .selectable(isSelected: exportSelectedTags.contains(tag.name), onTap: { if exportSelectedTags.contains(tag.name) { exportSelectedTags.remove(tag.name) } else { exportSelectedTags.insert(tag.name) } } ))
+                                    }
+                                }
+                            }
                         }
-                    }
+                    
                 }
-                .animation(.default, value: isExportOptionsExpanded)
             }
         }
         .task {
