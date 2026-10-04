@@ -64,11 +64,12 @@ private struct RootView: View {
     @AppStorage(AppStorageKeys.appLockEnabled) private var appLockEnabled: Bool = false
     @State private var isUnlocked = false
     @State private var lockWindow = AppLockWindow()
+    @State private var promptGate = AppLockPromptGate()
 
     var body: some View {
         ContentView()
             .onChange(of: appLockEnabled && !isUnlocked, initial: true) { _, isLocked in
-                lockWindow.setVisible(isLocked, onUnlock: unlock)
+                lockWindow.setVisible(isLocked, onUnlock: { await unlock() })
             }
             .onChange(of: scenePhase, initial: true) { _, newPhase in
                 guard appLockEnabled else {
@@ -78,17 +79,21 @@ private struct RootView: View {
 
                 switch newPhase {
                 case .active:
-                    if !isUnlocked { Task { await unlock() } }
+                    if !isUnlocked { Task { await unlock(automatic: true) } }
                 case .background:
                     isUnlocked = false
+                    promptGate.reset()
                 default:
                     break
                 }
             }
     }
 
-    private func unlock() async {
+    /// `automatic` is the prompt on returning to the app; otherwise the user tapped Unlock.
+    private func unlock(automatic: Bool = false) async {
+        guard automatic ? promptGate.beginAutomatic() : promptGate.beginManual() else { return }
         isUnlocked = await authenticateDeviceOwner()
+        promptGate.finish()
     }
 }
 

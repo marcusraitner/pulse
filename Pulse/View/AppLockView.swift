@@ -8,7 +8,8 @@
 import SwiftUI
 
 /// Full-screen cover shown while the app is locked. Fully opaque so no
-/// content underneath is visible, even blurred.
+/// content underneath is visible, even blurred. Does not prompt on its own:
+/// `RootView` starts the automatic prompt, the button is the manual retry.
 struct AppLockView: View {
     var onUnlock: () async -> Void
 
@@ -31,9 +32,6 @@ struct AppLockView: View {
                 .buttonStyle(.glassProminent)
                 .tint(.accent)
             }
-        }
-        .task {
-            await onUnlock()
         }
     }
 }
