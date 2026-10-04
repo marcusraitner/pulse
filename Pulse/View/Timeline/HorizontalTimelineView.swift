@@ -72,12 +72,17 @@ struct HorizontalTimelineView: View {
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition(id: $position, anchor: .center)
         .defaultScrollAnchor(.trailing)
-        .contentMargins(.horizontal, (containerWidth - barWidth) * 0.5, for: .scrollContent)
+        .contentMargins(.horizontal, max(0, (containerWidth - barWidth) * 0.5), for: .scrollContent)
         .onGeometryChange(for: CGSize.self) { proxy in
             proxy.size
         } action: { old, new in
             logger.trace("Setting container width to \(new.width)")
             containerWidth = new.width
+
+            // The side margins follow the width but the scroll offset does not, so the selected day
+            // ends up off-center once the real width is known (launch, rotation, window resizing)
+            guard new.width > 0, new.width != old.width else { return }
+            scroll(to: position ?? allEntries.last?.date)
         }
         .onChange(of: position) { _, new in
             // set selectedEntry on scroll pos change
@@ -128,11 +133,17 @@ struct HorizontalTimelineView: View {
             (!selectedEntry.isEmpty || Calendar.current.isDateInToday(selectedEntry.date)) ?
             selectedEntry.date : allEntries.last?.date
            
-            position = nil
-            DispatchQueue.main.async() {
-                if let target {
-                    position = target
-                }
+            scroll(to: target)
+        }
+    }
+
+    /// Scrolls the timeline to `target` on the next run loop. The position is cleared first,
+    /// because setting it to the value it already has would not scroll.
+    private func scroll(to target: Date?) {
+        position = nil
+        DispatchQueue.main.async {
+            if let target {
+                position = target
             }
         }
     }
