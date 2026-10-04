@@ -42,7 +42,7 @@ struct HorizontalTimelineView: View {
 
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 3) {
-                ForEach(allEntries.filter( { showEmptyDays || !$0.isEmpty || Calendar.current.isDateInToday($0.date) } ) , id: \.date ) { entry in
+                ForEach(allEntries.filter(isShown), id: \.date ) { entry in
                     let avg: CGFloat? = entry.averageScore(
                         taggedWith: filterState.activeFilter)
                     let barHeight: CGFloat = max(2, heightScale * (avg?.magnitude ?? 0))
@@ -82,7 +82,7 @@ struct HorizontalTimelineView: View {
             // The side margins follow the width but the scroll offset does not, so the selected day
             // ends up off-center once the real width is known (launch, rotation, window resizing)
             guard new.width > 0, new.width != old.width else { return }
-            scroll(to: position ?? allEntries.last?.date)
+            scroll(to: recenterTarget())
         }
         .onChange(of: position) { _, new in
             // set selectedEntry on scroll pos change
@@ -135,6 +135,19 @@ struct HorizontalTimelineView: View {
            
             scroll(to: target)
         }
+    }
+
+    /// Whether the day gets a bar in the timeline.
+    private func isShown(_ entry: DailyEntry) -> Bool {
+        showEmptyDays || !entry.isEmpty || Calendar.current.isDateInToday(entry.date)
+    }
+
+    /// The day to keep centered when the width changes: the selected day, or the last day if
+    /// nothing is selected yet. Not `position`, which is `nil` while a scroll is being re-applied
+    /// and whenever SwiftUI lays the scroll view out at an odd size.
+    private func recenterTarget() -> Date? {
+        let selected = allEntries.first { $0.date == selectedEntry.date && isShown($0) }
+        return selected?.date ?? allEntries.last?.date
     }
 
     /// Scrolls the timeline to `target` on the next run loop. The position is cleared first,
