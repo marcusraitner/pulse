@@ -34,15 +34,30 @@ struct SelectedDateView: View {
                 Text(date.formatted(.dateTime.weekday().day().month().year()))
             }
 
-            Rectangle()
-                .fill(.secondary)
-                .frame(width: 40, height: 1)
+            VStack(spacing: 0) {
+                Rectangle()
+                    .fill(.secondary)
+                    .frame(width: 56, height: 1)
 
-            Image(systemName: "arrowtriangle.down.fill")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+                FlatTriangle()
+                    .fill(.secondary)
+                    .frame(width: 14, height: 5)
+            }
+            .padding(.top, 4)
         }
         .font(.body.bold())
+    }
+}
+
+/// A shallow, isoceles triangle pointing down, used as a pointer beneath `SelectedDateView`'s underline.
+private struct FlatTriangle: Shape {
+    func path(in rect: CGRect) -> Path {
+        Path { path in
+            path.move(to: CGPoint(x: rect.minX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+            path.closeSubpath()
+        }
     }
 }
 

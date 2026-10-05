@@ -178,8 +178,8 @@ struct ContentView: View {
                     .safeAreaBar(edge: .top) {
                         VStack {
                             SelectedDateView(date: selectedEntry.date)
-                                .padding(.top)
-                                .padding(.bottom, 4)
+                                .padding(.top, 2)
+                                .padding(.bottom, 2)
                             // The timeline scroll view
                             HorizontalTimelineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
                                 .padding(.bottom)

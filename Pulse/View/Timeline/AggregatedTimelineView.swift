@@ -90,8 +90,8 @@ struct AggregatedTimelineView: View {
         .safeAreaBar(edge: .top) {
             VStack {
                 SelectedDateView(date: selectedStartDate, level: aggregationLevel)
-                    .padding(.top)
-                    .padding(.bottom, 4)
+                    .padding(.top, 2)
+                    .padding(.bottom, 2)
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
