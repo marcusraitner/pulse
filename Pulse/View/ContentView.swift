@@ -20,6 +20,14 @@ enum ViewMode: String, CaseIterable {
         case .month: return "calendar"
         }
     }
+
+    var title: String {
+        switch self {
+        case .day:   return "Day"
+        case .week:  return "Week"
+        case .month: return "Month"
+        }
+    }
 }
 
 /// Day-starts between `start` and `end` that have no entry yet, newest first.
@@ -169,13 +177,13 @@ struct ContentView: View {
                     }
                     .safeAreaBar(edge: .top) {
                         VStack {
+                            SelectedDateView(date: selectedEntry.date)
+                                .padding(.top)
+                                .padding(.bottom, 4)
                             // The timeline scroll view
                             HorizontalTimelineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
-                                .padding(.top)
-                                .accessibilityIdentifier("HorizontalTimelineView")
-                            SelectedDateView(date: selectedEntry.date)
                                 .padding(.bottom)
-                                .padding(.top, 4)
+                                .accessibilityIdentifier("HorizontalTimelineView")
                         }
                     }
                 } else {
@@ -210,28 +218,12 @@ struct ContentView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        switch viewMode {
-                        case .day:
-                            viewMode = .week
-                        case .week:
-                            viewMode = .month
-                        case .month:
-                            viewMode = .day
+                    Picker("View Mode", selection: $viewMode) {
+                        ForEach(ViewMode.allCases, id: \.self) { mode in
+                            Label(LocalizedStringKey(mode.title), systemImage: mode.systemImage).tag(mode)
                         }
-                    } label: {
-                        ZStack {
-                            ForEach(ViewMode.allCases, id: \.self) { mode in
-                                Image(systemName: mode.systemImage)
-                                    .hidden()
-                            }
-                            
-                            Image(systemName: viewMode.systemImage)
-                                .fontWeight(.medium)
-                                .contentTransition(.symbolEffect(.replace))
-                        }
-                        .animation(.snappy(duration: 0.25), value: viewMode)
                     }
+                    .pickerStyle(.menu)
                 }
                 
                 ToolbarItem(placement: .bottomBar) {

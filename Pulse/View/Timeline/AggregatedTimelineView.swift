@@ -89,6 +89,10 @@ struct AggregatedTimelineView: View {
         }
         .safeAreaBar(edge: .top) {
             VStack {
+                SelectedDateView(date: selectedStartDate, level: aggregationLevel)
+                    .padding(.top)
+                    .padding(.bottom, 4)
+
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         ForEach(periodStarts, id: \.self) { periodStart in
@@ -149,11 +153,7 @@ struct AggregatedTimelineView: View {
                     logger.trace("New selected start date: \(selectedStartDate)")
                 }
                 .sensoryFeedback(.impact, trigger: selectedStartDate)
-                .padding(.top)
-                
-                SelectedDateView(date: selectedStartDate, level: aggregationLevel)
-                    .padding(.top, 4)
-                    .padding(.bottom)
+                .padding(.bottom)
             }
         }
     }

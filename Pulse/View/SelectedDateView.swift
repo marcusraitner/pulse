@@ -12,22 +12,35 @@ struct SelectedDateView: View {
     let date: Date
     var level: AggregationLevel? = nil
     
+    private var cal: Calendar { .current }
+
     var body: some View {
-        VStack(alignment: .center) {
+        VStack(alignment: .center, spacing: 2) {
             if let level {
                 switch level {
                 case .week:
-                    let cal = Calendar.current
                     let start = cal.dateInterval(of: .weekOfYear, for: date)?.start ?? date
                     let end = cal.date(byAdding: .day, value: 6, to: start) ?? start
-                    
-                    Text("Week \(date.formatted(.dateTime.week())): \(start.formatted(.dateTime.day().month(.defaultDigits).year(.twoDigits))) – \(end.formatted(.dateTime.day().month(.defaultDigits).year(.twoDigits)))")
+
+                    Text((start..<end).formatted(.interval.day().month(.abbreviated).year()))
                 case .month:
                     Text(date.formatted(.dateTime.month(.wide).year()))
                 }
+            } else if cal.isDateInToday(date) {
+                Text("Today")
+            } else if cal.isDateInYesterday(date) {
+                Text("Yesterday")
             } else {
                 Text(date.formatted(.dateTime.weekday().day().month().year()))
             }
+
+            Rectangle()
+                .fill(.secondary)
+                .frame(width: 40, height: 1)
+
+            Image(systemName: "arrowtriangle.down.fill")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
         }
         .font(.body.bold())
     }
