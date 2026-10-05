@@ -8,17 +8,58 @@
 
 import SwiftUI
 import SwiftData
-import CloudKitSyncMonitor
 
 struct StatisticsSettingsView: View {
 
     @Query private var allEntries: [DailyEntry]
     @Query private var allLogs: [DailyLogEntry]
 
-    @StateObject private var syncMonitor = SyncMonitor.default
+    @Environment(ICloudSyncMonitor.self) private var syncMonitor
 
     private var countDays: Int { allEntries.count }
     private var countLogs: Int { allLogs.count }
+
+    private var syncSymbol: (name: String, color: Color) {
+        switch syncMonitor.model.summary {
+        case .synced: ("icloud", .green)
+        case .waiting: ("icloud", .gray)
+        case .syncing, .busy: ("arrow.clockwise.icloud", .gray)
+        case .offline: ("bolt.horizontal.icloud", .gray)
+        case .noAccount: ("lock.icloud", .red)
+        case .problem: ("exclamationmark.icloud", .red)
+        }
+    }
+
+    /// Problems the user has to act on are highlighted; waiting states stay quiet.
+    private var syncNeedsAttention: Bool {
+        switch syncMonitor.model.summary {
+        case .noAccount, .problem: true
+        default: false
+        }
+    }
+
+    @ViewBuilder private var syncDescription: some View {
+        switch syncMonitor.model.summary {
+        case .synced(let date):
+            // refreshes so "1 minute ago" doesn't go stale while the screen is open
+            TimelineView(.periodic(from: .now, by: 30)) { _ in
+                Text("Last synced \(Self.relativeFormatter.localizedString(for: date, relativeTo: .now))")
+            }
+        case .syncing: Text("Syncing…")
+        case .waiting: Text("Waiting for the first sync")
+        case .offline: Text("Offline – will sync when you're back online")
+        case .busy: Text("iCloud is busy – will try again")
+        case .noAccount: Text("No iCloud account – changes stay on this device")
+        case .problem(.other(let message)): Text("Sync problem: \(message)")
+        case .problem: Text("iCloud storage is full – changes aren't being saved")  // the only other problem
+        }
+    }
+
+    private static let relativeFormatter: RelativeDateTimeFormatter = {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .full
+        return formatter
+    }()
 
     var body: some View {
         List {
@@ -45,36 +86,17 @@ struct StatisticsSettingsView: View {
                 Text("\(countLogs)")
             }
             Section("iCloud Sync") {
-                VStack(alignment: .leading) {
-                    VStack(alignment: .trailing) {
-                        HStack {
-                            Text("Status")
-                            Spacer()
-                            Image(systemName: syncMonitor.syncStateSummary.symbolName)
-                                .foregroundColor(syncMonitor.syncStateSummary.symbolColor)
-                        }
-                        Text(syncMonitor.syncStateSummary.description)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                VStack(alignment: .trailing) {
+                    HStack {
+                        Text("Status")
+                        Spacer()
+                        Image(systemName: syncSymbol.name)
+                            .foregroundStyle(syncSymbol.color)
                     }
-
-                    Group {
-                        if syncMonitor.hasSyncError {
-                            if let error = syncMonitor.setupError {
-                                Text("Unable to set up iCloud sync, changes won't be saved! \(error.localizedDescription)")
-                            }
-                            if let error = syncMonitor.importError {
-                                Text("Import is broken: \(error.localizedDescription)")
-                            }
-                            if let error = syncMonitor.exportError {
-                                Text("Export is broken - your changes aren't being saved! \(error.localizedDescription)")
-                            }
-                        } else if syncMonitor.isNotSyncing {
-                            Text("Sync should be working, but isn't. Look for a badge on Settings or other possible issues.")
-                        }
-                    }
-                    .foregroundStyle(.accent)
-                    .padding(.top, 2)
+                    syncDescription
+                        .font(.caption)
+                        .foregroundStyle(syncNeedsAttention ? AnyShapeStyle(.accent) : AnyShapeStyle(.secondary))
+                        .multilineTextAlignment(.trailing)
                 }
             }
         }
@@ -85,6 +107,7 @@ struct StatisticsSettingsView: View {
     NavigationStack {
         StatisticsSettingsView()
             .modelContainer(SampleData.shared.modelContainer)
+            .environment(ICloudSyncMonitor())
             .preferredColorScheme(.dark)
     }
 }

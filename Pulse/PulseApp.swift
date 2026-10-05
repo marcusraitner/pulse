@@ -23,10 +23,16 @@ struct PulseApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "PulseApp")
     @State private var filterState = FilterState()
+    @State private var syncMonitor: ICloudSyncMonitor
     
     let modelContainer: ModelContainer
     
     init() {
+        // observe CloudKit before the container exists, so its setup and first import are seen
+        let syncMonitor = ICloudSyncMonitor()
+        syncMonitor.start()
+        _syncMonitor = State(initialValue: syncMonitor)
+
         let schema = Schema([DailyEntry.self, DailyLogEntry.self, DailyKPIValue.self, KPITemplate.self, Tag.self])
         let modelconfiguration = ModelConfiguration(
             schema: schema,
@@ -50,6 +56,7 @@ struct PulseApp: App {
             RootView()
                 .environment(\.featureFlags, FeatureFlags(adminEnabled: false))
                 .environment(filterState)
+                .environment(syncMonitor)
                 .preferredColorScheme(.dark)
         }
         .modelContainer(modelContainer)
