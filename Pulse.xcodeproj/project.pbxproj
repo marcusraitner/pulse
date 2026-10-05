@@ -6,10 +6,6 @@
 	objectVersion = 100;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		2CB839FB3021CB4100C5E0B7 /* CloudKitSyncMonitor in Frameworks */ = {isa = PBXBuildFile; productRef = 2CB839FA3021CB4100C5E0B7 /* CloudKitSyncMonitor */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		2D40E6292F73FC3B0001D250 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -88,7 +84,6 @@
 		2C3749852F4308270079D893 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
-				2CB839FB3021CB4100C5E0B7 /* CloudKitSyncMonitor in Frameworks */,
 			);
 		};
 		2D40E6222F73FC3B0001D250 /* Frameworks */ = {
@@ -138,7 +133,6 @@
 			);
 			name = Pulse;
 			packageProductDependencies = (
-				2CB839FA3021CB4100C5E0B7 /* CloudKitSyncMonitor */,
 			);
 			productName = Pulse;
 			productReference = 2C3749882F4308270079D893 /* Pulse.app */;
@@ -194,9 +188,6 @@
 			);
 			mainGroup = 2C37497F2F4308270079D893;
 			minimizedProjectReferenceProxies = 1;
-			packageReferences = (
-				2CB839F93021CB4100C5E0B7 /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */,
-			);
 			preferredProjectObjectVersion = 100;
 			productRefGroup = 2C3749892F4308270079D893 /* Products */;
 			projectDirPath = "";
@@ -537,24 +528,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		2CB839F93021CB4100C5E0B7 /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/marcusraitner/CloudKitSyncMonitor.git";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		2CB839FA3021CB4100C5E0B7 /* CloudKitSyncMonitor */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2CB839F93021CB4100C5E0B7 /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */;
-			productName = CloudKitSyncMonitor;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2C3749802F4308270079D893 /* Project object */;
 }

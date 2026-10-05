@@ -16,7 +16,7 @@ Pulse is a minimalist iOS micro-journaling app. Users capture short "moments" th
 2. **Privacy is the product.** All data stays on device and in the user's private iCloud. AI runs 100% on-device via Foundation Models.
    - NEVER add analytics, tracking, crash reporters, ad SDKs, or telemetry of any kind.
    - NEVER add network calls other than CloudKit sync and on-device Foundation Models usage.
-   - NEVER add third-party dependencies without explicit approval from the maintainer. The project intentionally has none. <!-- TODO(Marcus): verify still true -->
+   - NEVER add third-party dependencies without explicit approval from the maintainer. The project intentionally has none.
 3. **No dark patterns.** No streaks, no guilt mechanics, no gamification, no subscription. Free and open source.
 4. Reviews praise the app as "schlicht und schnell" (simple and fast). Preserve that. Performance and low friction beat feature richness.
 
