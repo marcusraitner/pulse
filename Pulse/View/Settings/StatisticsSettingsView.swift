@@ -43,7 +43,7 @@ struct StatisticsSettingsView: View {
         case .synced(let date):
             // refreshes so "1 minute ago" doesn't go stale while the screen is open
             TimelineView(.periodic(from: .now, by: 30)) { _ in
-                Text("Last synced \(Self.relativeFormatter.localizedString(for: date, relativeTo: .now))")
+                Text("Last synced \(date, format: .relative(presentation: .numeric, unitsStyle: .wide))")
             }
         case .syncing: Text("Syncing…")
         case .waiting: Text("Waiting for the first sync")
@@ -54,12 +54,6 @@ struct StatisticsSettingsView: View {
         case .problem: Text("iCloud storage is full – changes aren't being saved")  // the only other problem
         }
     }
-
-    private static let relativeFormatter: RelativeDateTimeFormatter = {
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .full
-        return formatter
-    }()
 
     var body: some View {
         List {
