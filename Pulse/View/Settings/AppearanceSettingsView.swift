@@ -76,7 +76,7 @@ struct AppearanceSettingsView: View {
                                     .frame(height: 120)
                                     .clipped()
                                     .contentShape(Rectangle())
-                                    .cornerRadius(12)
+                                    .clipShape(.rect(cornerRadius: 12))
                                     .overlay(alignment: .bottomTrailing) {
                                         if isSelected {
                                             Image(systemName: "checkmark.circle.fill")
@@ -99,7 +99,7 @@ struct AppearanceSettingsView: View {
                                     .frame(height: 120)
                                     .clipped()
                                     .contentShape(Rectangle())
-                                    .cornerRadius(12)
+                                    .clipShape(.rect(cornerRadius: 12))
                                     .overlay(alignment: .bottomTrailing) {
                                         Image(systemName: "checkmark.circle.fill")
                                             .foregroundStyle(.white, .blue)
@@ -113,7 +113,7 @@ struct AppearanceSettingsView: View {
                                     .frame(height: 120)
                                     .clipped()
                                     .contentShape(Rectangle())
-                                    .cornerRadius(12)
+                                    .clipShape(.rect(cornerRadius: 12))
                                     .saturation(0.2)
                                     .overlay {
                                         Image(systemName: "photo")
