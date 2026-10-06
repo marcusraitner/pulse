@@ -53,7 +53,7 @@ func missingEntryDates(existing: [Date], from start: Date, to end: Date,
 }
 
 /// Merges `DailyEntry` duplicates for the same day (from CloudKit sync races) into one
-/// and deletes the rest. The survivor per day is the group's first entry.
+/// and deletes the rest. The survivor per day is the first entry in `mergeOrder`.
 func mergeAndPruneDuplicateEntries(
     _ entries: [DailyEntry], context: ModelContext, calendar: Calendar = .current,
     logger: Logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
@@ -61,8 +61,24 @@ func mergeAndPruneDuplicateEntries(
     let groupedEntries = Dictionary(grouping: entries) { calendar.startOfDay(for: $0.date) }
 
     for (_, dayEntries) in groupedEntries where dayEntries.count > 1 {
-        merge(sources: Array(dayEntries.dropFirst()), into: dayEntries.first!,
+        // every device must pick the same survivor, see `mergeOrder`
+        let ordered = dayEntries.sorted { $0.mergeOrder < $1.mergeOrder }
+        merge(sources: Array(ordered.dropFirst()), into: ordered[0],
               context: context, logger: logger)
+    }
+}
+
+private extension DailyEntry {
+    /// Picks the survivor of a same-day merge, and the order the others are merged in. Every
+    /// device has to get the same answer, otherwise each keeps the entry the other deletes. So it
+    /// only uses values that sync, not the query order or `persistentModelID` (local to a device).
+    /// More log entries win, so fewer rows have to move.
+    var mergeOrder: (Int, String, Int, String, String) {
+        (-(logEntries?.count ?? 0),
+         logEntries?.map(\.id.uuidString).min() ?? "",
+         -(kpiValues?.count ?? 0),
+         summary,
+         morning)
     }
 }
 
