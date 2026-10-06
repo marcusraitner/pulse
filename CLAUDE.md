@@ -38,13 +38,13 @@ Pulse is a minimalist iOS micro-journaling app. Users capture short "moments" th
 
 ```bash
 # Build
-xcodebuild build -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
+xcodebuild build -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17'
 
 # Unit tests
-xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:PulseTests
+xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:PulseTests
 
 # UI tests
-xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:PulseUITests
+xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:PulseUITests
 ```
 
 Always run a build after non-trivial changes; run `PulseTests` after any change to models, persistence, or business logic. UI tests are slow — run them only when the change touches navigation or core flows, or when asked.

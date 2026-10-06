@@ -27,10 +27,10 @@ It helps you capture moments through the day, rate them from -2 to +2, reflect e
 
 ```bash
 # Build
-xcodebuild build -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
+xcodebuild build -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17'
 
 # Unit tests
-xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:PulseTests
+xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:PulseTests
 ```
 
 ## Repository structure
