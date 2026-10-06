@@ -21,7 +21,7 @@ struct StatisticsSettingsView: View {
 
     private var syncSymbol: (name: String, color: Color) {
         switch syncMonitor.model.summary {
-        case .synced: ("icloud", .green)
+        case .synced: ("checkmark.icloud", .green)
         case .waiting: ("icloud", .gray)
         case .syncing, .busy: ("arrow.clockwise.icloud", .gray)
         case .offline: ("bolt.horizontal.icloud", .gray)
@@ -92,12 +92,14 @@ struct StatisticsSettingsView: View {
                         Spacer()
                         Image(systemName: syncSymbol.name)
                             .foregroundStyle(syncSymbol.color)
+                            .accessibilityHidden(true)
                     }
                     syncDescription
                         .font(.caption)
                         .foregroundStyle(syncNeedsAttention ? AnyShapeStyle(.accent) : AnyShapeStyle(.secondary))
                         .multilineTextAlignment(.trailing)
                 }
+                .accessibilityElement(children: .combine)
             }
         }
     }
