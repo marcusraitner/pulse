@@ -132,8 +132,6 @@
 				2C92C5EA2F7FDBDB0048B14D /* landing */,
 			);
 			name = Pulse;
-			packageProductDependencies = (
-			);
 			productName = Pulse;
 			productReference = 2C3749882F4308270079D893 /* Pulse.app */;
 			productType = "com.apple.product-type.application";
@@ -527,7 +525,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
 	};
 	rootObject = 2C3749802F4308270079D893 /* Project object */;
 }
