@@ -150,11 +150,11 @@ struct HorizontalTimelineView: View {
         return selected?.date ?? allEntries.last?.date
     }
 
-    /// Scrolls the timeline to `target` on the next run loop. The position is cleared first,
-    /// because setting it to the value it already has would not scroll.
+    /// Scrolls the timeline to `target` in a following main-actor task. The position is cleared
+    /// first, because setting it to the value it already has would not scroll.
     private func scroll(to target: Date?) {
         position = nil
-        DispatchQueue.main.async {
+        Task {
             if let target {
                 position = target
             }
