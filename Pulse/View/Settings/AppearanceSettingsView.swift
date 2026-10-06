@@ -63,25 +63,32 @@ struct AppearanceSettingsView: View {
                         let presets = ["mountain", "mountain-dark", "clouds", "moon", "stars",
                                        "fuji", "overland", "ridges", "embers"]
 
-                        ForEach(presets, id: \.self) { imageName in
-                            Image("\(imageName)-thumb")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(height: 120)
-                                .clipped()
-                                .contentShape(Rectangle())
-                                .cornerRadius(12)
-                                .onTapGesture {
-                                    backgroundImageName = imageName
-                                    backgroundImageData = nil
-                                }
-                                .overlay(alignment: .bottomTrailing) {
-                                    if imageName == backgroundImageName && backgroundImageData == nil {
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .foregroundStyle(.white, .blue)
-                                            .padding(8)
+                        ForEach(presets.enumerated(), id: \.element) { index, imageName in
+                            let isSelected = imageName == backgroundImageName && backgroundImageData == nil
+
+                            Button {
+                                backgroundImageName = imageName
+                                backgroundImageData = nil
+                            } label: {
+                                Image("\(imageName)-thumb")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(height: 120)
+                                    .clipped()
+                                    .contentShape(Rectangle())
+                                    .cornerRadius(12)
+                                    .overlay(alignment: .bottomTrailing) {
+                                        if isSelected {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .foregroundStyle(.white, .blue)
+                                                .padding(8)
+                                                .accessibilityHidden(true)
+                                        }
                                     }
-                                }
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Background image \(index + 1)")
+                            .accessibilityAddTraits(isSelected ? .isSelected : [])
                         }
 
                         PhotosPicker(selection: $backgroundImageSelection, matching: .images, photoLibrary: .shared()) {
@@ -97,6 +104,7 @@ struct AppearanceSettingsView: View {
                                         Image(systemName: "checkmark.circle.fill")
                                             .foregroundStyle(.white, .blue)
                                             .padding(8)
+                                            .accessibilityHidden(true)
                                     }
                             } else {
                                 Image("mountain")
@@ -116,6 +124,8 @@ struct AppearanceSettingsView: View {
                                     }
                             }
                         }
+                        .accessibilityLabel("Choose a photo")
+                        .accessibilityAddTraits(backgroundImage != nil ? .isSelected : [])
                     }
                 }
             }
