@@ -18,7 +18,7 @@ struct RemindersSettingsView: View {
     @AppStorage(AppStorageKeys.reflectionReminderTime) private var reflectionReminderTime: Date =
         Calendar.current.date(bySetting: .hour, value: 20, of: .now) ?? Date.now
 
-    @State private var notificationTimes: [Date] = []
+    @State private var reminders: [ReminderTime] = []
     @State private var notificationsAuthorized: Bool = true
 
     @Environment(\.dismiss) private var dismiss
@@ -64,32 +64,32 @@ struct RemindersSettingsView: View {
                     }
                 }
                 Section("Your Reminders") {
-                    List(notificationTimes.indices, id: \.self) { index in
+                    ForEach($reminders) { $reminder in
                         DatePicker("Every day at",
-                                   selection: $notificationTimes[index],
+                                   selection: $reminder.time,
                                    displayedComponents: [.hourAndMinute])
                         .swipeActions(edge: .trailing) {
-                            Button(role: .destructive) {
-                                notificationTimes.remove(at: index)
-                            } label: {
-                                Image(systemName: "trash")
+                            Button("Delete", systemImage: "trash", role: .destructive) {
+                                reminders.removeAll { $0.id == reminder.id }
                             }
+                            .labelStyle(.iconOnly)
                         }
                     }
 
                     Button("Add reminder") {
-                        notificationTimes.append(.now)
+                        reminders.append(ReminderTime(time: .now))
                     }
                 }
             }
         }
-        .onChange(of: notificationTimes) {
-            UserDefaults.standard.set(notificationTimes, forKey: AppStorageKeys.notificationTimes)
+        .onChange(of: reminders) {
+            UserDefaults.standard.set(reminders.map(\.time), forKey: AppStorageKeys.notificationTimes)
         }
         .task {
             let settings = await UNUserNotificationCenter.current().notificationSettings()
             notificationsAuthorized = settings.authorizationStatus == .authorized
-            notificationTimes = UserDefaults.standard.array(forKey: AppStorageKeys.notificationTimes) as? [Date] ?? []
+            let times = UserDefaults.standard.array(forKey: AppStorageKeys.notificationTimes) as? [Date] ?? []
+            reminders = times.map { ReminderTime(time: $0) }
         }
     }
 }
