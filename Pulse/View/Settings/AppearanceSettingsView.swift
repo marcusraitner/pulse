@@ -18,11 +18,8 @@ struct AppearanceSettingsView: View {
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
 
     @State private var backgroundImageSelection: PhotosPickerItem?
-
-    private var backgroundImage: Image? {
-        guard let data = backgroundImageData, let uiImage = UIImage(data: data) else { return nil }
-        return Image(uiImage: uiImage)
-    }
+    // Decoded when the stored photo changes, not on every body pass
+    @State private var backgroundImage: Image?
 
     var body: some View {
         Form {
@@ -122,6 +119,9 @@ struct AppearanceSettingsView: View {
                     }
                 }
             }
+        }
+        .onChange(of: backgroundImageData, initial: true) {
+            backgroundImage = backgroundImageData.flatMap { UIImage(data: $0) }.map { Image(uiImage: $0) }
         }
         .onChange(of: backgroundImageSelection) { _, newValue in
             guard let newValue else { return }
