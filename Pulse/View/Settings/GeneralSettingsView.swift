@@ -21,7 +21,7 @@ struct GeneralSettingsView: View {
     @State private var isPresentingExport: Bool = false
     @State private var exportDocument: ExportJSONDocument?
     @State private var exportFilename: String = "pulse-export.json"
-    @State private var exportErrorMessage: String?
+    @State private var exportErrorMessage: LocalizedStringResource?
     @State private var exportTimeRange: ExportTimeRange = .allTime
     @State private var exportStartDate: Date = Calendar.current.date(byAdding: .month, value: -1, to: .now) ?? .now
     @State private var exportEndDate: Date = .now
@@ -198,7 +198,9 @@ struct GeneralSettingsView: View {
                 exportErrorMessage = nil
             }
         } message: {
-            Text(exportErrorMessage ?? "")
+            if let exportErrorMessage {
+                Text(exportErrorMessage)
+            }
         }
         .fileExporter(
             isPresented: $isPresentingExport,

@@ -567,6 +567,26 @@
         }
       }
     },
+    "Could not create data for download. Please try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Daten für den Download konnten nicht erstellt werden. Bitte versuche es erneut."
+          }
+        }
+      }
+    },
+    "Could not create file. Please try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Datei konnte nicht erstellt werden. Bitte versuche es erneut."
+          }
+        }
+      }
+    },
     "Custom range" : {
       "localizations" : {
         "de" : {
