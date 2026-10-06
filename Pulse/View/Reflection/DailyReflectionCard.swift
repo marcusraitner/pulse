@@ -17,6 +17,9 @@ struct DailyReflectionCard: View {
     @Query(sort: \KPITemplate.sortOrder) private var allTemplates: [KPITemplate]
     private var topTemplates: [KPITemplate] { Array(allTemplates.prefix(3)) }
 
+    /// Width reserved for the section icons, so the two titles line up; grows with the icons.
+    @ScaledMetric(relativeTo: .subheadline) private var iconWidth: Double = 18
+
     private func recordedValue(for template: KPITemplate) -> Int? {
         day.kpiValues?.first { $0.template?.id == template.id }?.value
     }
@@ -26,8 +29,8 @@ struct DailyReflectionCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
                     Image(systemName: "sunrise")
-                        .font(.system(size: 15))
-                        .frame(width: 18, alignment: .leading)
+                        .font(.subheadline)
+                        .frame(width: iconWidth, alignment: .leading)
                     Text("Forecast")
                 }
                 .foregroundStyle(.secondary)
@@ -43,8 +46,8 @@ struct DailyReflectionCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
                     Image(systemName: "moon.stars")
-                        .font(.system(size: 16))
-                        .frame(width: 18, alignment: .leading)
+                        .font(.callout)
+                        .frame(width: iconWidth, alignment: .leading)
                     Text("Reflection")
                 }
                 .foregroundStyle(.secondary)
