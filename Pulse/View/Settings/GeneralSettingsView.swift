@@ -27,6 +27,9 @@ struct GeneralSettingsView: View {
     @State private var exportEndDate: Date = .now
     @State private var exportSelectedTags: Set<String> = []
     @State private var isExportOptionsExpanded: Bool = false
+
+    // Read once when the screen appears; asking the system on every body pass is wasteful
+    @State private var biometryType: LABiometryType = .none
     
     @Query private var allEntries: [DailyEntry]
     @Query private var allTags: [Tag]
@@ -60,14 +63,10 @@ struct GeneralSettingsView: View {
     }
 
     private var appLockToggleTitle: LocalizedStringKey {
-        let context = LAContext()
-        // biometryType is only populated after canEvaluatePolicy has run at least once
-        _ = context.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
-        
-        switch context.biometryType {
-        case .faceID: return "Require Face ID to open Pulse"
-        case .touchID: return "Require Touch ID to open Pulse"
-        default: return "Require your device passcode to open Pulse"
+        switch biometryType {
+        case .faceID: "Require Face ID to open Pulse"
+        case .touchID: "Require Touch ID to open Pulse"
+        default: "Require your device passcode to open Pulse"
         }
     }
     
@@ -180,6 +179,7 @@ struct GeneralSettingsView: View {
             }
         }
         .task {
+            biometryType = deviceBiometryType()
             // A small migration step to transfer the old `freezeHistory` setting to the new one
             if let freezeHistory = UserDefaults.standard.value(forKey: AppStorageKeys.freezeHistory) {
                 enableEditingHistory = !(freezeHistory as! Bool)

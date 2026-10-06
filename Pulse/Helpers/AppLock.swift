@@ -25,6 +25,14 @@ func authenticateDeviceOwner() async -> Bool {
     }
 }
 
+/// The biometry the device offers, to label the lock toggle. `.none` without biometrics.
+func deviceBiometryType() -> LABiometryType {
+    let context = LAContext()
+    // biometryType is only populated after canEvaluatePolicy has run at least once
+    _ = context.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
+    return context.biometryType
+}
+
 /// Decides when the lock screen may start the system Face ID / passcode prompt.
 ///
 /// The prompt itself moves the scene to `.inactive` and back to `.active`, so starting a
