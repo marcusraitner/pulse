@@ -307,8 +307,9 @@ struct MergeAndPruneDuplicateEntriesTests {
         #expect(try context.fetch(FetchDescriptor<DailyLogEntry>()).count == 2)
     }
 
-    @Test("Sums KPI values sharing a template and deletes the now-redundant duplicate row")
-    func sumsMatchingKPITemplate() throws {
+    @Test("Keeps the larger KPI value for a shared template and deletes the redundant row",
+          arguments: zip([100, 50], [50, 100]))
+    func keepsLargerKPIValue(first: Int, second: Int) throws {
         let context = try makeContext()
         let template = KPITemplate(title: "Steps")
         context.insert(template)
@@ -318,14 +319,15 @@ struct MergeAndPruneDuplicateEntriesTests {
         context.insert(a)
         context.insert(b)
 
-        a.kpiValues = [DailyKPIValue(value: 100, template: template, entry: a)]
-        b.kpiValues = [DailyKPIValue(value: 50, template: template, entry: b)]
+        a.kpiValues = [DailyKPIValue(value: first, template: template, entry: a)]
+        b.kpiValues = [DailyKPIValue(value: second, template: template, entry: b)]
         try context.save()
 
         mergeAndPruneDuplicateEntries([a, b], context: context)
 
+        // the two entries tie, so either may survive; the larger value must win either way
         let merged = try #require(context.fetch(FetchDescriptor<DailyEntry>()).first)
-        #expect(merged.kpiValues?.map(\.value) == [150])
+        #expect(merged.kpiValues?.map(\.value) == [100])
         // the merged-away duplicate's KPI row must not linger as an orphan
         #expect(try context.fetch(FetchDescriptor<DailyKPIValue>()).count == 1)
     }

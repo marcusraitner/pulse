@@ -103,7 +103,9 @@ private func merge(sources: [DailyEntry], into target: DailyEntry, context: Mode
         if let kpiValues = source.kpiValues, !kpiValues.isEmpty {
             for kpi in kpiValues {
                 if let targetKpi = target.kpiValues?.first(where: { $0.template == kpi.template } ) {
-                    targetKpi.value += kpi.value
+                    // not summed: duplicates that both recorded a metric usually hold the same
+                    // reading, and a rating or a duration would be doubled
+                    targetKpi.value = max(targetKpi.value, kpi.value)
                     context.delete(kpi)  // merged into targetKpi; otherwise never cascade-deleted
                 } else {
                     kpi.entry = target
