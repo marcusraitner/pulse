@@ -29,10 +29,6 @@ struct HorizontalTimelineView: View {
     
     @Environment(\.featureFlags) private var featureFlags
 
-    private var entriesByDate: [Date:DailyEntry] {
-        Dictionary(allEntries.map( { ($0.date, $0) } ), uniquingKeysWith: { first, _ in first } )
-    }
-    
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "HorizontalTimeLineView")
 
     var body: some View {
@@ -92,7 +88,7 @@ struct HorizontalTimelineView: View {
                 return
             }
             
-            guard let newSelected = entriesByDate[new] else {
+            guard let newSelected = entry(for: new) else {
                 logger.warning("Could not find entry for date \(new)")
                 return
             }
@@ -135,6 +131,12 @@ struct HorizontalTimelineView: View {
            
             scroll(to: target)
         }
+    }
+
+    /// The entry for `date`. A plain search over the sorted entries: building a dictionary of all
+    /// of them on every scroll step costs more than one pass.
+    private func entry(for date: Date) -> DailyEntry? {
+        allEntries.first { $0.date == date }
     }
 
     /// Whether the day gets a bar in the timeline.
