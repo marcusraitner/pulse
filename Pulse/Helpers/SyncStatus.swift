@@ -134,8 +134,10 @@ nonisolated struct SyncStatusModel: Equatable {
 
     enum Summary: Equatable {
         case noAccount
-        /// A failure that needs the user: full storage or an unknown error.
-        case problem(SyncFailure)
+        /// iCloud storage is full, so changes can't be saved until space is freed.
+        case storageFull
+        /// An error that isn't recognised, with CloudKit's description of it.
+        case problem(String)
         case syncing
         case offline
         case busy
@@ -186,7 +188,11 @@ nonisolated struct SyncStatusModel: Equatable {
         let pending = kinds.compactMap { failures[$0] }
 
         if pending.contains(.noAccount) { return .noAccount }
-        if let problem = pending.first(where: { !$0.isTransient }) { return .problem(problem) }
+        switch pending.first(where: { !$0.isTransient }) {
+        case .storageFull: return .storageFull
+        case .other(let message): return .problem(message)
+        case .noAccount, .offline, .busy, nil: break  // handled above, or not a problem
+        }
         if !running.isEmpty { return .syncing }
         if pending.contains(.offline) { return .offline }
         if pending.contains(.busy) { return .busy }

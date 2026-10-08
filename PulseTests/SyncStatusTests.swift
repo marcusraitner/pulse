@@ -90,7 +90,7 @@ struct SyncStatusModelTests {
     @Test("A failure of one kind is cleared by the next success of that kind")
     func staleFailureCleared() {
         var m = model(event(.export, .failed(.storageFull)))
-        #expect(m.summary == .problem(.storageFull))
+        #expect(m.summary == .storageFull)
 
         m.apply(event(.export, .succeeded(ended: at(8))))
         #expect(m.summary == .synced(at(8)))
@@ -100,7 +100,7 @@ struct SyncStatusModelTests {
     func otherKindDoesNotClear() {
         let m = model(event(.export, .failed(.storageFull)),
                       event(.import, .succeeded(ended: at(8))))
-        #expect(m.summary == .problem(.storageFull))
+        #expect(m.summary == .storageFull)
     }
 
     @Test("Offline and busy are neutral, and a retry shows syncing")
@@ -117,7 +117,7 @@ struct SyncStatusModelTests {
     @Test("A real problem is not hidden by a retry in progress")
     func problemStaysWhileRetrying() {
         let m = model(event(.export, .failed(.storageFull)), event(.export, .running))
-        #expect(m.summary == .problem(.storageFull))
+        #expect(m.summary == .storageFull)
     }
 
     @Test("A cancelled event neither succeeds nor fails")
@@ -160,7 +160,7 @@ struct SyncStatusModelTests {
     func exportFirst() {
         let m = model(event(.import, .failed(.other("import"))),
                       event(.export, .failed(.other("export"))))
-        #expect(m.summary == .problem(.other("export")))
+        #expect(m.summary == .problem("export"))
     }
 }
 

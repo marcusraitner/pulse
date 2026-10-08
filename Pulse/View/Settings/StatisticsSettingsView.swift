@@ -26,14 +26,14 @@ struct StatisticsSettingsView: View {
         case .syncing, .busy: ("arrow.clockwise.icloud", .gray)
         case .offline: ("bolt.horizontal.icloud", .gray)
         case .noAccount: ("lock.icloud", .red)
-        case .problem: ("exclamationmark.icloud", .red)
+        case .storageFull, .problem: ("exclamationmark.icloud", .red)
         }
     }
 
     /// Problems the user has to act on are highlighted; waiting states stay quiet.
     private var syncNeedsAttention: Bool {
         switch syncMonitor.model.summary {
-        case .noAccount, .problem: true
+        case .noAccount, .storageFull, .problem: true
         default: false
         }
     }
@@ -50,8 +50,8 @@ struct StatisticsSettingsView: View {
         case .offline: Text("Offline – will sync when you're back online")
         case .busy: Text("iCloud is busy – will try again")
         case .noAccount: Text("No iCloud account – changes stay on this device")
-        case .problem(.other(let message)): Text("Sync problem: \(message)")
-        case .problem: Text("iCloud storage is full – changes aren't being saved")  // the only other problem
+        case .storageFull: Text("iCloud storage is full – changes aren't being saved")
+        case .problem(let message): Text("Sync problem: \(message)")
         }
     }
 
