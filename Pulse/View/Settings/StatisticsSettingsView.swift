@@ -19,42 +19,6 @@ struct StatisticsSettingsView: View {
     private var countDays: Int { allEntries.count }
     private var countLogs: Int { allLogs.count }
 
-    private var syncSymbol: (name: String, color: Color) {
-        switch syncMonitor.model.summary {
-        case .synced: ("checkmark.icloud", .green)
-        case .waiting: ("icloud", .gray)
-        case .syncing, .busy: ("arrow.clockwise.icloud", .gray)
-        case .offline: ("bolt.horizontal.icloud", .gray)
-        case .noAccount: ("lock.icloud", .red)
-        case .storageFull, .problem: ("exclamationmark.icloud", .red)
-        }
-    }
-
-    /// Problems the user has to act on are highlighted; waiting states stay quiet.
-    private var syncNeedsAttention: Bool {
-        switch syncMonitor.model.summary {
-        case .noAccount, .storageFull, .problem: true
-        default: false
-        }
-    }
-
-    @ViewBuilder private var syncDescription: some View {
-        switch syncMonitor.model.summary {
-        case .synced(let date):
-            // refreshes so "1 minute ago" doesn't go stale while the screen is open
-            TimelineView(.periodic(from: .now, by: 30)) { _ in
-                Text("Last synced \(date, format: .relative(presentation: .numeric, unitsStyle: .wide))")
-            }
-        case .syncing: Text("Syncing…")
-        case .waiting: Text("Waiting for the first sync")
-        case .offline: Text("Offline – will sync when you're back online")
-        case .busy: Text("iCloud is busy – will try again")
-        case .noAccount: Text("No iCloud account – changes stay on this device")
-        case .storageFull: Text("iCloud storage is full – changes aren't being saved")
-        case .problem(let message): Text("Sync problem: \(message)")
-        }
-    }
-
     var body: some View {
         List {
             Section {
@@ -80,20 +44,7 @@ struct StatisticsSettingsView: View {
                 Text("\(countLogs)")
             }
             Section("iCloud Sync") {
-                VStack(alignment: .trailing) {
-                    HStack {
-                        Text("Status")
-                        Spacer()
-                        Image(systemName: syncSymbol.name)
-                            .foregroundStyle(syncSymbol.color)
-                            .accessibilityHidden(true)
-                    }
-                    syncDescription
-                        .font(.caption)
-                        .foregroundStyle(syncNeedsAttention ? AnyShapeStyle(.accent) : AnyShapeStyle(.secondary))
-                        .multilineTextAlignment(.trailing)
-                }
-                .accessibilityElement(children: .combine)
+                SyncStatusRow(summary: syncMonitor.model.summary)
             }
         }
     }
