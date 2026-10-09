@@ -73,6 +73,31 @@ struct GeneralSettingsView: View {
         }
     }
     
+    private func prepareExport() {
+        do {
+            let payload = ExportPayloadMapper.exportPayload(
+                from: allEntries,
+                kpiTemplates: allKPIs,
+                dateRange: exportDateRange,
+                tags: exportTagsFilter
+            )
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+
+            let data = try encoder.encode(payload)
+
+            exportDocument = .init(data: data)
+            exportFilename = "pulse-export-\(DateFormatHelper.formatDate(.now)).json"
+            isPresentingExport = true
+
+        } catch {
+            logger.error("Failed to create export payload: \(error.localizedDescription)")
+            showExportError("Could not create data for download. Please try again.")
+            isPresentingExport = false
+        }
+    }
+
     var body: some View {
         Form {
             Section {
@@ -109,32 +134,7 @@ struct GeneralSettingsView: View {
                     
                     Spacer()
                     
-                    Button {
-                        do {
-                            let payload = ExportPayloadMapper.exportPayload(
-                                from: allEntries,
-                                kpiTemplates: allKPIs,
-                                dateRange: exportDateRange,
-                                tags: exportTagsFilter
-                            )
-                            let encoder = JSONEncoder()
-                            encoder.dateEncodingStrategy = .iso8601
-                            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-                            
-                            let data = try encoder.encode(payload)
-                            
-                            exportDocument = .init(data: data)
-                            exportFilename = "pulse-export-\(DateFormatHelper.formatDate(.now)).json"
-                            isPresentingExport = true
-                            
-                        } catch {
-                            logger.error("Failed to create export payload: \(error.localizedDescription)")
-                            showExportError("Could not create data for download. Please try again.")
-                            isPresentingExport = false
-                        }
-                    } label: {
-                        Text("Download")
-                    }
+                    Button("Download", action: prepareExport)
                     .disabled(exportSelectedTags.isEmpty)
                     .buttonStyle(.bordered)
                     .padding(.leading, 10)
