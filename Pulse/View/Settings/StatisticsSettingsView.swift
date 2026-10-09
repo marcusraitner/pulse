@@ -33,16 +33,8 @@ struct StatisticsSettingsView: View {
 
                 }
             }
-            HStack {
-                Text("Number of days")
-                Spacer()
-                Text("\(countDays)")
-            }
-            HStack {
-                Text("Number of moments")
-                Spacer()
-                Text("\(countLogs)")
-            }
+            LabeledContent("Number of days", value: countDays, format: .number)
+            LabeledContent("Number of moments", value: countLogs, format: .number)
             Section("iCloud Sync") {
                 SyncStatusRow(summary: syncMonitor.model.summary)
             }
