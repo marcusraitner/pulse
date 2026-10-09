@@ -9,13 +9,6 @@ import SwiftUI
 import SwiftData
 import OSLog
 
-@Observable
-final class FilterState {
-    var selectedTag: String? = nil
-    var isFilterActive: Bool = false
-    var activeFilter: String? { isFilterActive ? selectedTag : nil }
-}
-
 /// App entry point. Sets up the SwiftData `ModelContainer` with CloudKit sync
 /// and the versioned migration plan, then injects `FeatureFlags` into the environment.
 @main
@@ -60,65 +53,5 @@ struct PulseApp: App {
                 .preferredColorScheme(.dark)
         }
         .modelContainer(modelContainer)
-    }
-}
-
-/// Wraps `ContentView` with the optional Face ID / Touch ID app lock, shown in a
-/// separate window so it also covers sheets. Locks
-/// whenever the scene leaves `.active` and re-authenticates on return.
-private struct RootView: View {
-    @Environment(\.scenePhase) private var scenePhase
-    @AppStorage(AppStorageKeys.appLockEnabled) private var appLockEnabled: Bool = false
-    @State private var isUnlocked = false
-    @State private var lockWindow = AppLockWindow()
-    @State private var promptGate = AppLockPromptGate()
-
-    var body: some View {
-        ContentView()
-            .onChange(of: appLockEnabled && !isUnlocked, initial: true) { _, isLocked in
-                lockWindow.setVisible(isLocked, onUnlock: { await unlock() })
-            }
-            .onChange(of: scenePhase, initial: true) { _, newPhase in
-                guard appLockEnabled else {
-                    isUnlocked = true
-                    return
-                }
-
-                switch newPhase {
-                case .active:
-                    if !isUnlocked { Task { await unlock(automatic: true) } }
-                case .background:
-                    isUnlocked = false
-                    promptGate.reset()
-                default:
-                    break
-                }
-            }
-    }
-
-    /// `automatic` is the prompt on returning to the app; otherwise the user tapped Unlock.
-    private func unlock(automatic: Bool = false) async {
-        guard automatic ? promptGate.beginAutomatic() : promptGate.beginManual() else { return }
-        isUnlocked = await authenticateDeviceOwner()
-        promptGate.finish()
-    }
-}
-
-/// UIApplicationDelegate that sets this class as the `UNUserNotificationCenter` delegate
-/// so notification tap actions can open deep-link URLs while the app is foregrounded.
-final class AppDelegate: NSObject, UIApplicationDelegate {
-    func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        UNUserNotificationCenter.current().delegate = self
-        return true
-    }
-}
-
-extension AppDelegate: UNUserNotificationCenterDelegate {
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
-        guard
-            let urlString = response.notification.request.content.userInfo["url"] as? String,
-            let url = URL(string: urlString)
-        else { return }
-        await UIApplication.shared.open(url)
     }
 }
