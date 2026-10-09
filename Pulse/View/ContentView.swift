@@ -140,7 +140,7 @@ struct ContentView: View {
                             Button {
                                 filterState.isFilterActive.toggle()
                                 if filterState.selectedTag == nil {
-                                    filterState.selectedTag = tags.first!.name
+                                    filterState.selectedTag = tags.first?.name
                                 }
                             } label: {
                                 Image(systemName: filterState.isFilterActive ? "tag.fill" : "tag")
