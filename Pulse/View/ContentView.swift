@@ -10,28 +10,6 @@ import SwiftData
 import SwiftUI
 import StoreKit
 
-/// Day-starts between `start` and `end` that have no entry yet, newest first.
-/// `start` itself is excluded — it already exists.
-func missingEntryDates(existing: [Date], from start: Date, to end: Date,
-                       calendar: Calendar = .current) -> [Date] {
-    let have = Set(existing.map { calendar.startOfDay(for: $0) })
-    let firstDay = calendar.startOfDay(for: start)
-    var missing: [Date] = []
-    var current = calendar.startOfDay(for: end)
-
-    while current > firstDay {
-        if !have.contains(current) { missing.append(current) }
-
-        guard let previous = calendar.date(byAdding: .day, value: -1, to: current) else { break }
-        // re-normalise: day arithmetic lands off midnight where DST shifts at 00:00
-        let previousDay = calendar.startOfDay(for: previous)
-        guard previousDay < current else { break }  // ponytail: paranoia, no hang if it ever stalls
-        current = previousDay
-    }
-
-    return missing
-}
-
 /// Merges `DailyEntry` duplicates for the same day (from CloudKit sync races) into one
 /// and deletes the rest. The survivor per day is the first entry in `mergeOrder`.
 func mergeAndPruneDuplicateEntries(
