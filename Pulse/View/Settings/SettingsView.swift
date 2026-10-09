@@ -45,7 +45,7 @@ struct SettingsView: View {
                     Text("Metrics")
                 } icon: {
                     Image(systemName: "chart.line.uptrend.xyaxis.circle.fill")
-                        .listLabelIcon(.orange)
+                        .listLabelIcon(.purple)
                 }
             }
             NavigationLink() {

@@ -24,7 +24,7 @@ struct KPITemplatesSettingsView: View {
             Section {
                 VStack(alignment: .leading) {
                     Image(systemName: "chart.line.uptrend.xyaxis.circle.fill")
-                        .titleLabelIcon(.orange)
+                        .titleLabelIcon(.purple)
                     Text("Metrics")
                         .font(.title2.bold())
                         .padding(.top, 4)
@@ -40,7 +40,7 @@ struct KPITemplatesSettingsView: View {
                             if index < 3 {
                                 Image(systemName: "circle.fill")
                                     .font(.caption)
-                                    .foregroundStyle(.orange)
+                                    .foregroundStyle(.purple)
                             }
                             Text(template.title)
                                 .font(.headline)
