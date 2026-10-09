@@ -143,14 +143,16 @@ struct ContentView: View {
                                     filterState.selectedTag = tags.first?.name
                                 }
                             } label: {
-                                Image(systemName: filterState.isFilterActive ? "tag.fill" : "tag")
+                                Label("Filter by tag", systemImage: filterState.isFilterActive ? "tag.fill" : "tag")
+                                    .labelStyle(.iconOnly)
                                     .fontWeight(.medium)
                                     .foregroundStyle(filterState.isFilterActive ? .accent : .white)
                                     .padding(6)
                                     .padding(.vertical, 2)
                             }
                             .buttonStyle(.plain)
-                            
+                            .accessibilityAddTraits(filterState.isFilterActive ? .isSelected : [])
+
                             if filterState.isFilterActive {
                                 Menu {
                                     Picker("Filter by", selection: $filterState.selectedTag) {
@@ -183,7 +185,8 @@ struct ContentView: View {
                     // The Add Button (day mode only)
                     if viewMode == .day && (Calendar.current.isDateInToday(selectedEntry.date) || enableEditingHistory) {
                         Button(action: { isPresentingNewEntry = true }) {
-                            Image(systemName: "plus")
+                            Label("New Moment", systemImage: "plus")
+                                .labelStyle(.iconOnly)
                                 .fontWeight(.semibold)
                         }
                         .buttonStyle(.glassProminent)
@@ -221,7 +224,8 @@ struct ContentView: View {
                             }
                         }
                     } label: {
-                        Image(systemName: "ellipsis")
+                        Label("More", systemImage: "ellipsis")
+                            .labelStyle(.iconOnly)
                     }
                 }
             }
