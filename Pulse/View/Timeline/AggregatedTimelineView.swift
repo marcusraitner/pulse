@@ -9,12 +9,6 @@ import SwiftUI
 import SwiftData
 import OSLog
 
-enum AggregationLevel {
-    case week
-    case month
-}
-
-
 struct AggregatedTimelineView: View {
     var aggregationLevel: AggregationLevel = .week
     private var component: Calendar.Component {
@@ -165,7 +159,6 @@ struct AggregatedTimelineView: View {
     AggregatedTimelineView(aggregationLevel: .week)
         .modelContainer(SampleData.shared.modelContainer)
 }
-
 
 #Preview("Month") {
     AggregatedTimelineView(aggregationLevel: .month)

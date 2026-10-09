@@ -7,11 +7,6 @@
 
 import SwiftUI
 
-enum TagChipStyle {
-    case display
-    case selectable(isSelected: Bool, onTap: () -> Void)
-}
-
 struct TagChipView: View {
     var label: String
     var style: TagChipStyle
