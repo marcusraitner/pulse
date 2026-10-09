@@ -8,16 +8,18 @@
 
 import SwiftUI
 import SwiftData
+import OSLog
 
 struct StatisticsSettingsView: View {
 
-    @Query private var allEntries: [DailyEntry]
-    @Query private var allLogs: [DailyLogEntry]
-
+    @Environment(\.modelContext) private var context
     @Environment(ICloudSyncMonitor.self) private var syncMonitor
 
-    private var countDays: Int { allEntries.count }
-    private var countLogs: Int { allLogs.count }
+    // Counted with fetchCount: a @Query would load every entry and log into memory just to count them
+    @State private var countDays = 0
+    @State private var countLogs = 0
+
+    private let logger = Logger(subsystem: "de.raitner.pulse", category: "StatisticsSettingsView")
 
     var body: some View {
         List {
@@ -38,6 +40,20 @@ struct StatisticsSettingsView: View {
             Section("iCloud Sync") {
                 SyncStatusRow(summary: syncMonitor.model.summary)
             }
+        }
+        // fetchCount does not update live, so count again after each completed sync, which can add data
+        .task(id: syncMonitor.model.lastSuccess) {
+            updateCounts()
+        }
+    }
+
+    private func updateCounts() {
+        do {
+            countDays = try context.fetchCount(FetchDescriptor<DailyEntry>())
+            countLogs = try context.fetchCount(FetchDescriptor<DailyLogEntry>())
+        } catch {
+            // keep the last counts rather than showing a misleading 0
+            logger.error("Could not count the days and moments: \(error.localizedDescription)")
         }
     }
 }
