@@ -559,6 +559,16 @@
         }
       }
     },
+    "Could not load photo" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto konnte nicht geladen werden"
+          }
+        }
+      }
+    },
     "Custom range" : {
       "localizations" : {
         "de" : {
@@ -1349,6 +1359,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bitte erfasse deinen Moment hier."
+          }
+        }
+      }
+    },
+    "Please try again or choose a different photo." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte versuche es erneut oder wähle ein anderes Foto."
           }
         }
       }

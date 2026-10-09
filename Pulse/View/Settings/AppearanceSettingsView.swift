@@ -9,7 +9,7 @@
 import SwiftUI
 import SwiftData
 import PhotosUI
-import UIKit
+import OSLog
 
 struct AppearanceSettingsView: View {
 
@@ -20,6 +20,9 @@ struct AppearanceSettingsView: View {
     @State private var backgroundImageSelection: PhotosPickerItem?
     // Decoded when the stored photo changes, not on every body pass
     @State private var backgroundImage: Image?
+    @State private var isShowingPhotoError: Bool = false
+
+    private let logger = Logger(subsystem: "de.raitner.pulse", category: "AppearanceSettingsView")
 
     var body: some View {
         Form {
@@ -135,11 +138,28 @@ struct AppearanceSettingsView: View {
         }
         .onChange(of: backgroundImageSelection) { _, newValue in
             guard let newValue else { return }
-            Task {
-                if let data = try? await newValue.loadTransferable(type: Data.self) {
-                    backgroundImageData = data
-                }
+            Task { await loadPhoto(from: newValue) }
+        }
+        .alert("Could not load photo", isPresented: $isShowingPhotoError) {
+        } message: {
+            Text("Please try again or choose a different photo.")
+        }
+    }
+
+    private func loadPhoto(from item: PhotosPickerItem) async {
+        // clear the selection afterwards, so choosing the same photo again changes it and fires onChange
+        defer { backgroundImageSelection = nil }
+
+        do {
+            guard let data = try await item.loadTransferable(type: Data.self) else {
+                logger.error("The chosen photo has no image data")
+                isShowingPhotoError = true
+                return
             }
+            backgroundImageData = data
+        } catch {
+            logger.error("Could not load the chosen photo: \(error.localizedDescription)")
+            isShowingPhotoError = true
         }
     }
 }
