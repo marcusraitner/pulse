@@ -21,6 +21,7 @@ struct GeneralSettingsView: View {
     @State private var isPresentingExport: Bool = false
     @State private var exportDocument: ExportJSONDocument?
     @State private var exportFilename: String = "pulse-export.json"
+    @State private var isShowingExportError: Bool = false
     @State private var exportErrorMessage: LocalizedStringResource?
     @State private var exportTimeRange: ExportTimeRange = .allTime
     @State private var exportStartDate: Date = Calendar.current.date(byAdding: .month, value: -1, to: .now) ?? .now
@@ -37,17 +38,11 @@ struct GeneralSettingsView: View {
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "GeneralSettingsView")
     
-    private var isShowingExportError: Binding<Bool> {
-        Binding(
-            get: { exportErrorMessage != nil },
-            set: { newValue in
-                if !newValue {
-                    exportErrorMessage = nil
-                }
-            }
-        )
+    private func showExportError(_ message: LocalizedStringResource) {
+        exportErrorMessage = message
+        isShowingExportError = true
     }
-    
+
     /// Resolved on each access, so tapping Download always uses the range relative to now.
     private var exportDateRange: ClosedRange<Date>? {
         exportTimeRange.dateRange(now: .now, calendar: .current,
@@ -134,7 +129,7 @@ struct GeneralSettingsView: View {
                             
                         } catch {
                             logger.error("Failed to create export payload: \(error.localizedDescription)")
-                            exportErrorMessage = "Could not create data for download. Please try again."
+                            showExportError("Could not create data for download. Please try again.")
                             isPresentingExport = false
                         }
                     } label: {
@@ -197,10 +192,7 @@ struct GeneralSettingsView: View {
             exportSelectedTags.formUnion(newTags.map(\.name))
             exportSelectedTags.formIntersection(newTags.map(\.name))
         }
-        .alert("Download Failed", isPresented: isShowingExportError) {
-            Button("OK") {
-                exportErrorMessage = nil
-            }
+        .alert("Download Failed", isPresented: $isShowingExportError) {
         } message: {
             if let exportErrorMessage {
                 Text(exportErrorMessage)
@@ -216,7 +208,7 @@ struct GeneralSettingsView: View {
                     exportDocument = nil
                 case .failure(let error):
                     logger.error("Failed to export to file: \(error.localizedDescription)")
-                    exportErrorMessage = "Could not create file. Please try again."
+                    showExportError("Could not create file. Please try again.")
                 }
             }
     }
