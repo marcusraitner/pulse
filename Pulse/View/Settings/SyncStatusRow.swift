@@ -40,7 +40,7 @@ struct SyncStatusRow: View {
                     .accessibilityHidden(true)
             }
             statusText
-                .font(.caption)
+                .font(.footnote)
                 .foregroundStyle(needsAttention ? AnyShapeStyle(.accent) : AnyShapeStyle(.secondary))
                 .multilineTextAlignment(.trailing)
         }
