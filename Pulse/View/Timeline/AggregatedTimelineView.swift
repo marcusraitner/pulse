@@ -9,12 +9,6 @@ import SwiftUI
 import SwiftData
 import OSLog
 
-enum AggregationLevel {
-    case week
-    case month
-}
-
-
 struct AggregatedTimelineView: View {
     var aggregationLevel: AggregationLevel = .week
     private var component: Calendar.Component {
@@ -24,6 +18,7 @@ struct AggregatedTimelineView: View {
     @State private var containerWidth: CGFloat = 0.0
     @State private var selectedStartDate: Date = .now
     @State private var position: Date?
+    @State private var scrollPosition = ScrollPosition()
     
     @Query(sort: \DailyEntry.date) private var allEntries: [DailyEntry]
     
@@ -78,9 +73,20 @@ struct AggregatedTimelineView: View {
         ScrollView(.vertical) {
                 DaysListView(aggregationLevel: aggregationLevel, date: selectedStartDate)
                     .padding(.horizontal, 8)
+                    .frame(maxWidth: LayoutMetrics.maxContentWidth)
+                    .frame(maxWidth: .infinity)
+        }
+        .scrollPosition($scrollPosition)
+        .onChange(of: selectedStartDate) {
+            // each period starts at the top instead of inheriting the previous period's offset
+            scrollPosition.scrollTo(edge: .top)
         }
         .safeAreaBar(edge: .top) {
             VStack {
+                SelectedDateView(date: selectedStartDate, level: aggregationLevel)
+                    .padding(.top, 2)
+                    .padding(.bottom, 2)
+
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         ForEach(periodStarts, id: \.self) { periodStart in
@@ -141,11 +147,7 @@ struct AggregatedTimelineView: View {
                     logger.trace("New selected start date: \(selectedStartDate)")
                 }
                 .sensoryFeedback(.impact, trigger: selectedStartDate)
-                .padding(.top)
-                
-                SelectedDateView(date: selectedStartDate, level: aggregationLevel)
-                    .padding(.top, 4)
-                    .padding(.bottom)
+                .padding(.bottom)
             }
         }
     }
@@ -157,7 +159,6 @@ struct AggregatedTimelineView: View {
     AggregatedTimelineView(aggregationLevel: .week)
         .modelContainer(SampleData.shared.modelContainer)
 }
-
 
 #Preview("Month") {
     AggregatedTimelineView(aggregationLevel: .month)

@@ -29,10 +29,6 @@ struct HorizontalTimelineView: View {
     
     @Environment(\.featureFlags) private var featureFlags
 
-    private var entriesByDate: [Date:DailyEntry] {
-        Dictionary(allEntries.map( { ($0.date, $0) } ), uniquingKeysWith: { first, _ in first } )
-    }
-    
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "HorizontalTimeLineView")
 
     var body: some View {
@@ -42,7 +38,7 @@ struct HorizontalTimelineView: View {
 
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 3) {
-                ForEach(allEntries.filter( { showEmptyDays || !$0.isEmpty || Calendar.current.isDateInToday($0.date) } ) , id: \.date ) { entry in
+                ForEach(allEntries.filter(isShown), id: \.date ) { entry in
                     let avg: CGFloat? = entry.averageScore(
                         taggedWith: filterState.activeFilter)
                     let barHeight: CGFloat = max(2, heightScale * (avg?.magnitude ?? 0))
@@ -72,12 +68,17 @@ struct HorizontalTimelineView: View {
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition(id: $position, anchor: .center)
         .defaultScrollAnchor(.trailing)
-        .contentMargins(.horizontal, (containerWidth - barWidth) * 0.5, for: .scrollContent)
+        .contentMargins(.horizontal, max(0, (containerWidth - barWidth) * 0.5), for: .scrollContent)
         .onGeometryChange(for: CGSize.self) { proxy in
             proxy.size
         } action: { old, new in
             logger.trace("Setting container width to \(new.width)")
             containerWidth = new.width
+
+            // The side margins follow the width but the scroll offset does not, so the selected day
+            // ends up off-center once the real width is known (launch, rotation, window resizing)
+            guard new.width > 0, new.width != old.width else { return }
+            scroll(to: recenterTarget())
         }
         .onChange(of: position) { _, new in
             // set selectedEntry on scroll pos change
@@ -87,7 +88,7 @@ struct HorizontalTimelineView: View {
                 return
             }
             
-            guard let newSelected = entriesByDate[new] else {
+            guard let newSelected = entry(for: new) else {
                 logger.warning("Could not find entry for date \(new)")
                 return
             }
@@ -128,11 +129,36 @@ struct HorizontalTimelineView: View {
             (!selectedEntry.isEmpty || Calendar.current.isDateInToday(selectedEntry.date)) ?
             selectedEntry.date : allEntries.last?.date
            
-            position = nil
-            DispatchQueue.main.async() {
-                if let target {
-                    position = target
-                }
+            scroll(to: target)
+        }
+    }
+
+    /// The entry for `date`. A plain search over the sorted entries: building a dictionary of all
+    /// of them on every scroll step costs more than one pass.
+    private func entry(for date: Date) -> DailyEntry? {
+        allEntries.first { $0.date == date }
+    }
+
+    /// Whether the day gets a bar in the timeline.
+    private func isShown(_ entry: DailyEntry) -> Bool {
+        showEmptyDays || !entry.isEmpty || Calendar.current.isDateInToday(entry.date)
+    }
+
+    /// The day to keep centered when the width changes: the selected day, or the last day if
+    /// nothing is selected yet. Not `position`, which is `nil` while a scroll is being re-applied
+    /// and whenever SwiftUI lays the scroll view out at an odd size.
+    private func recenterTarget() -> Date? {
+        let selected = allEntries.first { $0.date == selectedEntry.date && isShown($0) }
+        return selected?.date ?? allEntries.last?.date
+    }
+
+    /// Scrolls the timeline to `target` in a following main-actor task. The position is cleared
+    /// first, because setting it to the value it already has would not scroll.
+    private func scroll(to target: Date?) {
+        position = nil
+        Task {
+            if let target {
+                position = target
             }
         }
     }

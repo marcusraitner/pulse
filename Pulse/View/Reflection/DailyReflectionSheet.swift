@@ -91,12 +91,9 @@ struct DailyReflectionSheet: View {
                         .lineLimit(5...Int.max)
                         .focused($focusedField, equals: .morning)
                 } header: {
-                    Text("Forecast")
+                    Label("Forecast", systemImage: "sunrise")
                 } footer: {
                     Text("What might be hard today — once anticipated, it won't catch you off guard. One sentence is enough.")
-                }
-                .onAppear() {
-                    focusedField = .morning
                 }
 
                 Section {
@@ -105,7 +102,7 @@ struct DailyReflectionSheet: View {
                         .lineLimit(5...Int.max)
                         .focused($focusedField, equals: .summary)
                 } header: {
-                    Text("Reflect Your Day")
+                    Label("Reflect Your Day", systemImage: "moon.stars")
                 } footer: {
                     let question = Self.questionKeys[coachingQuestionIndex]
                     VStack(alignment: .leading) {
@@ -124,9 +121,7 @@ struct DailyReflectionSheet: View {
                     }
                         
                 }
-                .onAppear() {
-                    focusedField = .summary
-                }
+
                 
                 if !kpiTemplates.isEmpty {
                     Section {
@@ -161,7 +156,7 @@ struct DailyReflectionSheet: View {
                             }
                         }
                     } header: {
-                        Text("Metrics")
+                        Label("Metrics", systemImage: "chart.line.uptrend.xyaxis")
                     }
                 }
                 Section {
@@ -175,7 +170,7 @@ struct DailyReflectionSheet: View {
                         }
                     }
                 } header: {
-                    Text("Moments")
+                    Label("Moments", systemImage: "list.bullet")
                 } footer: {
                     if day.logEntries?.isEmpty ?? true {
                         Text("No moments logged for this day.")
@@ -212,6 +207,14 @@ struct DailyReflectionSheet: View {
                     kpiValues[template.id] = String(value.value)
                 }
             }
+
+            // Only auto-focus once the fields above are hydrated from `day`,
+            // otherwise this would always see the empty initial state.
+            if morning.isEmpty {
+                focusedField = .morning
+            } else if reflection.isEmpty {
+                focusedField = .summary
+            }
         }
     }
 }
@@ -246,4 +249,3 @@ struct DailyReflectionSheetPreviewContainer: View {
     .modelContainer(SampleData.shared.modelContainer)
     .preferredColorScheme(.dark)
 }
-

@@ -45,7 +45,7 @@ struct PulseRoundedRectangle: View {
         }
 
         // pulse may flip again before this runs; only apply if still the latest request
-        DispatchQueue.main.async {
+        Task {
             guard generation == requestedGeneration else { return }
             withAnimation(cursorAnimation) {
                 cursorOpacity = 1

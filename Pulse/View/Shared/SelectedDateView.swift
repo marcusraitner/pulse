@@ -12,24 +12,52 @@ struct SelectedDateView: View {
     let date: Date
     var level: AggregationLevel? = nil
     
+    private var cal: Calendar { .current }
+
     var body: some View {
-        VStack(alignment: .center) {
+        VStack(alignment: .center, spacing: 2) {
             if let level {
                 switch level {
                 case .week:
-                    let cal = Calendar.current
                     let start = cal.dateInterval(of: .weekOfYear, for: date)?.start ?? date
                     let end = cal.date(byAdding: .day, value: 6, to: start) ?? start
-                    
-                    Text("Week \(date.formatted(.dateTime.week())): \(start.formatted(.dateTime.day().month(.defaultDigits).year(.twoDigits))) – \(end.formatted(.dateTime.day().month(.defaultDigits).year(.twoDigits)))")
+
+                    Text((start..<end).formatted(.interval.day().month(.abbreviated).year()))
                 case .month:
                     Text(date.formatted(.dateTime.month(.wide).year()))
                 }
+            } else if cal.isDateInToday(date) {
+                Text("Today")
+            } else if cal.isDateInYesterday(date) {
+                Text("Yesterday")
             } else {
                 Text(date.formatted(.dateTime.weekday().day().month().year()))
             }
+
+            VStack(spacing: 0) {
+                Rectangle()
+                    .fill(.secondary)
+                    .frame(width: 56, height: 1)
+
+                FlatTriangle()
+                    .fill(.secondary)
+                    .frame(width: 14, height: 5)
+            }
+            .padding(.top, 4)
         }
         .font(.body.bold())
+    }
+}
+
+/// A shallow, isoceles triangle pointing down, used as a pointer beneath `SelectedDateView`'s underline.
+private struct FlatTriangle: Shape {
+    func path(in rect: CGRect) -> Path {
+        Path { path in
+            path.move(to: CGPoint(x: rect.minX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+            path.closeSubpath()
+        }
     }
 }
 

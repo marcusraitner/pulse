@@ -9,13 +9,6 @@ import SwiftUI
 import SwiftData
 import OSLog
 
-@Observable
-final class FilterState {
-    var selectedTag: String? = nil
-    var isFilterActive: Bool = false
-    var activeFilter: String? { isFilterActive ? selectedTag : nil }
-}
-
 /// App entry point. Sets up the SwiftData `ModelContainer` with CloudKit sync
 /// and the versioned migration plan, then injects `FeatureFlags` into the environment.
 @main
@@ -23,10 +16,16 @@ struct PulseApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "PulseApp")
     @State private var filterState = FilterState()
+    @State private var syncMonitor: ICloudSyncMonitor
     
     let modelContainer: ModelContainer
     
     init() {
+        // observe CloudKit before the container exists, so its setup and first import are seen
+        let syncMonitor = ICloudSyncMonitor()
+        syncMonitor.start()
+        _syncMonitor = State(initialValue: syncMonitor)
+
         let schema = Schema([DailyEntry.self, DailyLogEntry.self, DailyKPIValue.self, KPITemplate.self, Tag.self])
         let modelconfiguration = ModelConfiguration(
             schema: schema,
@@ -47,30 +46,12 @@ struct PulseApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
                 .environment(\.featureFlags, FeatureFlags(adminEnabled: false))
                 .environment(filterState)
+                .environment(syncMonitor)
                 .preferredColorScheme(.dark)
         }
         .modelContainer(modelContainer)
-    }
-}
-
-/// UIApplicationDelegate that sets this class as the `UNUserNotificationCenter` delegate
-/// so notification tap actions can open deep-link URLs while the app is foregrounded.
-final class AppDelegate: NSObject, UIApplicationDelegate {
-    func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        UNUserNotificationCenter.current().delegate = self
-        return true
-    }
-}
-
-extension AppDelegate: UNUserNotificationCenterDelegate {
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
-        guard
-            let urlString = response.notification.request.content.userInfo["url"] as? String,
-            let url = URL(string: urlString)
-        else { return }
-        await UIApplication.shared.open(url)
     }
 }

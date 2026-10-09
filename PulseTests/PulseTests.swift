@@ -14,7 +14,7 @@ internal import Foundation
 // MARK: - Helpers
 
 private func makeContext() throws -> ModelContext {
-    let schema = Schema([DailyEntry.self, DailyLogEntry.self])
+    let schema = Schema([DailyEntry.self, DailyLogEntry.self, DailyKPIValue.self, KPITemplate.self])
     let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
     let container = try ModelContainer(for: schema, configurations: config)
     return ModelContext(container)
@@ -238,6 +238,199 @@ struct ExportPayloadMapperTests {
     }
 }
 
+
+// MARK: - mergeAndPruneDuplicateEntries
+
+@Suite("mergeAndPruneDuplicateEntries")
+struct MergeAndPruneDuplicateEntriesTests {
+
+    @Test("Leaves entries on distinct days untouched")
+    func noDuplicates() throws {
+        let context = try makeContext()
+        let day1 = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "one")
+        let day2 = DailyEntry(date: Date(timeIntervalSince1970: 86_400), summary: "two")
+        context.insert(day1)
+        context.insert(day2)
+
+        mergeAndPruneDuplicateEntries([day1, day2], context: context)
+
+        #expect(try context.fetch(FetchDescriptor<DailyEntry>()).count == 2)
+    }
+
+    @Test("Concatenates summary and morning with a newline, in merge order")
+    func mergesTextFields() throws {
+        let context = try makeContext()
+        let a = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "Went well", morning: "Slept ok")
+        let b = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "Also good", morning: "Woke early")
+        context.insert(a)
+        context.insert(b)
+
+        mergeAndPruneDuplicateEntries([a, b], context: context)
+
+        // "Also good" sorts first, so `b` survives and `a` is merged into it
+        let merged = try #require(context.fetch(FetchDescriptor<DailyEntry>()).first)
+        #expect(merged.summary == "Also good\nWent well")
+        #expect(merged.morning == "Woke early\nSlept ok")
+        #expect(try context.fetch(FetchDescriptor<DailyEntry>()).count == 1)
+    }
+
+    @Test("Skips an empty duplicate field instead of leaving a stray newline")
+    func skipsEmptyTextFields() throws {
+        let context = try makeContext()
+        let a = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "Went well")
+        let b = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "")
+        context.insert(a)
+        context.insert(b)
+
+        mergeAndPruneDuplicateEntries([a, b], context: context)
+
+        let merged = try #require(context.fetch(FetchDescriptor<DailyEntry>()).first)
+        #expect(merged.summary == "Went well")
+    }
+
+    @Test("Reassigns duplicate's log entries to the survivor and deletes the duplicate")
+    func reassignsLogEntries() throws {
+        let context = try makeContext()
+        let logA = DailyLogEntry(timestamp: .now, log: "a", score: 1)
+        let logB = DailyLogEntry(timestamp: .now, log: "b", score: 2)
+        let a = DailyEntry(date: Date(timeIntervalSince1970: 0), logEntries: [logA])
+        let b = DailyEntry(date: Date(timeIntervalSince1970: 0), logEntries: [logB])
+        context.insert(a)
+        context.insert(b)
+        try context.save()
+
+        mergeAndPruneDuplicateEntries([a, b], context: context)
+
+        let merged = try #require(context.fetch(FetchDescriptor<DailyEntry>()).first)
+        #expect(Set(merged.logEntries?.map(\.log) ?? []) == ["a", "b"])
+        #expect(try context.fetch(FetchDescriptor<DailyEntry>()).count == 1)
+        #expect(try context.fetch(FetchDescriptor<DailyLogEntry>()).count == 2)
+    }
+
+    @Test("Keeps the larger KPI value for a shared template and deletes the redundant row",
+          arguments: zip([100, 50], [50, 100]))
+    func keepsLargerKPIValue(first: Int, second: Int) throws {
+        let context = try makeContext()
+        let template = KPITemplate(title: "Steps")
+        context.insert(template)
+
+        let a = DailyEntry(date: Date(timeIntervalSince1970: 0))
+        let b = DailyEntry(date: Date(timeIntervalSince1970: 0))
+        context.insert(a)
+        context.insert(b)
+
+        a.kpiValues = [DailyKPIValue(value: first, template: template, entry: a)]
+        b.kpiValues = [DailyKPIValue(value: second, template: template, entry: b)]
+        try context.save()
+
+        mergeAndPruneDuplicateEntries([a, b], context: context)
+
+        // the two entries tie, so either may survive; the larger value must win either way
+        let merged = try #require(context.fetch(FetchDescriptor<DailyEntry>()).first)
+        #expect(merged.kpiValues?.map(\.value) == [100])
+        // the merged-away duplicate's KPI row must not linger as an orphan
+        #expect(try context.fetch(FetchDescriptor<DailyKPIValue>()).count == 1)
+    }
+
+    @Test("Keeps KPI values for templates the survivor doesn't have yet")
+    func movesNonMatchingKPITemplate() throws {
+        let context = try makeContext()
+        let steps = KPITemplate(title: "Steps")
+        let sleep = KPITemplate(title: "Sleep")
+        context.insert(steps)
+        context.insert(sleep)
+
+        let a = DailyEntry(date: Date(timeIntervalSince1970: 0))
+        let b = DailyEntry(date: Date(timeIntervalSince1970: 0))
+        context.insert(a)
+        context.insert(b)
+
+        a.kpiValues = [DailyKPIValue(value: 100, template: steps, entry: a)]
+        b.kpiValues = [DailyKPIValue(value: 8, template: sleep, entry: b)]
+        try context.save()
+
+        mergeAndPruneDuplicateEntries([a, b], context: context)
+
+        let merged = try #require(context.fetch(FetchDescriptor<DailyEntry>()).first)
+        #expect(Set(merged.kpiValues?.map(\.template?.title) ?? []) == ["Steps", "Sleep"])
+        #expect(try context.fetch(FetchDescriptor<DailyKPIValue>()).count == 2)
+    }
+
+    @Test("Picks the same survivor whatever order the entries arrive in", arguments: [false, true])
+    func survivorIgnoresInputOrder(reversed: Bool) throws {
+        let context = try makeContext()
+        // identical but for the log ids, so the lowest id has to decide
+        let lowLog = DailyLogEntry(timestamp: .now, log: "low", score: 1)
+        lowLog.id = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+        let highLog = DailyLogEntry(timestamp: .now, log: "high", score: 1)
+        highLog.id = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000002"))
+
+        let low = DailyEntry(date: Date(timeIntervalSince1970: 0), logEntries: [lowLog])
+        let high = DailyEntry(date: Date(timeIntervalSince1970: 0), logEntries: [highLog])
+        context.insert(low)
+        context.insert(high)
+
+        mergeAndPruneDuplicateEntries(reversed ? [high, low] : [low, high], context: context)
+
+        let remaining = try context.fetch(FetchDescriptor<DailyEntry>())
+        #expect(remaining.count == 1)
+        #expect(remaining.first === low)
+    }
+
+    @Test("Concatenates text in the same order whatever order the entries arrive in",
+          arguments: [false, true])
+    func textOrderIgnoresInputOrder(reversed: Bool) throws {
+        let context = try makeContext()
+        let x = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "x")
+        let y = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "y")
+        context.insert(x)
+        context.insert(y)
+
+        mergeAndPruneDuplicateEntries(reversed ? [y, x] : [x, y], context: context)
+
+        let merged = try #require(context.fetch(FetchDescriptor<DailyEntry>()).first)
+        #expect(merged.summary == "x\ny")
+    }
+
+    @Test("The entry with more log entries survives, so fewer rows move")
+    func entryWithMoreLogsSurvives() throws {
+        let context = try makeContext()
+        // the single log has the lower id, so only the log count can make `busy` win
+        let singleLog = DailyLogEntry(timestamp: .now, log: "single", score: 1)
+        singleLog.id = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+        let busyLogs = [
+            DailyLogEntry(timestamp: .now, log: "one", score: 1),
+            DailyLogEntry(timestamp: .now, log: "two", score: 1),
+        ]
+
+        let quiet = DailyEntry(date: Date(timeIntervalSince1970: 0), logEntries: [singleLog])
+        let busy = DailyEntry(date: Date(timeIntervalSince1970: 0), logEntries: busyLogs)
+        context.insert(quiet)
+        context.insert(busy)
+
+        mergeAndPruneDuplicateEntries([quiet, busy], context: context)
+
+        let remaining = try context.fetch(FetchDescriptor<DailyEntry>())
+        #expect(remaining.count == 1)
+        #expect(remaining.first === busy)
+        #expect(busy.logEntries?.count == 3)
+    }
+
+    @Test("Merges three same-day duplicates into one survivor")
+    func mergesMoreThanTwoDuplicates() throws {
+        let context = try makeContext()
+        let a = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "a")
+        let b = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "b")
+        let c = DailyEntry(date: Date(timeIntervalSince1970: 0), summary: "c")
+        context.insert(a)
+        context.insert(b)
+        context.insert(c)
+
+        mergeAndPruneDuplicateEntries([a, b, c], context: context)
+
+        #expect(try context.fetch(FetchDescriptor<DailyEntry>()).count == 1)
+    }
+}
 
 // MARK: - missingEntryDates
 

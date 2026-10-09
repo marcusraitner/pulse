@@ -6,16 +6,16 @@ This file provides guidance to GitHub Copilot when working with code in this rep
 
 ```bash
 # Build the app
-xcodebuild build -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild build -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17'
 
 # Run unit tests
-xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:PulseTests
+xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:PulseTests
 
 # Run a single test suite
-xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:PulseTests/AverageScoreTests
+xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:PulseTests/AverageScoreTests
 
 # Run UI tests
-xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:PulseUITests
+xcodebuild test -scheme Pulse -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:PulseUITests
 ```
 
 ## Architecture Overview

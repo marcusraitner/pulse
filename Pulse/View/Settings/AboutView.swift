@@ -56,7 +56,7 @@ struct AboutView: View {
                     Spacer()
                 }
                 
-                Text("Background images by [Louis Gaudiau](https://unsplash.com/@louisgaudiau), [Kseniia Lobko](https://unsplash.com/@hello_kseniia), [Klara Kulikova](https://unsplash.com/@kkalerry), and [Martin Baron](https://unsplash.com/@elmartinbaron) found on [Unsplash](https://unsplash.com/).")
+                Text("Background images by [Louis Gaudiau](https://unsplash.com/@louisgaudiau), [Kseniia Lobko](https://unsplash.com/@hello_kseniia), [Klara Kulikova](https://unsplash.com/@kkalerry), [Martin Baron](https://unsplash.com/@elmartinbaron), [Clay Banks](https://unsplash.com/@claybanks), [Jonatan Pie](https://unsplash.com/@r3dmax), [Qingbao Meng](https://unsplash.com/@ideasboom), and [Rafael Garcin](https://unsplash.com/@nimbus_vulpis) found on [Unsplash](https://unsplash.com/).")
                     .foregroundStyle(.secondary)
                 
                 HStack {

@@ -81,11 +81,15 @@ struct DailyEntryDTO: Codable {
 }
 
 private extension DailyEntry {
-    func toExport() -> DailyEntryDTO {
+    func toExport(tags: Set<String>?) -> DailyEntryDTO {
         let mappedLogEntries = (logEntries ?? [])
+            .filter { logEntry in
+                guard let tags else { return true }
+                return logEntry.tags.contains { tags.contains($0) }
+            }
             .sorted { $0.timestamp < $1.timestamp }
             .map { $0.toExport() }
-        
+
         let mappedKPIValues = (kpiValues ?? [])
             .sorted {
                 if let template1 = $0.template, let template2 = $1.template {
@@ -118,14 +122,28 @@ enum ExportPayloadMapper {
     static let currentModelSchemaVersion = "1.5.0"
     static let currentFormatVersion: String = "1.0.0"
     
-    static func exportPayload(from entries: [DailyEntry], kpiTemplates: [KPITemplate]) -> ExportPayload {
+    /// - Parameters:
+    ///   - dateRange: When set, only entries whose `date` falls within the range are exported.
+    ///   - tags: When set, only log entries carrying at least one of these tags are exported (OR-matched);
+    ///     the parent `DailyEntry` is still exported even if none of its log entries match. `nil` exports all log entries.
+    static func exportPayload(
+        from entries: [DailyEntry],
+        kpiTemplates: [KPITemplate],
+        dateRange: ClosedRange<Date>? = nil,
+        tags: Set<String>? = nil
+    ) -> ExportPayload {
+        let filteredEntries = entries.filter { entry in
+            guard let dateRange else { return true }
+            return dateRange.contains(entry.date)
+        }
+
         return ExportPayload(
             exportedAt: .now,
             modelSchemaVersion: currentModelSchemaVersion,
             formatVersion: currentFormatVersion,
-            entries: entries
+            entries: filteredEntries
                 .sorted { $0.date < $1.date }
-                .map { $0.toExport() },
+                .map { $0.toExport(tags: tags) },
             kpiTemplates: kpiTemplates
                 .sorted { $0.sortOrder < $1.sortOrder }
                 .map { $0.toExport() }

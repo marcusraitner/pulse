@@ -10,40 +10,6 @@ import SwiftData
 import SwiftUI
 import StoreKit
 
-enum ViewMode: String, CaseIterable {
-    case day, week, month
-
-    var systemImage: String {
-        switch self {
-        case .day:   return "calendar.day.timeline.left"
-        case .week:  return "rectangle.split.3x1"
-        case .month: return "calendar"
-        }
-    }
-}
-
-/// Day-starts between `start` and `end` that have no entry yet, newest first.
-/// `start` itself is excluded — it already exists.
-func missingEntryDates(existing: [Date], from start: Date, to end: Date,
-                       calendar: Calendar = .current) -> [Date] {
-    let have = Set(existing.map { calendar.startOfDay(for: $0) })
-    let firstDay = calendar.startOfDay(for: start)
-    var missing: [Date] = []
-    var current = calendar.startOfDay(for: end)
-
-    while current > firstDay {
-        if !have.contains(current) { missing.append(current) }
-
-        guard let previous = calendar.date(byAdding: .day, value: -1, to: current) else { break }
-        // re-normalise: day arithmetic lands off midnight where DST shifts at 00:00
-        let previousDay = calendar.startOfDay(for: previous)
-        guard previousDay < current else { break }  // ponytail: paranoia, no hang if it ever stalls
-        current = previousDay
-    }
-
-    return missing
-}
-
 /// Root view that orchestrates the timeline, selected-date display, log entries,
 /// reflection card, and FAB. Also owns sheet presentation for settings, new/edit
 /// entry, and reflection, and handles deep-link URLs (`pulseapp://log`, `pulseapp://reflect`).
@@ -76,13 +42,14 @@ struct ContentView: View {
     @State private var isPresentingReflection: Bool = false
     @State private var isPresentingInsights: Bool = false
     @State private var viewMode: ViewMode = .day
+    @State private var scrollPosition = ScrollPosition()
 
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "ContentView")
 
     
     var body: some View {
         @Bindable var filterState = filterState
-        
+
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
                                 
@@ -108,24 +75,32 @@ struct ContentView: View {
                             LogEntriesView(day: selectedEntry)
                                 .padding(.horizontal, 8)
                         }
+                        .frame(maxWidth: LayoutMetrics.maxContentWidth)
+                        .frame(maxWidth: .infinity)
+                    }
+                    .scrollPosition($scrollPosition)
+                    .onChange(of: selectedEntry.date) {
+                        // each day starts at the top instead of inheriting the previous day's offset
+                        scrollPosition.scrollTo(edge: .top)
                     }
                     .safeAreaBar(edge: .top) {
                         VStack {
+                            SelectedDateView(date: selectedEntry.date)
+                                .padding(.top, 2)
+                                .padding(.bottom, 2)
                             // The timeline scroll view
                             HorizontalTimelineView(selectedEntry: $selectedEntry, scrollToToday: $triggerScrollToToday)
-                                .padding(.top)
-                            SelectedDateView(date: selectedEntry.date)
                                 .padding(.bottom)
-                                .padding(.top, 4)
+                                .accessibilityIdentifier("HorizontalTimelineView")
                         }
                     }
                 } else {
                     AggregatedTimelineView(aggregationLevel: viewMode == .week ? .week : .month)
                 }
-                
-                BackgroundImageView()
-                    .zIndex(-1)
 
+            }
+            .background {
+                BackgroundImageView()
             }
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $isPresentingSettings,
@@ -142,6 +117,7 @@ struct ContentView: View {
                 NavigationStack {
                     DailyReflectionSheet(day: selectedEntry)
                 }
+                .presentationDetents([.large])
             }
             .sheet(isPresented: $isPresentingInsights) {
                 NavigationStack {
@@ -150,28 +126,12 @@ struct ContentView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        switch viewMode {
-                        case .day:
-                            viewMode = .week
-                        case .week:
-                            viewMode = .month
-                        case .month:
-                            viewMode = .day
+                    Picker("View Mode", selection: $viewMode) {
+                        ForEach(ViewMode.allCases, id: \.self) { mode in
+                            Label(mode.title, systemImage: mode.systemImage).tag(mode)
                         }
-                    } label: {
-                        ZStack {
-                            ForEach(ViewMode.allCases, id: \.self) { mode in
-                                Image(systemName: mode.systemImage)
-                                    .hidden()
-                            }
-                            
-                            Image(systemName: viewMode.systemImage)
-                                .fontWeight(.medium)
-                                .contentTransition(.symbolEffect(.replace))
-                        }
-                        .animation(.snappy(duration: 0.25), value: viewMode)
                     }
+                    .pickerStyle(.menu)
                 }
                 
                 ToolbarItem(placement: .bottomBar) {
@@ -180,17 +140,19 @@ struct ContentView: View {
                             Button {
                                 filterState.isFilterActive.toggle()
                                 if filterState.selectedTag == nil {
-                                    filterState.selectedTag = tags.first!.name
+                                    filterState.selectedTag = tags.first?.name
                                 }
                             } label: {
-                                Image(systemName: filterState.isFilterActive ? "tag.fill" : "tag")
+                                Label("Filter by tag", systemImage: filterState.isFilterActive ? "tag.fill" : "tag")
+                                    .labelStyle(.iconOnly)
                                     .fontWeight(.medium)
                                     .foregroundStyle(filterState.isFilterActive ? .accent : .white)
                                     .padding(6)
                                     .padding(.vertical, 2)
                             }
                             .buttonStyle(.plain)
-                            
+                            .accessibilityAddTraits(filterState.isFilterActive ? .isSelected : [])
+
                             if filterState.isFilterActive {
                                 Menu {
                                     Picker("Filter by", selection: $filterState.selectedTag) {
@@ -223,7 +185,8 @@ struct ContentView: View {
                     // The Add Button (day mode only)
                     if viewMode == .day && (Calendar.current.isDateInToday(selectedEntry.date) || enableEditingHistory) {
                         Button(action: { isPresentingNewEntry = true }) {
-                            Image(systemName: "plus")
+                            Label("New Moment", systemImage: "plus")
+                                .labelStyle(.iconOnly)
                                 .fontWeight(.semibold)
                         }
                         .buttonStyle(.glassProminent)
@@ -261,7 +224,8 @@ struct ContentView: View {
                             }
                         }
                     } label: {
-                        Image(systemName: "ellipsis")
+                        Label("More", systemImage: "ellipsis")
+                            .labelStyle(.iconOnly)
                     }
                 }
             }
@@ -273,6 +237,7 @@ struct ContentView: View {
             if newPhase == .active {
                 logger.trace("scene is now active.")
                 addMissingEntries()
+                mergeAndPruneDuplicateEntries(allEntries, context: context, logger: logger)
             }
         }
         .onChange(of: countLogs) { old, new in
@@ -308,7 +273,7 @@ struct ContentView: View {
             }
         }
     }
-    
+
     /// Re-schedules local notifications from current `AppStorage` values.
     /// Called when the settings sheet is dismissed.
     private func setNotifications() {

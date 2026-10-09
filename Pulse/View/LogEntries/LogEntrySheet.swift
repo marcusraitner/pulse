@@ -155,7 +155,7 @@ struct LogEntrySheet: View {
     
     var body: some View {
         Form {
-            Section(header: Text(timestamp.formatted(.dateTime.weekday().day().month().year().minute().hour()))) {
+            Section() {
                 if isEntryEditable {
                     VStack(alignment: .leading) {
                         TextField("What's going on?", text: $log, axis: .vertical)
@@ -301,7 +301,7 @@ struct LogEntrySheet: View {
                     }
                 }
             }
-            .headerProminence(.increased)
+            .headerProminence(.standard)
             .onChange(of: storeLocations) {
                 if storeLocations {
                     locationManager.setItem = self.setItem
@@ -346,7 +346,7 @@ struct LogEntrySheet: View {
         .onAppear {
             focusedField = .log
         }
-        .navigationTitle(isEntryNew ? "New Moment" : isEntryEditable ? "Edit Moment" : "View Moment")
+        .navigationTitle(timestamp.formatted(.dateTime.weekday().day().month().year().minute().hour()))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {

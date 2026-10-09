@@ -17,30 +17,43 @@ struct DailyReflectionCard: View {
     @Query(sort: \KPITemplate.sortOrder) private var allTemplates: [KPITemplate]
     private var topTemplates: [KPITemplate] { Array(allTemplates.prefix(3)) }
 
+    /// Width reserved for the section icons, so the two titles line up; grows with the icons.
+    @ScaledMetric(relativeTo: .subheadline) private var iconWidth: Double = 18
+
     private func recordedValue(for template: KPITemplate) -> Int? {
         day.kpiValues?.first { $0.template?.id == template.id }?.value
     }
 
     var body: some View {
         VStack(alignment: .leading) {
-            Group {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
+                    Image(systemName: "sunrise")
+                        .font(.subheadline)
+                        .frame(width: iconWidth, alignment: .leading)
+                    Text("Forecast")
+                }
+                .foregroundStyle(.secondary)
+
                 if !day.morning.isEmpty {
                     Text(day.morning)
-                } else {
-                    Text("Forecast")
-                        .foregroundStyle(.tertiary)
                 }
             }
             .padding(.bottom, 5)
-            
+
             Divider()
-            
-            Group {
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
+                    Image(systemName: "moon.stars")
+                        .font(.callout)
+                        .frame(width: iconWidth, alignment: .leading)
+                    Text("Reflection")
+                }
+                .foregroundStyle(.secondary)
+
                 if !day.summary.isEmpty {
                     Text(day.summary)
-                } else {
-                    Text("Reflection")
-                        .foregroundStyle(.tertiary)
                 }
             }
             .padding(.top, 5)
@@ -98,7 +111,7 @@ struct DailyReflectionCard: View {
 }
 
 #Preview("With summary") {
-    DailyReflectionCard(day: DailyEntry(date: .now, summary: "Had a great day overall. Felt productive and calm.", morning: "I will be distracted."), onTap: {})
+    DailyReflectionCard(day: DailyEntry(date: .now, summary: "Had a great day overall. Felt productive and calm. Was awesome. Now tired. Will go sleeping soon. Next day better", morning: "I will be distracted."), onTap: {})
         .modelContainer(SampleData.shared.modelContainer)
         .background(.black)
 }

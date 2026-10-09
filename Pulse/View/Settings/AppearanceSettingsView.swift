@@ -1,0 +1,173 @@
+//
+//  AppearanceSettingsView.swift
+//  Pulse
+//
+//  Created by Marcus Raitner on 14.02.26.
+//  Copyright © 2026 de.raitner. All rights reserved.
+//
+
+import SwiftUI
+import SwiftData
+import PhotosUI
+import OSLog
+
+struct AppearanceSettingsView: View {
+
+    @AppStorage(AppStorageKeys.backgroundImageData) private var backgroundImageData: Data?
+    @AppStorage(AppStorageKeys.backgroundImageName) private var backgroundImageName: String = "mountain"
+    @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
+
+    @State private var backgroundImageSelection: PhotosPickerItem?
+    // Decoded when the stored photo changes, not on every body pass
+    @State private var backgroundImage: Image?
+    @State private var isShowingPhotoError: Bool = false
+
+    private let logger = Logger(subsystem: "de.raitner.pulse", category: "AppearanceSettingsView")
+
+    var body: some View {
+        Form {
+            Section {
+                VStack(alignment: .leading) {
+                    Image(systemName: "paintbrush.fill")
+                        .titleLabelIcon(.blue)
+                    Text("Appearance")
+                        .font(.title2.bold())
+                        .padding(.top, 4)
+                    Text("Customize the overall appearance here.")
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Section {
+                Picker(selection: $themeName) {
+                    ForEach(Theme.builtIn) { theme in
+                        ThemePreview(theme)
+                            .tag(theme.id)
+                    }
+                } label: {
+                    Text("Theme: ")
+                }
+                .pickerStyle(.navigationLink)
+
+                let columns: [GridItem] = [
+                    GridItem(.flexible()),
+                    GridItem(.flexible())
+                ]
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Background Image")
+                        .font(.headline)
+                    Text("Select a custom background image. Darker backgrounds work best.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+
+
+                    LazyVGrid(columns: columns, spacing: 8) {
+                        let presets = ["mountain", "mountain-dark", "clouds", "moon", "stars",
+                                       "fuji", "overland", "ridges", "embers"]
+
+                        ForEach(presets.enumerated(), id: \.element) { index, imageName in
+                            let isSelected = imageName == backgroundImageName && backgroundImageData == nil
+
+                            Button {
+                                backgroundImageName = imageName
+                                backgroundImageData = nil
+                            } label: {
+                                Image("\(imageName)-thumb")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(height: 120)
+                                    .clipped()
+                                    .contentShape(Rectangle())
+                                    .clipShape(.rect(cornerRadius: 12))
+                                    .overlay(alignment: .bottomTrailing) {
+                                        if isSelected {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .foregroundStyle(.white, .blue)
+                                                .padding(8)
+                                                .accessibilityHidden(true)
+                                        }
+                                    }
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Background image \(index + 1)")
+                            .accessibilityAddTraits(isSelected ? .isSelected : [])
+                        }
+
+                        PhotosPicker(selection: $backgroundImageSelection, matching: .images, photoLibrary: .shared()) {
+                            if let backgroundImage {
+                                backgroundImage
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(height: 120)
+                                    .clipped()
+                                    .contentShape(Rectangle())
+                                    .clipShape(.rect(cornerRadius: 12))
+                                    .overlay(alignment: .bottomTrailing) {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundStyle(.white, .blue)
+                                            .padding(8)
+                                            .accessibilityHidden(true)
+                                    }
+                            } else {
+                                Image("mountain")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(height: 120)
+                                    .clipped()
+                                    .contentShape(Rectangle())
+                                    .clipShape(.rect(cornerRadius: 12))
+                                    .saturation(0.2)
+                                    .overlay {
+                                        Image(systemName: "photo")
+                                            .imageScale(.large)
+                                            .symbolRenderingMode(.hierarchical)
+                                            .foregroundStyle(.white)
+                                            .shadow(radius: 2)
+                                    }
+                            }
+                        }
+                        .accessibilityLabel("Choose a photo")
+                        .accessibilityAddTraits(backgroundImage != nil ? .isSelected : [])
+                    }
+                }
+            }
+        }
+        .onChange(of: backgroundImageData, initial: true) {
+            backgroundImage = backgroundImageData.flatMap { UIImage(data: $0) }.map { Image(uiImage: $0) }
+        }
+        .onChange(of: backgroundImageSelection) { _, newValue in
+            guard let newValue else { return }
+            Task { await loadPhoto(from: newValue) }
+        }
+        .alert("Could not load photo", isPresented: $isShowingPhotoError) {
+        } message: {
+            Text("Please try again or choose a different photo.")
+        }
+    }
+
+    private func loadPhoto(from item: PhotosPickerItem) async {
+        // clear the selection afterwards, so choosing the same photo again changes it and fires onChange
+        defer { backgroundImageSelection = nil }
+
+        do {
+            guard let data = try await item.loadTransferable(type: Data.self) else {
+                logger.error("The chosen photo has no image data")
+                isShowingPhotoError = true
+                return
+            }
+            backgroundImageData = data
+        } catch {
+            logger.error("Could not load the chosen photo: \(error.localizedDescription)")
+            isShowingPhotoError = true
+        }
+    }
+}
+
+#Preview {
+    NavigationStack {
+        AppearanceSettingsView()
+            .modelContainer(SampleData.shared.modelContainer)
+            .preferredColorScheme(.dark)
+    }
+}

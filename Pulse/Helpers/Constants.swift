@@ -28,7 +28,13 @@ enum AppStorageKeys {
     // MARK: - Review
     static let lastReviewRequest = "lastReviewRequest"
     static let numberOfRequests = "numberOfRequests"
-    
+
+    // MARK: - Security
+    static let appLockEnabled = "appLockEnabled"
+
+    // MARK: - Sync
+    static let lastSuccessfulSync = "lastSuccessfulSync"
+
     // MARK: - Other
     static let initialSweepDone = "initialSweepDone"
 }
