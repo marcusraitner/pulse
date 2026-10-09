@@ -10,26 +10,6 @@ import SwiftData
 import SwiftUI
 import StoreKit
 
-enum ViewMode: String, CaseIterable {
-    case day, week, month
-
-    var systemImage: String {
-        switch self {
-        case .day:   return "calendar.day.timeline.left"
-        case .week:  return "rectangle.split.3x1"
-        case .month: return "calendar"
-        }
-    }
-
-    var title: String {
-        switch self {
-        case .day:   return "Day"
-        case .week:  return "Week"
-        case .month: return "Month"
-        }
-    }
-}
-
 /// Day-starts between `start` and `end` that have no entry yet, newest first.
 /// `start` itself is excluded — it already exists.
 func missingEntryDates(existing: [Date], from start: Date, to end: Date,
@@ -238,7 +218,7 @@ struct ContentView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Picker("View Mode", selection: $viewMode) {
                         ForEach(ViewMode.allCases, id: \.self) { mode in
-                            Label(LocalizedStringKey(mode.title), systemImage: mode.systemImage).tag(mode)
+                            Label(mode.title, systemImage: mode.systemImage).tag(mode)
                         }
                     }
                     .pickerStyle(.menu)
