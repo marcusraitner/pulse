@@ -108,8 +108,8 @@ struct InsightsView: View {
                         .foregroundStyle(.red)
                 }
             } else if let display = displayInsights {
-                insightsSection(title: "What makes a great moment", items: display.greatMoments, systemImage: "sun.max.fill", tint: .orange)
-                insightsSection(title: "What makes a poor moment", items: display.poorMoments, systemImage: "cloud.rain.fill", tint: .blue)
+                insightsSection(title: "What makes a great moment", items: display.greatMoments, systemImage: "sun.max.fill", tint: .green)
+                insightsSection(title: "What makes a poor moment", items: display.poorMoments, systemImage: "cloud.rain.fill", tint: .red)
                 insightsSection(title: "Actionable tips", items: display.actionableTips, systemImage: "lightbulb.fill", tint: .yellow)
             }
         }
