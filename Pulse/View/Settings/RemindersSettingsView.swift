@@ -9,7 +9,6 @@
 import SwiftUI
 import SwiftData
 import UserNotifications
-import UIKit
 
 struct RemindersSettingsView: View {
 
@@ -22,6 +21,7 @@ struct RemindersSettingsView: View {
     @State private var notificationsAuthorized: Bool = true
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         Form {
@@ -43,7 +43,7 @@ struct RemindersSettingsView: View {
                     Text("Notifications are currently disabled. Please open settings to enable them.")
                     if let url = URL(string: UIApplication.openSettingsURLString) {
                         Button("Open Settings") {
-                            UIApplication.shared.open(url)
+                            openURL(url)
                             // turn notifications on here, such that they are enabled when user returns
                             notificationsEnabled = true
                             dismiss()
