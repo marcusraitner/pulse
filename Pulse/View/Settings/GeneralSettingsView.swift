@@ -62,6 +62,14 @@ struct GeneralSettingsView: View {
         exportSelectedTags.formSymmetricDifference([tagName])
     }
 
+    /// A small migration step to transfer the old `freezeHistory` setting to the new one.
+    private func migrateFreezeHistory() {
+        let defaults = UserDefaults.standard
+        guard let freezeHistory = defaults.object(forKey: AppStorageKeys.freezeHistory) as? Bool else { return }
+        enableEditingHistory = !freezeHistory
+        defaults.removeObject(forKey: AppStorageKeys.freezeHistory)
+    }
+
     private var appLockToggleTitle: LocalizedStringKey {
         switch biometryType {
         case .faceID: "Require Face ID to open Pulse"
@@ -180,11 +188,7 @@ struct GeneralSettingsView: View {
         }
         .task {
             biometryType = deviceBiometryType()
-            // A small migration step to transfer the old `freezeHistory` setting to the new one
-            if let freezeHistory = UserDefaults.standard.value(forKey: AppStorageKeys.freezeHistory) {
-                enableEditingHistory = !(freezeHistory as! Bool)
-                UserDefaults.standard.removeObject(forKey: AppStorageKeys.freezeHistory)
-            }
+            migrateFreezeHistory()
             // Default the export tag filter to "everything selected"
             exportSelectedTags = Set(allTags.map(\.name))
         }
