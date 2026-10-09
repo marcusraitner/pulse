@@ -165,7 +165,7 @@ struct ContentView: View {
                             LogEntriesView(day: selectedEntry)
                                 .padding(.horizontal, 8)
                         }
-                        .frame(maxWidth: 700)
+                        .frame(maxWidth: LayoutMetrics.maxContentWidth)
                         .frame(maxWidth: .infinity)
                     }
                     .scrollPosition($scrollPosition)
