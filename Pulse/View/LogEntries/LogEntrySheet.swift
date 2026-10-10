@@ -84,7 +84,7 @@ struct LogEntrySheet: View {
     @Environment(\.modelContext) private var context
 
     private var allTags: [String] {
-       tags.map(\.name)
+       tags.map(\.name).sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
     }
     
     private var rawTags: String {
