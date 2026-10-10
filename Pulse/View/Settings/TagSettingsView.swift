@@ -13,7 +13,10 @@ struct TagSettingsView: View {
     @Environment(\.modelContext) private var context
     @Environment(FilterState.self) private var filterState
 
-    @Query(sort: \Tag.name) private var tags: [Tag]
+    @Query private var storedTags: [Tag]
+    private var tags: [Tag] {
+        storedTags.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+    }
     @Query private var logs: [DailyLogEntry]
     @State private var tagToDelete: Tag?
     @State private var isPresentingDeleteAlert: Bool = false
