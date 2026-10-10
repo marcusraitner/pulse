@@ -593,6 +593,7 @@ enum PulseVersionedSchemaV160: VersionedSchema {
             tagsRaw.split(separator: ",")
                 .map( { $0.trimmingCharacters(in: .whitespacesAndNewlines) } )
                 .filter( { !$0.isEmpty } )
+                .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
         }
 
         var formattedTimestamp: String {
