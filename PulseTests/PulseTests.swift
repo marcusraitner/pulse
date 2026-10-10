@@ -507,3 +507,21 @@ struct MissingEntryDatesTests {
         #expect(missing.allSatisfy { santiago.startOfDay(for: $0) == $0 })
     }
 }
+
+// MARK: - DailyLogEntry.tags
+
+@Suite("DailyLogEntry.tags")
+struct LogEntryTagsTests {
+
+    @Test("Sorts tags alphabetically and case-insensitively, regardless of stored order")
+    func sortedAlphabetically() {
+        let log = DailyLogEntry(timestamp: .now, log: "test", score: 0, tagsRaw: "sleep, Focus,deep work,Family")
+        #expect(log.tags == ["deep work", "Family", "Focus", "sleep"])
+    }
+
+    @Test("Ignores empty segments")
+    func ignoresEmptySegments() {
+        let log = DailyLogEntry(timestamp: .now, log: "test", score: 0, tagsRaw: ",b, ,a,")
+        #expect(log.tags == ["a", "b"])
+    }
+}
