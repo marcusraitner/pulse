@@ -22,7 +22,10 @@ struct ContentView: View {
     
     @Query(sort: \DailyEntry.date, order: .forward) private var allEntries: [DailyEntry]
     @Query private var allLogs: [DailyLogEntry]
-    @Query(sort: \Tag.name, order: .forward) private var tags: [Tag]
+    @Query private var storedTags: [Tag]
+    private var tags: [Tag] {
+        storedTags.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+    }
     
     private var countLogs: Int { allLogs.count }
     
