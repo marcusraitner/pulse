@@ -22,7 +22,7 @@ class SampleData {
         case en
         case de
         
-        static var current: SeedLanguage {
+        nonisolated static var current: SeedLanguage {
             Locale.preferredLanguages.first?.hasPrefix("de") == true ? .de : .en
         }
     }
