@@ -59,15 +59,6 @@ struct ContentView: View {
                 if viewMode == .day {
                     ScrollView {
                         VStack {
-                            // Delete Button (only admin mode)
-                            if featureFlags.adminEnabled {
-                                Button("Delete Entry", systemImage: "trash") {
-                                    context.delete(selectedEntry)
-                                    context.saveOrLog("Failure saving deleted entry", logger: logger)
-                                }
-                                .tint(.white)
-                            }
-                            
                             // The daily reflection
                             DailyReflectionCard(day: selectedEntry) {
                                 isPresentingReflection = true
@@ -358,7 +349,7 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .modelContainer(SampleData.shared.modelContainer)
-        .environment(\.featureFlags, FeatureFlags(adminEnabled: false))
+        .environment(\.featureFlags, FeatureFlags())
         .preferredColorScheme(.dark)
 }
 

@@ -56,7 +56,7 @@ struct PulseApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
-                .environment(\.featureFlags, FeatureFlags(adminEnabled: false))
+                .environment(\.featureFlags, FeatureFlags())
                 .environment(filterState)
                 .environment(syncMonitor)
                 .preferredColorScheme(.dark)
