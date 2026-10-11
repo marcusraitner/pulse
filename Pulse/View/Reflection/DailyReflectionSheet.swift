@@ -30,7 +30,6 @@ struct DailyReflectionSheet: View {
     @FocusState private var focusedField: FocusField?
     
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.featureFlags) private var featureFlags
     @Environment(\.modelContext) private var context
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "DailyReflectionSheet")

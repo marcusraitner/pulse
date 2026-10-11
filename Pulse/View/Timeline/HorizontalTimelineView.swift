@@ -26,8 +26,6 @@ struct HorizontalTimelineView: View {
     @AppStorage(AppStorageKeys.theme) private var themeName: String = "traffic"
     @AppStorage(AppStorageKeys.showEmptyDays) private var showEmptyDays: Bool = false
     @Environment(FilterState.self) private var filterState
-    
-    @Environment(\.featureFlags) private var featureFlags
 
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "HorizontalTimeLineView")
 

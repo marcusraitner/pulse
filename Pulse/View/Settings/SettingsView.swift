@@ -12,7 +12,6 @@ import OSLog
 
 struct SettingsView: View {
 
-    @Environment(\.featureFlags) private var featureFlags
 
     // MARK: - Body
 
@@ -94,11 +93,6 @@ struct SettingsView: View {
                             .listLabelIcon(.gray)
                     }
                 }
-            }
-
-            // MARK: Admin
-            if featureFlags.adminEnabled {
-                AdminSettingsSection()
             }
         }
         .navigationTitle("Settings")

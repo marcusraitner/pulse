@@ -21,10 +21,19 @@ struct PulseApp: App {
     let modelContainer: ModelContainer
     
     init() {
-        // observe CloudKit before the container exists, so its setup and first import are seen
         let syncMonitor = ICloudSyncMonitor()
-        syncMonitor.start()
         _syncMonitor = State(initialValue: syncMonitor)
+
+        #if DEBUG
+        // `-sampleData de|en` in the scheme: in-memory sample data without CloudKit, the real data stays untouched
+        if let language = SampleData.launchArgumentLanguage() {
+            modelContainer = SampleData(language: language).modelContainer
+            return
+        }
+        #endif
+
+        // observe CloudKit before the container exists, so its setup and first import are seen
+        syncMonitor.start()
 
         let schema = Schema([DailyEntry.self, DailyLogEntry.self, DailyKPIValue.self, KPITemplate.self, Tag.self])
         let modelconfiguration = ModelConfiguration(
@@ -47,7 +56,7 @@ struct PulseApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
-                .environment(\.featureFlags, FeatureFlags(adminEnabled: false))
+                .environment(\.featureFlags, FeatureFlags())
                 .environment(filterState)
                 .environment(syncMonitor)
                 .preferredColorScheme(.dark)

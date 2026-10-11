@@ -22,10 +22,22 @@ class SampleData {
         case en
         case de
         
-        static var current: SeedLanguage {
+        nonisolated static var current: SeedLanguage {
             Locale.preferredLanguages.first?.hasPrefix("de") == true ? .de : .en
         }
     }
+
+    #if DEBUG
+    /// Key of the DEBUG launch argument `-sampleData de|en`. Arguments of the form `-key value`
+    /// land in the argument domain of `UserDefaults`, so no parsing is needed.
+    static let launchArgumentKey = "sampleData"
+
+    /// Seed language requested via `-sampleData de|en` in the Xcode scheme,
+    /// or `nil` (argument missing or unknown value) to start with the real data.
+    static func launchArgumentLanguage(from defaults: UserDefaults = .standard) -> SeedLanguage? {
+        defaults.string(forKey: launchArgumentKey).flatMap(SeedLanguage.init(rawValue:))
+    }
+    #endif
 
     /// Creates fresh `DailyEntry` objects (without log entries) linked to the provided KPI templates.
     static func makeSeedDays(templates: [KPITemplate], language: SeedLanguage = .en) -> [DailyEntry] {
@@ -203,7 +215,8 @@ class SampleData {
         "Updated README and API docs": "README und API-Dokumentation aktualisiert",
     ]
 
-    private init() {
+    /// Creates an in-memory container seeded in `language`.
+    init(language: SeedLanguage = .current) {
         let schema = Schema([
             DailyEntry.self,
             DailyLogEntry.self,
@@ -216,7 +229,6 @@ class SampleData {
 
         do {
             modelContainer = try ModelContainer(for: schema, configurations: modelConfiguration)
-            let language = SeedLanguage.current
 
             let templates = SampleData.makeSeedTemplates(language: language)
             for template in templates {
