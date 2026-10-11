@@ -146,14 +146,14 @@ struct ContentView: View {
                                     filterState.selectedTag = tags.first?.name
                                 }
                             } label: {
-                                Label("Filter by tag", systemImage: filterState.isFilterActive ? "tag.fill" : "tag")
-                                    .labelStyle(.iconOnly)
+                                Image(systemName: filterState.isFilterActive ? "tag.fill" : "tag")
                                     .fontWeight(.medium)
                                     .foregroundStyle(filterState.isFilterActive ? .accent : .white)
                                     .padding(6)
                                     .padding(.vertical, 2)
                             }
                             .buttonStyle(.plain)
+                            .accessibilityLabel("Filter by tag")
                             .accessibilityAddTraits(filterState.isFilterActive ? .isSelected : [])
 
                             if filterState.isFilterActive {
