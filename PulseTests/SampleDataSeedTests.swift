@@ -43,7 +43,7 @@ struct SampleDataSeedTests {
         }
     }
 
-    @Test("Every day has a moment; older days exactly one and no reflection", arguments: SampleData.SeedLanguage.allCases)
+    @Test("Every day has a moment; older days exactly one and no forecast or reflection", arguments: SampleData.SeedLanguage.allCases)
     func momentsPerDay(language: SampleData.SeedLanguage) throws {
         let days = try seededDays(language)
 
@@ -51,9 +51,11 @@ struct SampleDataSeedTests {
             let count = day.logEntries?.count ?? 0
             if index < SampleData.detailedDayCount {
                 #expect(count >= 1, "day \(index)")
+                #expect(!day.morning.isEmpty, "day \(index)")
                 #expect(!day.summary.isEmpty, "day \(index)")
             } else {
                 #expect(count == 1, "day \(index)")
+                #expect(day.morning.isEmpty, "day \(index)")
                 #expect(day.summary.isEmpty, "day \(index)")
                 #expect(day.kpiValues?.isEmpty ?? true, "day \(index)")
             }

@@ -70,11 +70,30 @@ class SampleData {
             "Quiet household day; finally tackled the kids' cupboard. It rained all day, so the bike ride was off – not mine to control. Tomorrow: ride, whatever the weather.",
         ]
 
+        // Forecasts as premeditatio: anticipate what might be hard today.
+        let forecasts: [String] = [
+            "Grandma might be confused or gloomy on the phone again – I can't change that, only how patiently I listen.",
+            "The kids will want everything at once on a free day – I don't have to fill every hour.",
+            "After this night I'll be short-tempered – the kids aren't to blame for my tiredness.",
+            "The blood test results could be bad news – worrying beforehand won't change them.",
+            "The urge to check my phone will come every few minutes – I can notice it without following it.",
+            "Something will get in the way of my study plan – I can be flexible without dropping it.",
+            "Meetings will eat into my afternoon – how much I let that annoy me is up to me.",
+            "The teacher might criticise our child – I want to listen before I defend.",
+            "I'll probably mess up the tricky verse again – that's what rehearsals are for.",
+            "The paperwork will feel overwhelming – one sheet at a time is enough.",
+            "Something will go wrong today that I didn't plan for – I'll deal with it when it comes.",
+            "Colleagues will interrupt my focus – I can protect it without being unfriendly.",
+            "The news will try to pull me in all morning – I choose what I let in.",
+            "Bad news might come in the post – panicking won't make it any smaller.",
+            "The weather may spoil our plans – there's always something to do at home.",
+        ]
+
         let entries: [DailyEntry] = d.enumerated().map { index, date in
-            DailyEntry(date: date, summary: index < summaries.count ? summaries[index] : "")
+            DailyEntry(date: date,
+                       summary: index < summaries.count ? summaries[index] : "",
+                       morning: index < forecasts.count ? forecasts[index] : "")
         }
-        // Forecast as premeditatio: anticipate what might be hard today.
-        entries[0].morning = "Grandma might be confused or gloomy on the phone again – I can't change that, only how patiently I listen."
 
         if language == .de {
             for entry in entries {
@@ -256,6 +275,20 @@ class SampleData {
     /// Translations for the evening reflections (`summary`) and the morning forecast (`morning`).
     private static let germanReflectionByEnglish: [String: String] = [
         "Grandma might be confused or gloomy on the phone again – I can't change that, only how patiently I listen.": "Oma könnte am Telefon wieder durcheinander oder bedrückt sein – das kann ich nicht ändern, nur wie geduldig ich zuhöre.",
+        "The kids will want everything at once on a free day – I don't have to fill every hour.": "Die Kinder werden am freien Tag alles auf einmal wollen – ich muss nicht jede Stunde füllen.",
+        "After this night I'll be short-tempered – the kids aren't to blame for my tiredness.": "Nach dieser Nacht werde ich gereizt sein – die Kinder können nichts für meine Müdigkeit.",
+        "The blood test results could be bad news – worrying beforehand won't change them.": "Die Blutwerte könnten schlechte Nachrichten bringen – Sorgen vorher ändern nichts daran.",
+        "The urge to check my phone will come every few minutes – I can notice it without following it.": "Der Drang, aufs Handy zu schauen, wird alle paar Minuten kommen – ich kann ihn bemerken, ohne ihm zu folgen.",
+        "Something will get in the way of my study plan – I can be flexible without dropping it.": "Irgendetwas wird meinen Lernplan durchkreuzen – ich kann flexibel sein, ohne ihn aufzugeben.",
+        "Meetings will eat into my afternoon – how much I let that annoy me is up to me.": "Meetings werden mir den Nachmittag wegfressen – wie sehr ich mich darüber ärgere, entscheide ich.",
+        "The teacher might criticise our child – I want to listen before I defend.": "Die Lehrkraft könnte unser Kind kritisieren – ich will zuhören, bevor ich verteidige.",
+        "I'll probably mess up the tricky verse again – that's what rehearsals are for.": "Ich werde die schwierige Strophe wohl wieder verpatzen – genau dafür ist die Probe da.",
+        "The paperwork will feel overwhelming – one sheet at a time is enough.": "Der Papierkram wird mich erschlagen wollen – ein Blatt nach dem anderen reicht.",
+        "Something will go wrong today that I didn't plan for – I'll deal with it when it comes.": "Heute wird etwas schiefgehen, das ich nicht eingeplant habe – ich kümmere mich darum, wenn es so weit ist.",
+        "Colleagues will interrupt my focus – I can protect it without being unfriendly.": "Kolleginnen und Kollegen werden meine Konzentration stören – ich kann sie schützen, ohne unfreundlich zu sein.",
+        "The news will try to pull me in all morning – I choose what I let in.": "Die Nachrichten werden mich den ganzen Vormittag hineinziehen wollen – was ich hereinlasse, entscheide ich.",
+        "Bad news might come in the post – panicking won't make it any smaller.": "Mit der Post könnten schlechte Nachrichten kommen – Panik macht sie nicht kleiner.",
+        "The weather may spoil our plans – there's always something to do at home.": "Das Wetter könnte unsere Pläne durchkreuzen – zu Hause gibt es immer etwas zu tun.",
         "Had patience for Grandma on the phone – she sounded like herself again. The bakery was out of rye bread; not worth a second thought. Tomorrow I'll call before dinner, not after.": "Am Telefon hatte ich Geduld für Oma – sie klang wieder ganz nach sich selbst. Beim Bäcker war das Roggenbrot aus; keinen zweiten Gedanken wert. Morgen rufe ich vor dem Abendessen an, nicht danach.",
         "At breakfast I was fully there, phone in the drawer. The neighbours' party went on past midnight – not mine to control. Tomorrow: earplugs on the nightstand.": "Beim Frühstück war ich ganz da, das Handy in der Schublade. Die Party der Nachbarn ging bis nach Mitternacht – liegt nicht in meiner Hand. Morgen: Ohrstöpsel auf den Nachttisch.",
         "Not a good day with the kids, but I apologized and meant it. The sleepless night wasn't my choice; my mood afterwards partly was. Tomorrow: breathe first, then react.": "Kein guter Tag mit den Kindern, aber ich habe mich entschuldigt und es ernst gemeint. Die schlaflose Nacht konnte ich mir nicht aussuchen, meine Laune danach zum Teil schon. Morgen: erst durchatmen, dann reagieren.",
