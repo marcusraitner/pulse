@@ -52,7 +52,7 @@ struct SampleDataSeedTests {
             if index < SampleData.detailedDayCount {
                 #expect(count >= 1, "day \(index)")
                 #expect(!day.morning.isEmpty, "day \(index)")
-                #expect(!day.summary.isEmpty, "day \(index)")
+                if index > 0 { #expect(!day.summary.isEmpty, "day \(index)") }
             } else {
                 #expect(count == 1, "day \(index)")
                 #expect(day.morning.isEmpty, "day \(index)")
@@ -62,11 +62,12 @@ struct SampleDataSeedTests {
         }
     }
 
-    @Test("Today has a forecast and a reflection", arguments: SampleData.SeedLanguage.allCases)
-    func todayHasForecastAndReflection(language: SampleData.SeedLanguage) throws {
+    /// Today's reflection stays empty, so it can be written by hand, e.g. for screenshots.
+    @Test("Today has a forecast and leaves the reflection open", arguments: SampleData.SeedLanguage.allCases)
+    func todayLeavesReflectionOpen(language: SampleData.SeedLanguage) throws {
         let today = try #require(try seededDays(language).first)
         #expect(!today.morning.isEmpty)
-        #expect(!today.summary.isEmpty)
+        #expect(today.summary.isEmpty)
     }
 
     /// Catches missing or mistyped keys in the English → German dictionaries.
