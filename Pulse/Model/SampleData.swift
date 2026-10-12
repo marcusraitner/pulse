@@ -64,7 +64,7 @@ class SampleData {
         // Reflections loosely follow the guiding questions (`stoic.reflection.1…3`): a role filled well,
         // something outside my control, one small thing to do differently tomorrow.
         let summaries: [String] = [
-            "Had patience for Grandma on the phone – she sounded like herself again. The bakery was out of rye bread; not worth a second thought. Tomorrow I'll call before dinner, not after.",
+            "", // today: reflection left open
             "At breakfast I was fully there, phone in the drawer. The neighbours' party went on past midnight – not mine to control. Tomorrow: earplugs on the nightstand.",
             "Not a good day with the kids, but I apologized and meant it. The sleepless night wasn't my choice; my mood afterwards partly was. Tomorrow: breathe first, then react.",
             "Took care of myself today: three chapters and a check-up with good results. The noise in the café wasn't mine to control. Tomorrow: book the next check-up before I forget.",
@@ -83,7 +83,7 @@ class SampleData {
 
         // Forecasts as premeditatio: anticipate what might be hard today.
         let forecasts: [String] = [
-            "Grandma might be confused or gloomy on the phone again – I can't change that, only how patiently I listen.",
+            "App review might reject the v2.5 build over some detail – that's not in my hands, only how carefully I prepare it.",
             "The kids will want everything at once on a free day – I don't have to fill every hour.",
             "After this night I'll be short-tempered – the kids aren't to blame for my tiredness.",
             "The blood test results could be bad news – worrying beforehand won't change them.",
@@ -116,7 +116,7 @@ class SampleData {
         let kpiTemplates = Array(templates.sorted(by: { $0.sortOrder < $1.sortOrder }).prefix(3))
         if kpiTemplates.count == 3 {
             let seedKPIValues: [(deepWorkMinutes: Int, sleepHours: Int, exerciseMinutes: Int)] = [
-                (45, 7, 30),  (0, 8, 50),   (20, 5, 10),  (30, 6, 20),
+                (120, 7, 15), (0, 8, 50),   (20, 5, 10),  (30, 6, 20),
                 (30, 6, 15),  (90, 7, 35),  (60, 7, 20),  (40, 8, 40),
                 (20, 7, 30),  (45, 8, 40),  (20, 6, 40),  (200, 7, 25),
                 (30, 6, 10),  (40, 6, 15),  (0, 7, 20),
@@ -144,9 +144,10 @@ class SampleData {
         guard days.count == seedDayCount else { return [] }
 
         var all: [DailyLogEntry] = [
-            // days[0] — today
-            DailyLogEntry(timestamp: time(9,  0,  on: days[0].date),  log: "Fog over the fields on the way to the bakery. Stood still for a minute just to look.",   score:  1, entry: days[0],                                                                 tagsRaw: "Outdoor"),
-            DailyLogEntry(timestamp: time(14, 30, on: days[0].date),  log: "Called Grandma. She laughed at her own joke twice, and I didn't mind at all.",           score:  2, entry: days[0],  latitude: 37.7749, longitude: -122.4194, address: "Home",          tagsRaw: "Family"),
+            // days[0] — today (early times, so moments added by hand land after them)
+            DailyLogEntry(timestamp: time(7,  30, on: days[0].date),  log: "Ran the whole test suite before breakfast – green on the first try. I'll take it.", score:  1, entry: days[0],  latitude: 37.7739, longitude: -122.4312, address: "Home Office", tagsRaw: "Focus"),
+            DailyLogEntry(timestamp: time(8,  15, on: days[0].date),  log: "The App Store screenshots are out of date again – the new forecast card is missing.", score: -1, entry: days[0],  latitude: 37.7739, longitude: -122.4312, address: "Home Office", tagsRaw: "Work Stress"),
+            DailyLogEntry(timestamp: time(9,  0,  on: days[0].date),  log: "Went through the v2.5 release notes in German and English. Cut two sentences, now they read well.", score:  1, entry: days[0],  latitude: 37.7739, longitude: -122.4312, address: "Home Office", tagsRaw: "Deep Work,Focus"),
             // days[1] — yesterday
             DailyLogEntry(timestamp: time(9,  30, on: days[1].date),  log: "Pancakes with the kids, nobody in a hurry for once.",                                    score:  2, entry: days[1],  latitude: 37.7749, longitude: -122.4194, address: "Home",          tagsRaw: "Family"),
             DailyLogEntry(timestamp: time(16, 0,  on: days[1].date),  log: "8 km by the water. Legs heavy, head clear.",                                             score:  1, entry: days[1],                                                                 tagsRaw: "Sport,Outdoor"),
@@ -285,7 +286,7 @@ class SampleData {
 
     /// Translations for the evening reflections (`summary`) and the morning forecast (`morning`).
     private static let germanReflectionByEnglish: [String: String] = [
-        "Grandma might be confused or gloomy on the phone again – I can't change that, only how patiently I listen.": "Oma könnte am Telefon wieder durcheinander oder bedrückt sein – das kann ich nicht ändern, nur wie geduldig ich zuhöre.",
+        "App review might reject the v2.5 build over some detail – that's not in my hands, only how carefully I prepare it.": "Das App-Review könnte den Build von v2.5 wegen einer Kleinigkeit ablehnen – das liegt nicht in meiner Hand, nur wie sorgfältig ich ihn vorbereite.",
         "The kids will want everything at once on a free day – I don't have to fill every hour.": "Die Kinder werden am freien Tag alles auf einmal wollen – ich muss nicht jede Stunde füllen.",
         "After this night I'll be short-tempered – the kids aren't to blame for my tiredness.": "Nach dieser Nacht werde ich gereizt sein – die Kinder können nichts für meine Müdigkeit.",
         "The blood test results could be bad news – worrying beforehand won't change them.": "Die Blutwerte könnten schlechte Nachrichten bringen – Sorgen vorher ändern nichts daran.",
@@ -300,7 +301,6 @@ class SampleData {
         "The news will try to pull me in all morning – I choose what I let in.": "Die Nachrichten werden mich den ganzen Vormittag hineinziehen wollen – was ich hereinlasse, entscheide ich.",
         "Bad news might come in the post – panicking won't make it any smaller.": "Mit der Post könnten schlechte Nachrichten kommen – Panik macht sie nicht kleiner.",
         "The weather may spoil our plans – there's always something to do at home.": "Das Wetter könnte unsere Pläne durchkreuzen – zu Hause gibt es immer etwas zu tun.",
-        "Had patience for Grandma on the phone – she sounded like herself again. The bakery was out of rye bread; not worth a second thought. Tomorrow I'll call before dinner, not after.": "Am Telefon hatte ich Geduld für Oma – sie klang wieder ganz nach sich selbst. Beim Bäcker war das Roggenbrot aus; keinen zweiten Gedanken wert. Morgen rufe ich vor dem Abendessen an, nicht danach.",
         "At breakfast I was fully there, phone in the drawer. The neighbours' party went on past midnight – not mine to control. Tomorrow: earplugs on the nightstand.": "Beim Frühstück war ich ganz da, das Handy in der Schublade. Die Party der Nachbarn ging bis nach Mitternacht – liegt nicht in meiner Hand. Morgen: Ohrstöpsel auf den Nachttisch.",
         "Not a good day with the kids, but I apologized and meant it. The sleepless night wasn't my choice; my mood afterwards partly was. Tomorrow: breathe first, then react.": "Kein guter Tag mit den Kindern, aber ich habe mich entschuldigt und es ernst gemeint. Die schlaflose Nacht konnte ich mir nicht aussuchen, meine Laune danach zum Teil schon. Morgen: erst durchatmen, dann reagieren.",
         "Took care of myself today: three chapters and a check-up with good results. The noise in the café wasn't mine to control. Tomorrow: book the next check-up before I forget.": "Heute gut für mich selbst gesorgt: drei Kapitel und ein Check-up mit guten Ergebnissen. Den Lärm im Café konnte ich nicht beeinflussen. Morgen: den nächsten Termin gleich ausmachen.",
@@ -319,8 +319,9 @@ class SampleData {
 
     private static let germanLogByEnglish: [String: String] = [
         // Detailed days
-        "Fog over the fields on the way to the bakery. Stood still for a minute just to look.": "Nebel über den Feldern auf dem Weg zum Bäcker. Kurz stehen geblieben, nur um zu schauen.",
-        "Called Grandma. She laughed at her own joke twice, and I didn't mind at all.": "Oma angerufen. Sie hat zweimal über ihren eigenen Witz gelacht, und es hat mich kein bisschen gestört.",
+        "Ran the whole test suite before breakfast – green on the first try. I'll take it.": "Vor dem Frühstück die ganze Testsuite laufen lassen – auf Anhieb grün. Nehme ich.",
+        "The App Store screenshots are out of date again – the new forecast card is missing.": "Die App-Store-Screenshots sind schon wieder veraltet – die neue Forecast-Karte fehlt.",
+        "Went through the v2.5 release notes in German and English. Cut two sentences, now they read well.": "Die Release Notes für v2.5 auf Deutsch und Englisch durchgegangen. Zwei Sätze gestrichen, jetzt lesen sie sich gut.",
         "Pancakes with the kids, nobody in a hurry for once.": "Pfannkuchen mit den Kindern, ausnahmsweise hatte es niemand eilig.",
         "8 km by the water. Legs heavy, head clear.": "8 km am Wasser entlang. Beine schwer, Kopf frei.",
         "Woke up at 4 and couldn't fall asleep again. Everything feels like wading through mud.": "Um 4 aufgewacht und nicht mehr eingeschlafen. Alles fühlt sich zäh an.",
