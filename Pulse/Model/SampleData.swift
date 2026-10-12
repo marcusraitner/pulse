@@ -50,28 +50,31 @@ class SampleData {
         let cal = Calendar.current
         let d: [Date] = (0..<seedDayCount).map { cal.date(byAdding: .day, value: -$0, to: .now)! }
 
+        // Reflections loosely follow the guiding questions (`stoic.reflection.1…3`): a role filled well,
+        // something outside my control, one small thing to do differently tomorrow.
         let summaries: [String] = [
-            "Foggy morning, warm afternoon. The call with Grandma was the best part – she sounded like herself again.",
-            "Lazy day. Pancakes, a long run, and a film on the sofa with everyone squeezed together.",
-            "Barely slept and felt it all day. Cancelled the evening plans and went to bed at nine.",
-            "Reading in a noisy café and good news from the doctor. A quiet kind of good day.",
-            "Wanted a focused day, got a scattered one. Tomorrow the phone stays in the bag.",
-            "Calm and useful. Proof that the phone is the problem, not me.",
-            "Good plan in the morning, meetings ate the rest. I need to protect my afternoons.",
-            "Hard conversation, but now we know where we stand. The walk home did me good.",
-            "Two hours of singing. Came home hoarse and happy.",
-            "The run was the best part. The paperwork remains a fight I keep losing.",
-            "Good start in the garden, then the washing machine gave up. Not everything is in my hands.",
-            "One of those rare days where everything clicks. I want more of these.",
-            "Too much news, too little fresh air. Felt drained by the evening.",
-            "Worrying news, but by the evening we had a plan. Still tense.",
-            "Quiet household day. Nothing exciting, but needed.",
+            "Had patience for Grandma on the phone – she sounded like herself again. The bakery was out of rye bread; not worth a second thought. Tomorrow I'll call before dinner, not after.",
+            "At breakfast I was fully there, phone in the drawer. The neighbours' party went on past midnight – not mine to control. Tomorrow: earplugs on the nightstand.",
+            "Not a good day with the kids, but I apologized and meant it. The sleepless night wasn't my choice; my mood afterwards partly was. Tomorrow: breathe first, then react.",
+            "Took care of myself today: three chapters and a check-up with good results. The noise in the café wasn't mine to control. Tomorrow: book the next check-up before I forget.",
+            "Studying didn't work out today. The building work outside the library wasn't my fault – reaching for the news was. Tomorrow the phone stays in the bag.",
+            "Good neighbourliness today, and the vocabulary is done. The lift was broken again – three floors on foot, nothing to be done. Tomorrow: ask how the new sofa is holding up.",
+            "Did my part well in the meeting, even though it dragged on. That it ran 90 minutes wasn't my call. Tomorrow: block two hours in the afternoon in my calendar.",
+            "Listened at the parent-teacher meeting instead of getting defensive. Class sizes and the teacher shortage are beyond my control. Tomorrow: 20 minutes of homework together.",
+            "Held my part in the choir, even in the tricky verse. The rehearsal room was freezing again – the heating isn't mine to fix. Tomorrow: five minutes of warming up my voice in the morning.",
+            "Kept my promise to myself and went running before work. The bureaucratic language in those letters isn't mine to change. Tomorrow: one envelope from the pile, not the whole pile.",
+            "Patient with the kids' hundred questions in the garden. The washing machine breaking down was bad luck, nothing more. Tomorrow: ask the neighbours if we can use theirs.",
+            "Did good work and looked after our friends well, all in one day. The pizza arrived cold – nothing to be done. Tomorrow: eat a proper lunch.",
+            "Wasn't really present in any role today. World events aren't in my hands; how much of them I consume is. Tomorrow: news once at noon, then off.",
+            "Sat down together as a team and made a plan. The rent increase is beyond our control; our budget isn't. Tomorrow: cancel the streaming subscription we never use.",
+            "Quiet household day; finally tackled the kids' cupboard. It rained all day, so the bike ride was off – not mine to control. Tomorrow: ride, whatever the weather.",
         ]
 
         let entries: [DailyEntry] = d.enumerated().map { index, date in
             DailyEntry(date: date, summary: index < summaries.count ? summaries[index] : "")
         }
-        entries[0].morning = "Pick up the vegetable box, call Grandma, take the long way home through the park."
+        // Forecast as premeditatio: anticipate what might be hard today.
+        entries[0].morning = "Grandma might be confused or gloomy on the phone again – I can't change that, only how patiently I listen."
 
         if language == .de {
             for entry in entries {
@@ -252,22 +255,22 @@ class SampleData {
 
     /// Translations for the evening reflections (`summary`) and the morning forecast (`morning`).
     private static let germanReflectionByEnglish: [String: String] = [
-        "Pick up the vegetable box, call Grandma, take the long way home through the park.": "Gemüsekiste abholen, Oma anrufen, den langen Weg durch den Park nach Hause nehmen.",
-        "Foggy morning, warm afternoon. The call with Grandma was the best part – she sounded like herself again.": "Nebliger Morgen, warmer Nachmittag. Das Telefonat mit Oma war das Schönste – sie klang wieder ganz nach sich selbst.",
-        "Lazy day. Pancakes, a long run, and a film on the sofa with everyone squeezed together.": "Fauler Tag. Pfannkuchen, ein langer Lauf und abends ein Film, alle zusammengequetscht auf dem Sofa.",
-        "Barely slept and felt it all day. Cancelled the evening plans and went to bed at nine.": "Kaum geschlafen und das den ganzen Tag gespürt. Die Pläne für den Abend abgesagt und um neun ins Bett.",
-        "Reading in a noisy café and good news from the doctor. A quiet kind of good day.": "Lesen im lauten Café und gute Nachrichten vom Arzt. Ein leiser, guter Tag.",
-        "Wanted a focused day, got a scattered one. Tomorrow the phone stays in the bag.": "Wollte einen fokussierten Tag, wurde ein zerstreuter. Morgen bleibt das Handy in der Tasche.",
-        "Calm and useful. Proof that the phone is the problem, not me.": "Ruhig und nützlich. Der Beweis, dass das Handy das Problem ist, nicht ich.",
-        "Good plan in the morning, meetings ate the rest. I need to protect my afternoons.": "Morgens guter Plan, den Rest haben Meetings gefressen. Ich muss meine Nachmittage schützen.",
-        "Hard conversation, but now we know where we stand. The walk home did me good.": "Schwieriges Gespräch, aber jetzt wissen wir, woran wir sind. Der Heimweg zu Fuß hat gutgetan.",
-        "Two hours of singing. Came home hoarse and happy.": "Zwei Stunden gesungen. Heiser und glücklich nach Hause gekommen.",
-        "The run was the best part. The paperwork remains a fight I keep losing.": "Das Laufen war das Beste am Tag. Der Papierkram bleibt ein Kampf, den ich immer wieder verliere.",
-        "Good start in the garden, then the washing machine gave up. Not everything is in my hands.": "Guter Start im Garten, dann hat die Waschmaschine aufgegeben. Nicht alles liegt in meiner Hand.",
-        "One of those rare days where everything clicks. I want more of these.": "Einer dieser seltenen Tage, an denen alles passt. Davon will ich mehr.",
-        "Too much news, too little fresh air. Felt drained by the evening.": "Zu viele Nachrichten, zu wenig frische Luft. Abends ausgelaugt.",
-        "Worrying news, but by the evening we had a plan. Still tense.": "Beunruhigende Nachricht, aber abends stand ein Plan. Trotzdem angespannt.",
-        "Quiet household day. Nothing exciting, but needed.": "Ruhiger Haushaltstag. Nichts Aufregendes, aber nötig.",
+        "Grandma might be confused or gloomy on the phone again – I can't change that, only how patiently I listen.": "Oma könnte am Telefon wieder durcheinander oder bedrückt sein – das kann ich nicht ändern, nur wie geduldig ich zuhöre.",
+        "Had patience for Grandma on the phone – she sounded like herself again. The bakery was out of rye bread; not worth a second thought. Tomorrow I'll call before dinner, not after.": "Am Telefon hatte ich Geduld für Oma – sie klang wieder ganz nach sich selbst. Beim Bäcker war das Roggenbrot aus; keinen zweiten Gedanken wert. Morgen rufe ich vor dem Abendessen an, nicht danach.",
+        "At breakfast I was fully there, phone in the drawer. The neighbours' party went on past midnight – not mine to control. Tomorrow: earplugs on the nightstand.": "Beim Frühstück war ich ganz da, das Handy in der Schublade. Die Party der Nachbarn ging bis nach Mitternacht – liegt nicht in meiner Hand. Morgen: Ohrstöpsel auf den Nachttisch.",
+        "Not a good day with the kids, but I apologized and meant it. The sleepless night wasn't my choice; my mood afterwards partly was. Tomorrow: breathe first, then react.": "Kein guter Tag mit den Kindern, aber ich habe mich entschuldigt und es ernst gemeint. Die schlaflose Nacht konnte ich mir nicht aussuchen, meine Laune danach zum Teil schon. Morgen: erst durchatmen, dann reagieren.",
+        "Took care of myself today: three chapters and a check-up with good results. The noise in the café wasn't mine to control. Tomorrow: book the next check-up before I forget.": "Heute gut für mich selbst gesorgt: drei Kapitel und ein Check-up mit guten Ergebnissen. Den Lärm im Café konnte ich nicht beeinflussen. Morgen: den nächsten Termin gleich ausmachen.",
+        "Studying didn't work out today. The building work outside the library wasn't my fault – reaching for the news was. Tomorrow the phone stays in the bag.": "Mit dem Lernen hat es heute nicht geklappt. Für den Baulärm vor der Bibliothek kann ich nichts – für den Griff zu den Nachrichten schon. Morgen bleibt das Handy in der Tasche.",
+        "Good neighbourliness today, and the vocabulary is done. The lift was broken again – three floors on foot, nothing to be done. Tomorrow: ask how the new sofa is holding up.": "Heute gute Nachbarschaft gelebt, und die Vokabeln sitzen. Der Aufzug war mal wieder kaputt – also drei Stockwerke zu Fuß, nicht zu ändern. Morgen: nachfragen, wie sich das neue Sofa macht.",
+        "Did my part well in the meeting, even though it dragged on. That it ran 90 minutes wasn't my call. Tomorrow: block two hours in the afternoon in my calendar.": "Im Meeting habe ich meinen Teil gut gemacht, auch wenn es sich zog. Dass es 90 Minuten dauerte, lag nicht bei mir. Morgen: zwei Stunden am Nachmittag im Kalender blocken.",
+        "Listened at the parent-teacher meeting instead of getting defensive. Class sizes and the teacher shortage are beyond my control. Tomorrow: 20 minutes of homework together.": "Beim Elterngespräch zugehört, statt mich zu verteidigen. Klassengröße und Lehrermangel liegen nicht in meiner Hand. Morgen: 20 Minuten gemeinsam Hausaufgaben machen.",
+        "Held my part in the choir, even in the tricky verse. The rehearsal room was freezing again – the heating isn't mine to fix. Tomorrow: five minutes of warming up my voice in the morning.": "Im Chor meine Stimme gehalten, auch in der schwierigen Strophe. Der Probenraum war wieder eiskalt – die Heizung kann ich nicht reparieren. Morgen: fünf Minuten Einsingen am Morgen.",
+        "Kept my promise to myself and went running before work. The bureaucratic language in those letters isn't mine to change. Tomorrow: one envelope from the pile, not the whole pile.": "Mein Versprechen an mich gehalten und vor der Arbeit gelaufen. Das Amtsdeutsch in den Briefen kann ich nicht ändern. Morgen: ein Umschlag vom Stapel, nicht der ganze Stapel.",
+        "Patient with the kids' hundred questions in the garden. The washing machine breaking down was bad luck, nothing more. Tomorrow: ask the neighbours if we can use theirs.": "Im Garten geduldig mit den hundert Fragen der Kinder gewesen. Dass die Waschmaschine kaputtgeht, war Pech, mehr nicht. Morgen: die Nachbarn fragen, ob wir ihre mitbenutzen dürfen.",
+        "Did good work and looked after our friends well, all in one day. The pizza arrived cold – nothing to be done. Tomorrow: eat a proper lunch.": "Am selben Tag gute Arbeit gemacht und Freunde gut bewirtet. Die Pizza kam kalt an – nicht zu ändern. Morgen: richtig zu Mittag essen.",
+        "Wasn't really present in any role today. World events aren't in my hands; how much of them I consume is. Tomorrow: news once at noon, then off.": "Heute in keiner Rolle wirklich da gewesen. Das Weltgeschehen liegt nicht in meiner Hand, wie viel ich davon konsumiere schon. Morgen: einmal mittags Nachrichten, dann aus.",
+        "Sat down together as a team and made a plan. The rent increase is beyond our control; our budget isn't. Tomorrow: cancel the streaming subscription we never use.": "Gemeinsam hingesetzt und als Team einen Plan gemacht. Die Mieterhöhung liegt nicht in unserer Hand, unser Budget schon. Morgen: das Streaming-Abo kündigen, das wir nie nutzen.",
+        "Quiet household day; finally tackled the kids' cupboard. It rained all day, so the bike ride was off – not mine to control. Tomorrow: ride, whatever the weather.": "Ruhiger Haushaltstag; endlich den Kinderschrank angepackt. Es hat den ganzen Tag geregnet, die Radtour fiel aus – nicht zu ändern. Morgen: fahren, egal bei welchem Wetter.",
     ]
 
     private static let germanLogByEnglish: [String: String] = [
