@@ -28,14 +28,25 @@ class SampleData {
     }
 
     #if DEBUG
-    /// Key of the DEBUG launch argument `-sampleData de|en`. Arguments of the form `-key value`
-    /// land in the argument domain of `UserDefaults`, so no parsing is needed.
-    static let launchArgumentKey = "sampleData"
+    /// The DEBUG launch argument `-sampleData de|en`.
+    static let launchArgument = "-sampleData"
 
     /// Seed language requested via `-sampleData de|en` in the Xcode scheme,
     /// or `nil` (argument missing or unknown value) to start with the real data.
-    static func launchArgumentLanguage(from defaults: UserDefaults = .standard) -> SeedLanguage? {
-        defaults.string(forKey: launchArgumentKey).flatMap(SeedLanguage.init(rawValue:))
+    ///
+    /// Reads the raw arguments rather than `UserDefaults`: the argument domain applies to every
+    /// `UserDefaults` instance in the process and would leak into the unit tests.
+    /// As the unit test host, the app ignores the argument, so its sample container
+    /// does not run alongside the containers the tests create.
+    static func launchArgumentLanguage(
+        arguments: [String] = ProcessInfo.processInfo.arguments,
+        environment: [String: String] = ProcessInfo.processInfo.environment
+    ) -> SeedLanguage? {
+        guard environment["XCTestConfigurationFilePath"] == nil,
+              let index = arguments.firstIndex(of: launchArgument),
+              arguments.indices.contains(index + 1)
+        else { return nil }
+        return SeedLanguage(rawValue: arguments[index + 1])
     }
     #endif
 

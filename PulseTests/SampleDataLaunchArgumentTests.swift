@@ -13,15 +13,9 @@ import Testing
 @Suite("SampleData launch argument")
 struct SampleDataLaunchArgumentTests {
 
-    /// Runs `body` against a throwaway `UserDefaults` suite, so the real defaults are never touched.
-    private func withDefaults(value: String?, _ body: (UserDefaults) -> Void) {
-        let suiteName = "SampleDataLaunchArgumentTests-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: suiteName)!
-        defer { defaults.removePersistentDomain(forName: suiteName) }
-        if let value {
-            defaults.set(value, forKey: SampleData.launchArgumentKey)
-        }
-        body(defaults)
+    /// Explicit arguments and an empty environment, so the scheme of the test run never leaks in.
+    private func language(_ arguments: [String], environment: [String: String] = [:]) -> SampleData.SeedLanguage? {
+        SampleData.launchArgumentLanguage(arguments: ["Pulse"] + arguments, environment: environment)
     }
 
     @Test("Maps de and en to the seed language", arguments: [
@@ -29,22 +23,26 @@ struct SampleDataLaunchArgumentTests {
         ("en", SampleData.SeedLanguage.en),
     ])
     func knownLanguage(value: String, expected: SampleData.SeedLanguage) {
-        withDefaults(value: value) { defaults in
-            #expect(SampleData.launchArgumentLanguage(from: defaults) == expected)
-        }
+        #expect(language(["-sampleData", value]) == expected)
     }
 
     @Test("Starts with the real data without the argument")
     func missingArgument() {
-        withDefaults(value: nil) { defaults in
-            #expect(SampleData.launchArgumentLanguage(from: defaults) == nil)
-        }
+        #expect(language([]) == nil)
     }
 
     @Test("Starts with the real data for an unknown language")
     func unknownLanguage() {
-        withDefaults(value: "fr") { defaults in
-            #expect(SampleData.launchArgumentLanguage(from: defaults) == nil)
-        }
+        #expect(language(["-sampleData", "fr"]) == nil)
+    }
+
+    @Test("Starts with the real data when the value is missing")
+    func missingValue() {
+        #expect(language(["-sampleData"]) == nil)
+    }
+
+    @Test("Ignores the argument when hosting unit tests")
+    func ignoredAsTestHost() {
+        #expect(language(["-sampleData", "de"], environment: ["XCTestConfigurationFilePath": "/tmp/x.xctestconfiguration"]) == nil)
     }
 }
