@@ -5,7 +5,7 @@
 //  Created by Marcus Raitner on 11.10.26.
 //
 
-import Foundation
+internal import Foundation
 import Testing
 @testable import Pulse
 
