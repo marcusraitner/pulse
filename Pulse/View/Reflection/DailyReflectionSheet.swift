@@ -176,6 +176,7 @@ struct DailyReflectionSheet: View {
                     }
                 }
             }
+            .scrollDismissesKeyboard(.interactively)
         }
         .navigationTitle("\(day.date.formatted(.dateTime.weekday(.wide).day().month(.defaultDigits).year(.twoDigits)))")
         .navigationBarTitleDisplayMode(.inline)
@@ -188,13 +189,6 @@ struct DailyReflectionSheet: View {
             }
             ToolbarItem(placement: .cancellationAction) {
                 Button(role: .close) { dismiss() }
-            }
-            ToolbarItemGroup(placement: .keyboard) {
-                Button {
-                    focusedField = nil
-                } label: {
-                    Label("Done", systemImage: "keyboard.chevron.compact.down")
-                }
             }
         }
         .task {
