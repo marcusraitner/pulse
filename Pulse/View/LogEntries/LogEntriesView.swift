@@ -60,6 +60,7 @@ struct LogEntriesViewPreview: View {
 #Preview {
     LogEntriesViewPreview()
         .modelContainer(SampleData.shared.modelContainer)
+        .environment(FilterState())
         .preferredColorScheme(.dark)
 }
 

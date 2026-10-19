@@ -349,6 +349,8 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .modelContainer(SampleData.shared.modelContainer)
+        .environment(FilterState())
+        .environment(ICloudSyncMonitor())
         .environment(\.featureFlags, FeatureFlags())
         .preferredColorScheme(.dark)
 }

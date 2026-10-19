@@ -82,6 +82,9 @@ struct TagRowView: View {
 }
 
 #Preview {
-    TagRowView(tag: .init(name: "Familie"), entriesCount: 42)
-    TagRowView(tag: .init(name: "Deep Work"), entriesCount: 0)
+    VStack {
+        TagRowView(tag: .init(name: "Familie"), entriesCount: 42)
+        TagRowView(tag: .init(name: "Deep Work"), entriesCount: 0)
+    }
+    .modelContainer(SampleData.shared.modelContainer)
 }

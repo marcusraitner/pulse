@@ -45,9 +45,11 @@ struct DaysListView: View {
 #Preview("Week") {
         DaysListView(aggregationLevel: .week)
             .modelContainer(SampleData.shared.modelContainer)
+            .environment(FilterState())
 }
 
 #Preview("Month") {
         DaysListView(aggregationLevel: .month)
             .modelContainer(SampleData.shared.modelContainer)
+            .environment(FilterState())
 }
