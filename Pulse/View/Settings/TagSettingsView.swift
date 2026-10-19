@@ -95,4 +95,5 @@ struct TagSettingsView: View {
 #Preview {
     TagSettingsView()
         .modelContainer(SampleData.shared.modelContainer)
+        .environment(FilterState())
 }

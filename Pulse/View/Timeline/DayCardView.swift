@@ -106,9 +106,11 @@ private struct DayCardPreviewContainer: View {
 #Preview("Week Level") {
     DayCardPreviewContainer(aggregationLevel: .week)
         .modelContainer(SampleData.shared.modelContainer)
+        .environment(FilterState())
 }
 
 #Preview("Month Level") {
     DayCardPreviewContainer(aggregationLevel: .month)
         .modelContainer(SampleData.shared.modelContainer)
+        .environment(FilterState())
 }

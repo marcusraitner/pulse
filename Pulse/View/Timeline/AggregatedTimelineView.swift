@@ -158,9 +158,11 @@ struct AggregatedTimelineView: View {
 #Preview("Week") {
     AggregatedTimelineView(aggregationLevel: .week)
         .modelContainer(SampleData.shared.modelContainer)
+        .environment(FilterState())
 }
 
 #Preview("Month") {
     AggregatedTimelineView(aggregationLevel: .month)
         .modelContainer(SampleData.shared.modelContainer)
+        .environment(FilterState())
 }

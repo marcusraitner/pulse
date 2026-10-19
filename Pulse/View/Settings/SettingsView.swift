@@ -103,6 +103,8 @@ struct SettingsView: View {
     NavigationStack {
         SettingsView()
             .modelContainer(SampleData.shared.modelContainer)
+            .environment(FilterState())
+            .environment(ICloudSyncMonitor())
             .preferredColorScheme(.dark)
     }
 }

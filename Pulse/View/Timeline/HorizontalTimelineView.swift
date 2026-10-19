@@ -179,4 +179,5 @@ struct TimeLineViewPreviewContainer: View {
 #Preview {
     TimeLineViewPreviewContainer()
         .modelContainer(SampleData.shared.modelContainer)
+        .environment(FilterState())
 }
