@@ -8,7 +8,8 @@
 import SwiftUI
 
 /// Preset periods for restricting the JSON export.
-enum ExportTimeRange: CaseIterable {
+/// `nonisolated`: pure date math, so it must not inherit the app's default main-actor isolation.
+nonisolated enum ExportTimeRange: CaseIterable {
     case allTime, last7Days, last30Days, thisWeek, lastWeek, thisMonth, lastMonth, custom
 
     var label: LocalizedStringKey {
