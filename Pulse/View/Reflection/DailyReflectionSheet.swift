@@ -26,11 +26,16 @@ struct DailyReflectionSheet: View {
     @State private var kpiValues: [UUID : String] = [:]
     @State private var reflection: String = ""
     @State private var morning: String = ""
+
+    // Mindful Minutes: foreground time in this sheet
+    @State private var session = ReflectionSession()
+    @State private var isSessionStarted = false
     @State private var coachingQuestionIndex: Int = 0
     @FocusState private var focusedField: FocusField?
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
+    @Environment(\.scenePhase) private var scenePhase
     
     private let logger = Logger(subsystem: "de.raitner.pulse", category: "DailyReflectionSheet")
 
@@ -183,7 +188,14 @@ struct DailyReflectionSheet: View {
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button(role: .confirm) {
+                    // Decide before saving: until save(), `day` still holds the texts as loaded
+                    let hasReflectionChanges = ReflectionSession.hasReflectionChanges(
+                        morning: morning, summary: reflection,
+                        originalMorning: day.morning, originalSummary: day.summary)
                     save()
+                    if hasReflectionChanges {
+                        MindfulSessionLogger.log(foregroundDuration: session.foregroundDuration(at: .now))
+                    }
                     dismiss()
                 }
             }
@@ -191,9 +203,22 @@ struct DailyReflectionSheet: View {
                 Button(role: .close) { dismiss() }
             }
         }
+        .onChange(of: scenePhase) { _, phase in
+            // Only time with the app in the foreground counts as reflecting
+            if phase == .active {
+                session.resume(at: .now)
+            } else {
+                session.pause(at: .now)
+            }
+        }
         .task {
             reflection = day.summary
             morning = day.morning
+            // `.task` runs again when returning from a pushed moment; keep the time counted so far
+            if !isSessionStarted {
+                session.start(at: .now)
+                isSessionStarted = true
+            }
             
             for value in day.kpiValues ?? [] {
                 if let template = value.template {
