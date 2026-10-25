@@ -41,12 +41,32 @@
         }
       }
     },
-    "Pulse is not allowed to write to Health. Allow it in Settings under Privacy & Security > Health > Pulse." : {
+    "Pulse is not allowed to save Mindful Minutes to Health. Allow it in Settings under Privacy & Security > Health > Pulse." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pulse darf nicht in Health schreiben. Erlaube es in den Einstellungen unter Datenschutz & Sicherheit > Health > Pulse."
+            "value" : "Pulse darf keine Minuten der Achtsamkeit in Health speichern. Erlaube es in den Einstellungen unter Datenschutz & Sicherheit > Health > Pulse."
+          }
+        }
+      }
+    },
+    "Pulse is not allowed to save State of Mind and Mindful Minutes to Health. Allow both in Settings under Privacy & Security > Health > Pulse." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulse darf weder Gemütszustand noch Minuten der Achtsamkeit in Health speichern. Erlaube beides in den Einstellungen unter Datenschutz & Sicherheit > Health > Pulse."
+          }
+        }
+      }
+    },
+    "Pulse is not allowed to save State of Mind to Health. Allow it in Settings under Privacy & Security > Health > Pulse." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulse darf keinen Gemütszustand in Health speichern. Erlaube es in den Einstellungen unter Datenschutz & Sicherheit > Health > Pulse."
           }
         }
       }

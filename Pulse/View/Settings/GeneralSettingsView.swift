@@ -86,6 +86,16 @@ struct GeneralSettingsView: View {
         }
     }
 
+    /// Names the denied data types the way Settings lists them, so the user knows which switch to turn on.
+    private var healthAccessDeniedHint: LocalizedStringKey? {
+        switch (isHealthAccessDenied, isMindfulAccessDenied) {
+        case (true, true): "Pulse is not allowed to save State of Mind and Mindful Minutes to Health. Allow both in Settings under Privacy & Security > Health > Pulse."
+        case (true, false): "Pulse is not allowed to save State of Mind to Health. Allow it in Settings under Privacy & Security > Health > Pulse."
+        case (false, true): "Pulse is not allowed to save Mindful Minutes to Health. Allow it in Settings under Privacy & Security > Health > Pulse."
+        case (false, false): nil
+        }
+    }
+
     private var appLockToggleTitle: LocalizedStringKey {
         switch biometryType {
         case .faceID: "Require Face ID to open Pulse"
@@ -158,8 +168,8 @@ struct GeneralSettingsView: View {
                     }
                     .disabled(isMindfulAccessDenied)
                 } footer: {
-                    if isHealthAccessDenied || isMindfulAccessDenied {
-                        Text("Pulse is not allowed to write to Health. Allow it in Settings under Privacy & Security > Health > Pulse.")
+                    if let healthAccessDeniedHint {
+                        Text(healthAccessDeniedHint)
                     }
                 }
             }
