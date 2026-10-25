@@ -29,7 +29,8 @@ struct DailyReflectionSheet: View {
 
     // Mindful Minutes: foreground time in this sheet
     @State private var session = ReflectionSession()
-    @State private var isSessionStarted = false
+    // `.task` runs again when returning from a pushed moment; load from `day` only the first time
+    @State private var hasLoaded = false
     @State private var coachingQuestionIndex: Int = 0
     @FocusState private var focusedField: FocusField?
     
@@ -212,14 +213,14 @@ struct DailyReflectionSheet: View {
             }
         }
         .task {
+            // Reloading on return would overwrite unsaved input and reset the session time
+            guard !hasLoaded else { return }
+            hasLoaded = true
+
             reflection = day.summary
             morning = day.morning
-            // `.task` runs again when returning from a pushed moment; keep the time counted so far
-            if !isSessionStarted {
-                session.start(at: .now)
-                isSessionStarted = true
-            }
-            
+            session.start(at: .now)
+
             for value in day.kpiValues ?? [] {
                 if let template = value.template {
                     kpiValues[template.id] = String(value.value)
