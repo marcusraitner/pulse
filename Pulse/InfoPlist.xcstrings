@@ -37,6 +37,24 @@
         }
       }
     },
+    "NSHealthUpdateUsageDescription" : {
+      "comment" : "Privacy – Health Update State of Mind from Log Entries",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulse speichert die Stimmungsbewertung jedes erfassten Moments als Gemütszustand in der Health-App. Pulse liest keine Daten aus Health."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulse saves the mood rating of each moment you log as a State of Mind entry in the Health app. Pulse never reads data from Health."
+          }
+        }
+      }
+    },
     "NSLocationWhenInUseUsageDescription" : {
       "comment" : "Privacy - Location When In Use Usage Description",
       "extractionState" : "extracted_with_value",

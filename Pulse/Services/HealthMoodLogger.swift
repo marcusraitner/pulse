@@ -47,10 +47,21 @@ struct HealthMoodLogger {
         )
     }
 
+    /// `true` if this device has a Health store (e.g. not on iPad without Health).
+    static var isAvailable: Bool {
+        HKHealthStore.isHealthDataAvailable()
+    }
+
+    /// `true` if the user denied write access. HealthKit shows its dialog only once, so access
+    /// can then only be granted in Settings.
+    static var isAccessDenied: Bool {
+        isAvailable && store.authorizationStatus(for: stateOfMindType) == .sharingDenied
+    }
+
     /// Asks for permission to write State of Mind samples. No read access is requested.
     /// - Returns: `true` if writing is allowed afterwards.
     static func requestAuthorization() async -> Bool {
-        guard HKHealthStore.isHealthDataAvailable() else { return false }
+        guard isAvailable else { return false }
         do {
             try await store.requestAuthorization(toShare: [stateOfMindType], read: [])
         } catch {
@@ -62,7 +73,7 @@ struct HealthMoodLogger {
     /// `true` if the user enabled the setting on this device and granted write access.
     private static var canWrite: Bool {
         UserDefaults.standard.bool(forKey: AppStorageKeys.healthMoodLogging)
-            && HKHealthStore.isHealthDataAvailable()
+            && isAvailable
             && store.authorizationStatus(for: stateOfMindType) == .sharingAuthorized
     }
 

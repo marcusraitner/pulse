@@ -21,6 +21,36 @@
         }
       }
     },
+    "Each new or edited moment is saved as a State of Mind in the Health app. Pulse never reads data from Health." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeder neue oder bearbeitete Moment wird als Gemütszustand in der Health-App gespeichert. Pulse liest keine Daten aus Health."
+          }
+        }
+      }
+    },
+    "Pulse is not allowed to write to Health. Allow it in Settings under Privacy & Security > Health > Pulse." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulse darf nicht in Health schreiben. Erlaube es in den Einstellungen unter Datenschutz & Sicherheit > Health > Pulse."
+          }
+        }
+      }
+    },
+    "Save moods to Apple Health" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stimmungen in Apple Health speichern"
+          }
+        }
+      }
+    },
     "—" : {
       "localizations" : {
         "de" : {
