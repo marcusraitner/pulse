@@ -35,6 +35,9 @@ enum AppStorageKeys {
     // MARK: - Sync
     static let lastSuccessfulSync = "lastSuccessfulSync"
 
+    // MARK: - Health
+    static let healthMoodLogging = "healthMoodLogging"
+
     // MARK: - Other
     static let initialSweepDone = "initialSweepDone"
 }

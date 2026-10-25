@@ -16,7 +16,12 @@ struct GeneralSettingsView: View {
     
     @AppStorage(AppStorageKeys.enableEditingHistory) private var enableEditingHistory: Bool = false
     @AppStorage(AppStorageKeys.appLockEnabled) private var appLockEnabled: Bool = false
-    
+    @AppStorage(AppStorageKeys.healthMoodLogging) private var healthMoodLogging: Bool = false
+
+    // Re-read whenever the app becomes active: access can only be granted in Settings
+    @State private var isHealthAccessDenied: Bool = false
+    @Environment(\.scenePhase) private var scenePhase
+
     // Export data
     @State private var isPresentingExport: Bool = false
     @State private var exportDocument: ExportJSONDocument?
@@ -63,6 +68,15 @@ struct GeneralSettingsView: View {
         guard let freezeHistory = defaults.object(forKey: AppStorageKeys.freezeHistory) as? Bool else { return }
         enableEditingHistory = !freezeHistory
         defaults.removeObject(forKey: AppStorageKeys.freezeHistory)
+    }
+
+    /// Disables the Health toggle while access is denied, and turns it off if access was
+    /// revoked in Settings, so the toggle never claims Pulse is writing when it cannot.
+    private func refreshHealthAccess() {
+        isHealthAccessDenied = HealthMoodLogger.isAccessDenied
+        if isHealthAccessDenied {
+            healthMoodLogging = false
+        }
     }
 
     private var appLockToggleTitle: LocalizedStringKey {
@@ -121,6 +135,19 @@ struct GeneralSettingsView: View {
                 Toggle(isOn: $appLockEnabled) {
                     Text(appLockToggleTitle)
                     Text("Pulse will lock whenever you leave the app and ask you to unlock it again.")
+                }
+            }
+            if HealthMoodLogger.isAvailable {
+                Section {
+                    Toggle(isOn: $healthMoodLogging) {
+                        Text("Save moods to Apple Health")
+                        Text("Each new or edited moment is saved as a State of Mind in the Health app. Pulse never reads data from Health.")
+                    }
+                    .disabled(isHealthAccessDenied)
+                } footer: {
+                    if isHealthAccessDenied {
+                        Text("Pulse is not allowed to write to Health. Allow it in Settings under Privacy & Security > Health > Pulse.")
+                    }
                 }
             }
             Section {
@@ -186,6 +213,20 @@ struct GeneralSettingsView: View {
             migrateFreezeHistory()
             // Default the export tag filter to "everything selected"
             exportSelectedTags = Set(allTags.map(\.name))
+            refreshHealthAccess()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { refreshHealthAccess() }
+        }
+        .onChange(of: healthMoodLogging) { _, isEnabled in
+            // Turning off only stops new writes; samples already in Health stay there
+            guard isEnabled else { return }
+            Task {
+                if !(await HealthMoodLogger.requestAuthorization()) {
+                    healthMoodLogging = false
+                }
+                refreshHealthAccess()
+            }
         }
         .onChange(of: allTags) { _, newTags in
             // Keep newly created tags selected by default so the filter still behaves as "no filter" until the user deselects one
