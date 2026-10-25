@@ -37,6 +37,24 @@
         }
       }
     },
+    "NSHealthShareUsageDescription" : {
+      "comment" : "Privacy – Health Share; required by App Review whenever HealthKit is used, although Pulse never reads",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulse liest keine Daten aus Health. Pulse speichert nur die Stimmungsbewertung jedes erfassten Moments als Gemütszustand."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulse does not read any data from Health. It only saves the mood rating of each moment you log as a State of Mind entry."
+          }
+        }
+      }
+    },
     "NSHealthUpdateUsageDescription" : {
       "comment" : "Privacy – Health Update State of Mind from Log Entries",
       "extractionState" : "manual",
