@@ -37,6 +37,7 @@ enum AppStorageKeys {
 
     // MARK: - Health
     static let healthMoodLogging = "healthMoodLogging"
+    static let mindfulMinutesLogging = "mindfulMinutesLogging"
 
     // MARK: - Other
     static let initialSweepDone = "initialSweepDone"
