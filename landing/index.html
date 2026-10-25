@@ -611,7 +611,7 @@
           href="https://github.com/marcusraitner/pulse/releases"
           target="_blank"
           rel="noopener"
-          >✨ New in 2.5: iPad &amp; Face ID lock</a
+          >✨ New in 2.6: Apple Health</a
         >
         <a
           class="announcement-pill"
@@ -619,7 +619,7 @@
           href="https://github.com/marcusraitner/pulse/releases"
           target="_blank"
           rel="noopener"
-          >✨ Neu in 2.5: iPad &amp; Sperre mit Face ID</a
+          >✨ Neu in 2.6: Apple Health</a
         >
         <a
           class="announcement-pill secondary"
@@ -815,8 +815,25 @@
       <div class="features">
         <div class="features-grid">
           <div class="feature-card new">
-            <span class="new-badge" data-lang="en">New in 2.5</span>
-            <span class="new-badge" data-lang="de">Neu in 2.5</span>
+            <span class="new-badge" data-lang="en">New in 2.6</span>
+            <span class="new-badge" data-lang="de">Neu in 2.6</span>
+            <span class="feature-icon">❤️</span>
+            <h3 data-lang="en">Apple Health</h3>
+            <h3 data-lang="de">Apple Health</h3>
+            <p data-lang="en">
+              If you like, your moods appear as State of Mind and the time you
+              spend reflecting as Mindful Minutes in the Health app. Turn each
+              on separately; Pulse only writes and never reads.
+            </p>
+            <p data-lang="de">
+              Auf Wunsch landen deine Stimmungen als Gemütszustand und die Zeit
+              deiner Reflexion als Minuten der Achtsamkeit in der Health-App.
+              Beides lässt sich einzeln einschalten; Pulse schreibt nur und
+              liest nichts.
+            </p>
+          </div>
+
+          <div class="feature-card">
             <span class="feature-icon">🔐</span>
             <h3 data-lang="en">Lock with Face ID</h3>
             <h3 data-lang="de">Sperre mit Face ID</h3>
@@ -830,9 +847,7 @@
             </p>
           </div>
 
-          <div class="feature-card new">
-            <span class="new-badge" data-lang="en">New in 2.5</span>
-            <span class="new-badge" data-lang="de">Neu in 2.5</span>
+          <div class="feature-card">
             <span class="feature-icon">📱</span>
             <h3 data-lang="en">Now on iPad</h3>
             <h3 data-lang="de">Jetzt auch auf dem iPad</h3>
@@ -894,9 +909,7 @@
             </p>
           </div>
 
-          <div class="feature-card new">
-            <span class="new-badge" data-lang="en">New in 2.5</span>
-            <span class="new-badge" data-lang="de">Neu in 2.5</span>
+          <div class="feature-card">
             <span class="feature-icon">📤</span>
             <h3 data-lang="en">JSON Export</h3>
             <h3 data-lang="de">JSON-Export</h3>
@@ -1084,13 +1097,18 @@
             Pulse stores everything exclusively on your iPhone or iPad and in
             your personal iCloud account — using Apple's CloudKit. We operate no
             servers, collect no analytics, and have no access to your journal
-            whatsoever. Your reflections are yours alone.
+            whatsoever. If you turn it on, Pulse also writes your moods and
+            reflection time to Apple Health on your device — and never reads
+            from it. Your reflections are yours alone.
           </p>
           <p data-lang="de">
             Pulse speichert alles ausschließlich auf deinem iPhone oder iPad und
             in deinem persönlichen iCloud-Account — mit Apples CloudKit. Wir
             betreiben keine Server, erfassen keine Analysen und haben keinerlei
-            Zugriff auf dein Journal. Deine Reflexionen gehören allein dir.
+            Zugriff auf dein Journal. Wenn du es einschaltest, schreibt Pulse
+            deine Stimmungen und deine Reflexionszeit zusätzlich in Apple Health
+            auf deinem Gerät — und liest nichts daraus. Deine Reflexionen
+            gehören allein dir.
           </p>
         </div>
       </div>
@@ -1155,7 +1173,7 @@
       <!-- English -->
       <div class="policy-box" data-lang="en">
         <h2>Privacy Policy</h2>
-        <p class="policy-date">Last updated: April 2026</p>
+        <p class="policy-date">Last updated: October 2026</p>
 
         <h3>1. Overview</h3>
         <p>
@@ -1163,7 +1181,8 @@
           not collect, transmit, or have access to any personal data you enter
           into the app. All data is stored locally on your device and, if you
           choose to enable iCloud sync, in your personal Apple iCloud account
-          via Apple's CloudKit technology.
+          via Apple's CloudKit technology. If you turn on the Apple Health
+          options, Pulse also writes to Apple Health on your device.
         </p>
 
         <h3>2. Data We Do Not Collect</h3>
@@ -1183,7 +1202,8 @@
         <p>
           All data you create in Pulse — including moments, reflections, mood
           scores, metrics, and optional location information — is stored
-          exclusively in your app's local SwiftData database on your device.
+          exclusively in your app's local SwiftData database on your device —
+          except what you choose to write to Apple Health (see section 6).
         </p>
 
         <h3>4. iCloud Sync (CloudKit)</h3>
@@ -1207,13 +1227,51 @@
           servers.
         </p>
 
-        <h3>6. No Third-Party Analytics or Advertising</h3>
+        <h3>6. Apple Health (HealthKit)</h3>
+        <p>
+          Pulse can optionally write to Apple Health. Both options are off by
+          default and are turned on separately in Settings &gt; General, each
+          with your permission:
+        </p>
+        <ul>
+          <li>
+            Mood: each new or edited moment is saved as a State of Mind entry
+            with its mood score.
+          </li>
+          <li>
+            Mindful Minutes: the time you spend in the daily reflection with
+            the app open is saved as a mindfulness session.
+          </li>
+        </ul>
+        <p>
+          Pulse only writes to Apple Health and never reads from it. Health
+          data is stored by Apple's Health app on your device and, if you sync
+          Health with iCloud, in your iCloud account. It is governed by
+          <a
+            href="https://www.apple.com/legal/privacy/"
+            target="_blank"
+            rel="noopener"
+            >Apple's Privacy Policy</a
+          >. It is never sent to us, used for advertising, or shared with third
+          parties. You can turn the options off or revoke access at any time in
+          Settings &gt; Privacy &amp; Security &gt; Health &gt; Pulse, and
+          delete the entries in the Health app.
+        </p>
+
+        <h3>7. AI Coach (Apple Intelligence)</h3>
+        <p>
+          The optional AI coach uses Apple's on-device Foundation Models. Your
+          moments are analyzed entirely on your device; no data is sent to us,
+          to Apple, or to any other server for this purpose.
+        </p>
+
+        <h3>8. No Third-Party Analytics or Advertising</h3>
         <p>
           Pulse contains no third-party analytics SDKs, advertising networks, or
           tracking libraries. We do not share any data with third parties.
         </p>
 
-        <h3>7. App Store</h3>
+        <h3>9. App Store</h3>
         <p>
           Downloading Pulse through the App Store is subject to
           <a
@@ -1224,19 +1282,19 @@
           >.
         </p>
 
-        <h3>8. Children's Privacy</h3>
+        <h3>10. Children's Privacy</h3>
         <p>
           Pulse does not knowingly collect data from children under 13. Since we
           collect no data at all, the app is safe for all ages.
         </p>
 
-        <h3>9. Changes to This Policy</h3>
+        <h3>11. Changes to This Policy</h3>
         <p>
           We may update this privacy policy from time to time. Changes will be
           posted on this page with an updated date.
         </p>
 
-        <h3>10. Contact</h3>
+        <h3>12. Contact</h3>
         <p>
           If you have questions about this privacy policy, please contact us at
           <a href="mailto:pulse@raitner.de">pulse@raitner.de</a>.
@@ -1246,7 +1304,7 @@
       <!-- German -->
       <div class="policy-box" data-lang="de">
         <h2>Datenschutzerklärung</h2>
-        <p class="policy-date">Zuletzt aktualisiert: April 2026</p>
+        <p class="policy-date">Zuletzt aktualisiert: Oktober 2026</p>
 
         <h3>1. Überblick</h3>
         <p>
@@ -1255,6 +1313,8 @@
           die du in die App eingibst. Alle Daten werden lokal auf deinem Gerät
           gespeichert und — wenn du iCloud-Sync aktivierst — in deinem
           persönlichen Apple-iCloud-Account über Apples CloudKit-Technologie.
+          Wenn du die Apple-Health-Optionen einschaltest, schreibt Pulse
+          zusätzlich in Apple Health auf deinem Gerät.
         </p>
 
         <h3>2. Daten, die wir nicht erfassen</h3>
@@ -1275,7 +1335,9 @@
           Alle Daten, die du in Pulse erstellst — einschließlich Momenten,
           Reflexionen, Stimmungsbewertungen, Metriken und optionalen
           Standortinformationen — werden ausschließlich in der lokalen
-          SwiftData-Datenbank der App auf deinem Gerät gespeichert.
+          SwiftData-Datenbank der App auf deinem Gerät gespeichert — mit
+          Ausnahme dessen, was du in Apple Health schreiben lässt (siehe
+          Abschnitt 6).
         </p>
 
         <h3>4. iCloud-Synchronisation (CloudKit)</h3>
@@ -1300,13 +1362,54 @@
           deiner persönlichen iCloud gespeichert — niemals auf unseren Servern.
         </p>
 
-        <h3>6. Keine Drittanbieter-Analysen oder Werbung</h3>
+        <h3>6. Apple Health (HealthKit)</h3>
+        <p>
+          Pulse kann optional in Apple Health schreiben. Beide Optionen sind ab
+          Werk aus und werden einzeln unter Einstellungen &gt; Allgemein
+          eingeschaltet, jeweils mit deiner Genehmigung:
+        </p>
+        <ul>
+          <li>
+            Stimmung: Jeder neue oder bearbeitete Moment wird mit seiner
+            Stimmungsbewertung als Gemütszustand gespeichert.
+          </li>
+          <li>
+            Minuten der Achtsamkeit: Die Zeit, die du mit geöffneter App in
+            der Tagesreflexion verbringst, wird als Achtsamkeitssitzung
+            gespeichert.
+          </li>
+        </ul>
+        <p>
+          Pulse schreibt nur in Apple Health und liest nichts daraus.
+          Health-Daten werden von Apples Health-App auf deinem Gerät und — wenn
+          du Health mit iCloud synchronisierst — in deinem iCloud-Account
+          gespeichert und unterliegen der
+          <a
+            href="https://www.apple.com/de/legal/privacy/"
+            target="_blank"
+            rel="noopener"
+            >Datenschutzrichtlinie von Apple</a
+          >. Sie werden nie an uns gesendet, nicht für Werbung verwendet und
+          nicht an Dritte weitergegeben. Du kannst die Optionen jederzeit
+          ausschalten oder den Zugriff unter Einstellungen &gt; Datenschutz
+          &amp; Sicherheit &gt; Health &gt; Pulse widerrufen und die Einträge
+          in der Health-App löschen.
+        </p>
+
+        <h3>7. KI-Coach (Apple Intelligence)</h3>
+        <p>
+          Der optionale KI-Coach nutzt Apples Foundation Models auf dem Gerät.
+          Deine Momente werden vollständig auf deinem Gerät analysiert; dafür
+          werden keine Daten an uns, an Apple oder an andere Server gesendet.
+        </p>
+
+        <h3>8. Keine Drittanbieter-Analysen oder Werbung</h3>
         <p>
           Pulse enthält keine Analyse-SDKs von Drittanbietern, Werbenetzwerke
           oder Tracking-Bibliotheken. Wir geben keine Daten an Dritte weiter.
         </p>
 
-        <h3>7. App Store</h3>
+        <h3>9. App Store</h3>
         <p>
           Das Herunterladen von Pulse über den App Store unterliegt der
           <a
@@ -1317,21 +1420,21 @@
           >.
         </p>
 
-        <h3>8. Datenschutz für Kinder</h3>
+        <h3>10. Datenschutz für Kinder</h3>
         <p>
           Pulse erfasst wissentlich keine Daten von Kindern unter 13 Jahren. Da
           wir überhaupt keine Daten erfassen, ist die App für alle Altersgruppen
           geeignet.
         </p>
 
-        <h3>9. Änderungen dieser Richtlinie</h3>
+        <h3>11. Änderungen dieser Richtlinie</h3>
         <p>
           Wir können diese Datenschutzrichtlinie von Zeit zu Zeit aktualisieren.
           Änderungen werden auf dieser Seite mit einem aktualisierten Datum
           veröffentlicht.
         </p>
 
-        <h3>10. Kontakt</h3>
+        <h3>12. Kontakt</h3>
         <p>
           Bei Fragen zu dieser Datenschutzerklärung kontaktiere uns bitte unter
           <a href="mailto:pulse@raitner.de">pulse@raitner.de</a>.
