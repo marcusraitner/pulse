@@ -16,7 +16,6 @@ import HealthKit
 /// can find it again — without storing anything new in SwiftData.
 struct HealthMoodLogger {
     private static let logger = Logger(subsystem: "de.raitner.pulse", category: "HealthMoodLogger")
-    private static let store = HKHealthStore()
     private static let stateOfMindType = HKSampleType.stateOfMindType()
 
     /// Maps Pulse's −2…+2 score onto HealthKit's continuous −1…+1 valence.
@@ -49,32 +48,24 @@ struct HealthMoodLogger {
 
     /// `true` if this device has a Health store (e.g. not on iPad without Health).
     static var isAvailable: Bool {
-        HKHealthStore.isHealthDataAvailable()
+        HealthAccess.isAvailable
     }
 
     /// `true` if the user denied write access. HealthKit shows its dialog only once, so access
     /// can then only be granted in Settings.
     static var isAccessDenied: Bool {
-        isAvailable && store.authorizationStatus(for: stateOfMindType) == .sharingDenied
+        HealthAccess.isDenied(stateOfMindType)
     }
 
     /// Asks for permission to write State of Mind samples. No read access is requested.
     /// - Returns: `true` if writing is allowed afterwards.
     static func requestAuthorization() async -> Bool {
-        guard isAvailable else { return false }
-        do {
-            try await store.requestAuthorization(toShare: [stateOfMindType], read: [])
-        } catch {
-            logger.error("Failed to request HealthKit authorization: \(String(describing: error))")
-        }
-        return store.authorizationStatus(for: stateOfMindType) == .sharingAuthorized
+        await HealthAccess.requestWriteAccess(to: stateOfMindType)
     }
 
     /// `true` if the user enabled the setting on this device and granted write access.
     private static var canWrite: Bool {
-        UserDefaults.standard.bool(forKey: AppStorageKeys.healthMoodLogging)
-            && isAvailable
-            && store.authorizationStatus(for: stateOfMindType) == .sharingAuthorized
+        HealthAccess.canWrite(stateOfMindType, enabledBy: AppStorageKeys.healthMoodLogging)
     }
 
     /// Writes the moment to Health, replacing any earlier sample for the same entry.
@@ -86,7 +77,7 @@ struct HealthMoodLogger {
                             version: syncVersion(at: .now))
         Task {
             do {
-                try await store.save(sample)
+                try await HealthAccess.store.save(sample)
             } catch {
                 logger.error("Failed to save State of Mind sample: \(String(describing: error))")
             }
@@ -101,7 +92,7 @@ struct HealthMoodLogger {
                                                     allowedValues: [id.uuidString])
         Task {
             do {
-                try await store.deleteObjects(of: stateOfMindType, predicate: predicate)
+                try await HealthAccess.store.deleteObjects(of: stateOfMindType, predicate: predicate)
             } catch {
                 logger.error("Failed to delete State of Mind sample: \(String(describing: error))")
             }
