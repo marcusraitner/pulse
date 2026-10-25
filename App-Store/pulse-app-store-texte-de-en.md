@@ -46,9 +46,11 @@ SO FUNKTIONIERT'S
 
 • AI-Coach: Auf Wunsch analysiert Apple Intelligence deine Einträge und liefert Erkenntnisse über deine Muster – zu 100 % auf deinem Gerät, ohne Cloud.
 
+• Apple Health: Auf Wunsch landen deine Stimmungen als Gemütszustand und die Zeit deiner Reflexion als Minuten der Achtsamkeit in der Health-App.
+
 DEINE DATEN GEHÖREN DIR
 
-Alle Einträge bleiben auf deinem iPhone oder iPad und in deiner privaten iCloud. Auf Wunsch sperrst du Pulse mit Face ID, Touch ID oder deinem Gerätecode. Kein Tracking, keine Werbung, keine Konten. Der komplette Quellcode ist offen auf GitHub einsehbar. Export als JSON jederzeit möglich.
+Alle Einträge bleiben auf deinem iPhone oder iPad und in deiner privaten iCloud. In Apple Health schreibt Pulse nur, was du einschaltest – und liest nichts daraus. Auf Wunsch sperrst du Pulse mit Face ID, Touch ID oder deinem Gerätecode. Kein Tracking, keine Werbung, keine Konten. Der komplette Quellcode ist offen auf GitHub einsehbar. Export als JSON jederzeit möglich.
 
 FÜR WEN IST PULSE?
 
@@ -58,28 +60,24 @@ Was Nutzer sagen: „Endlich mal eine schlichte und schnelle App" – ★★★�
 
 Fragen oder Wünsche? Pulse wird aktiv weiterentwickelt – dein Feedback fließt direkt ein.
 ```
-*(ca. 1.630 Zeichen — bewusst kompakt; Versionshinweise wie „Neu in 2.2" gehören in „Was ist neu", nicht in die Beschreibung.)*
+*(ca. 1.860 Zeichen — bewusst kompakt; Versionshinweise wie „Neu in 2.2" gehören in „Was ist neu", nicht in die Beschreibung.)*
 
-### Was ist neu in 2.5 (max. 4.000 Zeichen)
+### Was ist neu in 2.6 (max. 4.000 Zeichen)
 ```
-Version 2.5 bringt Pulse aufs iPad und schützt dein Journal auf Wunsch mit Face ID.
+Version 2.6 verbindet Pulse auf Wunsch mit Apple Health.
 
-SPERRE MIT FACE ID
-Pulse sperrt sich auf Wunsch, sobald du die App verlässt, und öffnet sich erst wieder mit Face ID, Touch ID oder deinem Gerätecode. Einschalten unter Einstellungen > Allgemein.
+STIMMUNG IN APPLE HEALTH
+Jeder neue oder bearbeitete Moment kann als Gemütszustand in der Health-App erscheinen – deine Bewertung von −2 bis +2 wird dort zur Stimmung. Löschst du einen Moment, verschwindet auch sein Eintrag in Health.
 
-PULSE AUFS IPAD
-Auf dem großen Bildschirm bleibt der Inhalt in angenehmer Lesebreite zentriert, und die Zeitleiste hält deinen Tag in der Mitte – auch wenn du das Gerät drehst oder die Fenstergröße änderst.
+REFLEXION ALS MINUTEN DER ACHTSAMKEIT
+Die Zeit, die du mit geöffneter App in deiner Morgen- und Abendbilanz verbringst, kann als Minuten der Achtsamkeit gespeichert werden – ab einer Minute, höchstens 30 Minuten pro Sitzung.
 
-EXPORT MIT FILTERN
-Exportiere nur, was du brauchst: einen Zeitraum – diese Woche, letzten Monat oder frei gewählt – und auf Wunsch nur Momente mit bestimmten Tags. Das Dateiformat bleibt unverändert.
-
-SYNC-STATUS AUF EINEN BLICK
-Unter Einstellungen > Statistiken siehst du, was iCloud gerade macht: wann zuletzt synchronisiert wurde, ob du offline bist, ob ein iCloud-Account fehlt oder der Speicher voll ist.
+Beides schaltest du unabhängig voneinander unter Einstellungen > Allgemein ein; ab Werk ist beides aus. Pulse schreibt nur in Health und liest nichts daraus.
 
 KLEINERES
-Doppelte Tage, die bei der iCloud-Synchronisierung entstehen können, werden automatisch zusammengeführt. Dazu vier neue Hintergrundbilder, eine neu gestaltete Datumsanzeige mit „Heute" und „Gestern" und bessere Unterstützung für VoiceOver.
+Die Tastatur in der Tagesbilanz schließt du jetzt einfach durch Wischen. Und wenn du aus der Bilanz heraus einen Moment öffnest, bleibt dein noch nicht gespeicherter Text erhalten.
 ```
-*(ca. 1.150 Zeichen)*
+*(ca. 870 Zeichen)*
 
 ---
 
@@ -124,9 +122,11 @@ HOW IT WORKS
 
 • AI coach: on request, Apple Intelligence analyzes your entries and surfaces insights about your patterns — running entirely on your device, no cloud.
 
+• Apple Health: if you like, your moods appear as State of Mind and the time you spend reflecting as Mindful Minutes in the Health app.
+
 YOUR DATA STAYS YOURS
 
-Everything lives on your iPhone or iPad and in your private iCloud. Lock Pulse with Face ID, Touch ID or your device passcode if you like. No tracking, no ads, no accounts. The full source code is public on GitHub. Export to JSON anytime.
+Everything lives on your iPhone or iPad and in your private iCloud. Pulse only writes to Apple Health what you turn on — and never reads from it. Lock Pulse with Face ID, Touch ID or your device passcode if you like. No tracking, no ads, no accounts. The full source code is public on GitHub. Export to JSON anytime.
 
 WHO IS PULSE FOR?
 
@@ -134,25 +134,21 @@ For everyone who has failed at classic journaling: no long entries, no pressure,
 
 Questions or ideas? Pulse is actively developed — your feedback shapes the roadmap.
 ```
-*(approx. 1,420 characters. Note: the German testimonial is deliberately omitted here — add an English review quote once the US storefront has ratings.)*
+*(approx. 1,640 characters. Note: the German testimonial is deliberately omitted here — add an English review quote once the US storefront has ratings.)*
 
-### What's New in 2.5 (max. 4,000 characters)
+### What's New in 2.6 (max. 4,000 characters)
 ```
-Version 2.5 brings Pulse to the iPad and, if you like, locks your journal behind Face ID.
+Version 2.6 connects Pulse to Apple Health, if you like.
 
-LOCK WITH FACE ID
-If you turn it on, Pulse locks as soon as you leave the app and only opens again with Face ID, Touch ID or your device passcode. Find it under Settings > General.
+MOOD IN APPLE HEALTH
+Every new or edited moment can appear as State of Mind in the Health app — your rating from −2 to +2 becomes your mood there. Delete a moment, and its Health entry goes too.
 
-PULSE ON IPAD
-On the big screen your content stays centered at a comfortable reading width, and the timeline keeps your day in the middle — even when you rotate the device or resize the window.
+REFLECTION AS MINDFUL MINUTES
+The time you spend on your morning and evening reflection with the app open can be saved as Mindful Minutes — from one minute up to 30 minutes per session.
 
-EXPORT WITH FILTERS
-Export only what you need: a time range — this week, last month or your own — and, if you like, only moments with certain tags. The file format stays the same.
-
-SYNC STATUS AT A GLANCE
-Settings > Statistics now shows what iCloud is doing: when it last synced, whether you're offline, whether an iCloud account is missing or storage is full.
+Turn each on separately under Settings > General; both are off by default. Pulse only writes to Health and never reads from it.
 
 SMALLER THINGS
-Days that a sync race can duplicate are merged automatically. Plus four new background images, a redesigned date display with "Today" and "Yesterday", and better VoiceOver support.
+Swipe to dismiss the keyboard in the daily reflection. And when you open a moment from your reflection, the text you haven't saved yet stays put.
 ```
-*(approx. 1,025 characters)*
+*(approx. 730 characters)*
