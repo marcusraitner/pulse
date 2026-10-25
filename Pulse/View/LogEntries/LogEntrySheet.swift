@@ -136,6 +136,7 @@ struct LogEntrySheet: View {
             entry.tagsRaw = rawTags
             entry.timestamp = timestamp
             context.saveOrLog("Failure while saving entry", logger: logger)
+            HealthMoodLogger.save(entry)
         } else {
             // new entry
             let newEntry = DailyLogEntry(
@@ -150,6 +151,7 @@ struct LogEntrySheet: View {
             )
             context.insert(newEntry)
             context.saveOrLog("Failure saving new entry", logger: logger)
+            HealthMoodLogger.save(newEntry)
         }
     }
     
@@ -326,8 +328,11 @@ struct LogEntrySheet: View {
                                             titleVisibility: .visible) {
                             Button("Delete", role: .destructive) {
                                 if let entry {
+                                    // read before deleting; the model is unusable afterwards
+                                    let id = entry.id
                                     context.delete(entry)
                                     context.saveOrLog("Failure saving deleted entry", logger: logger)
+                                    HealthMoodLogger.delete(id: id)
                                     dismiss()
                                 }
                             }
