@@ -31,12 +31,42 @@
         }
       }
     },
-    "Pulse is not allowed to write to Health. Allow it in Settings under Privacy & Security > Health > Pulse." : {
+    "Log reflections as Mindful Minutes" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pulse darf nicht in Health schreiben. Erlaube es in den Einstellungen unter Datenschutz & Sicherheit > Health > Pulse."
+            "value" : "Reflexionen als Minuten der Achtsamkeit speichern"
+          }
+        }
+      }
+    },
+    "Pulse is not allowed to save Mindful Minutes to Health. Allow it in Settings under Privacy & Security > Health > Pulse." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulse darf keine Minuten der Achtsamkeit in Health speichern. Erlaube es in den Einstellungen unter Datenschutz & Sicherheit > Health > Pulse."
+          }
+        }
+      }
+    },
+    "Pulse is not allowed to save State of Mind and Mindful Minutes to Health. Allow both in Settings under Privacy & Security > Health > Pulse." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulse darf weder Gemütszustand noch Minuten der Achtsamkeit in Health speichern. Erlaube beides in den Einstellungen unter Datenschutz & Sicherheit > Health > Pulse."
+          }
+        }
+      }
+    },
+    "Pulse is not allowed to save State of Mind to Health. Allow it in Settings under Privacy & Security > Health > Pulse." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulse darf keinen Gemütszustand in Health speichern. Erlaube es in den Einstellungen unter Datenschutz & Sicherheit > Health > Pulse."
           }
         }
       }
@@ -47,6 +77,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stimmungen in Apple Health speichern"
+          }
+        }
+      }
+    },
+    "Time spent in the reflection with the app open is saved as Mindful Minutes, from one minute up to 30 minutes per session. Only saved reflections count." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zeit, die du mit geöffneter App in der Reflexion verbringst, wird als Minuten der Achtsamkeit gespeichert – ab einer Minute und höchstens 30 Minuten pro Sitzung. Nur gespeicherte Reflexionen zählen."
           }
         }
       }

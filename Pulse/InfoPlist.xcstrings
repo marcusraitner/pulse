@@ -44,13 +44,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pulse liest keine Daten aus Health. Pulse speichert nur die Stimmungsbewertung jedes erfassten Moments als Gemütszustand."
+            "value" : "Pulse liest keine Daten aus Health. Pulse speichert nur, jeweils wenn du es einschaltest, die Stimmungsbewertung jedes Moments als Gemütszustand und die Zeit deiner Reflexion als Minuten der Achtsamkeit."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pulse does not read any data from Health. It only saves the mood rating of each moment you log as a State of Mind entry."
+            "value" : "Pulse does not read any data from Health. It only saves, each only if you turn it on, the mood rating of each moment as State of Mind and the time spent on your reflection as Mindful Minutes."
           }
         }
       }
@@ -62,13 +62,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pulse speichert die Stimmungsbewertung jedes erfassten Moments als Gemütszustand in der Health-App. Pulse liest keine Daten aus Health."
+            "value" : "Pulse kann zwei Dinge in der Health-App speichern, jeweils nur, wenn du es einschaltest: die Stimmungsbewertung jedes Moments als Gemütszustand und die Zeit deiner Reflexion als Minuten der Achtsamkeit. Pulse liest keine Daten aus Health."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pulse saves the mood rating of each moment you log as a State of Mind entry in the Health app. Pulse never reads data from Health."
+            "value" : "Pulse can save two things in the Health app, each only if you turn it on: the mood rating of each moment as State of Mind, and the time spent on your reflection as Mindful Minutes. Pulse never reads data from Health."
           }
         }
       }
