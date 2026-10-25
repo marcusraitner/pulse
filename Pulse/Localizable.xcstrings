@@ -31,6 +31,16 @@
         }
       }
     },
+    "Log reflections as Mindful Minutes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reflexionen als Minuten der Achtsamkeit speichern"
+          }
+        }
+      }
+    },
     "Pulse is not allowed to write to Health. Allow it in Settings under Privacy & Security > Health > Pulse." : {
       "localizations" : {
         "de" : {
@@ -47,6 +57,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stimmungen in Apple Health speichern"
+          }
+        }
+      }
+    },
+    "Time spent in the reflection with the app open is saved as Mindful Minutes, from one minute up to 30 minutes per session. Only saved reflections count." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zeit, die du mit geöffneter App in der Reflexion verbringst, wird als Minuten der Achtsamkeit gespeichert – ab einer Minute und höchstens 30 Minuten pro Sitzung. Nur gespeicherte Reflexionen zählen."
           }
         }
       }

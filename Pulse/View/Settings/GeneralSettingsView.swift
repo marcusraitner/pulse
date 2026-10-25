@@ -17,9 +17,11 @@ struct GeneralSettingsView: View {
     @AppStorage(AppStorageKeys.enableEditingHistory) private var enableEditingHistory: Bool = false
     @AppStorage(AppStorageKeys.appLockEnabled) private var appLockEnabled: Bool = false
     @AppStorage(AppStorageKeys.healthMoodLogging) private var healthMoodLogging: Bool = false
+    @AppStorage(AppStorageKeys.mindfulMinutesLogging) private var mindfulMinutesLogging: Bool = false
 
     // Re-read whenever the app becomes active: access can only be granted in Settings
     @State private var isHealthAccessDenied: Bool = false
+    @State private var isMindfulAccessDenied: Bool = false
     @Environment(\.scenePhase) private var scenePhase
 
     // Export data
@@ -70,12 +72,17 @@ struct GeneralSettingsView: View {
         defaults.removeObject(forKey: AppStorageKeys.freezeHistory)
     }
 
-    /// Disables the Health toggle while access is denied, and turns it off if access was
-    /// revoked in Settings, so the toggle never claims Pulse is writing when it cannot.
+    /// Disables each Health toggle while its access is denied, and turns it off if access was
+    /// revoked in Settings, so a toggle never claims Pulse is writing when it cannot.
+    /// HealthKit grants access per data type, so the two toggles are checked separately.
     private func refreshHealthAccess() {
         isHealthAccessDenied = HealthMoodLogger.isAccessDenied
         if isHealthAccessDenied {
             healthMoodLogging = false
+        }
+        isMindfulAccessDenied = MindfulSessionLogger.isAccessDenied
+        if isMindfulAccessDenied {
+            mindfulMinutesLogging = false
         }
     }
 
@@ -144,8 +151,14 @@ struct GeneralSettingsView: View {
                         Text("Each new or edited moment is saved as a State of Mind in the Health app. Pulse never reads data from Health.")
                     }
                     .disabled(isHealthAccessDenied)
+
+                    Toggle(isOn: $mindfulMinutesLogging) {
+                        Text("Log reflections as Mindful Minutes")
+                        Text("Time spent in the reflection with the app open is saved as Mindful Minutes, from one minute up to 30 minutes per session. Only saved reflections count.")
+                    }
+                    .disabled(isMindfulAccessDenied)
                 } footer: {
-                    if isHealthAccessDenied {
+                    if isHealthAccessDenied || isMindfulAccessDenied {
                         Text("Pulse is not allowed to write to Health. Allow it in Settings under Privacy & Security > Health > Pulse.")
                     }
                 }
@@ -224,6 +237,16 @@ struct GeneralSettingsView: View {
             Task {
                 if !(await HealthMoodLogger.requestAuthorization()) {
                     healthMoodLogging = false
+                }
+                refreshHealthAccess()
+            }
+        }
+        .onChange(of: mindfulMinutesLogging) { _, isEnabled in
+            // Turning off only stops new writes; sessions already in Health stay there
+            guard isEnabled else { return }
+            Task {
+                if !(await MindfulSessionLogger.requestAuthorization()) {
+                    mindfulMinutesLogging = false
                 }
                 refreshHealthAccess()
             }
