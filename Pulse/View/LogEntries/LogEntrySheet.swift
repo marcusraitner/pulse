@@ -26,9 +26,10 @@ struct LogEntrySheet: View {
         self.entry = entry
         _log = State(initialValue: entry?.log ?? "")
         _score = State(initialValue: entry?.score ?? 0)
-        _latitude = State(initialValue: entry?.latitude)
-        _longitude = State(initialValue: entry?.longitude)
-        _address = State(initialValue: entry?.address)
+        _location = State(initialValue: entry?.location)
+        if let location = entry?.location {
+            _mapPosition = State(initialValue: .region(Self.region(around: location.coordinate)))
+        }
         if let entry {
             _timestamp = State(initialValue: entry.timestamp)
         } else {
@@ -51,9 +52,7 @@ struct LogEntrySheet: View {
     
     @State private var log: String
     @State private var score: Int
-    @State private var latitude: Double?
-    @State private var longitude: Double?
-    @State private var address: String?
+    @State private var location: MomentLocation?
     @State private var entryTags: Set = Set<String>()
     @State private var newTag: String = ""
     @State private var timestamp: Date = .now
@@ -78,7 +77,8 @@ struct LogEntrySheet: View {
     }
     
     @State var locationManager = LocationManager()
-    @State private var mapPosition: MapCameraPosition = .automatic
+    @State private var mapPosition: MapCameraPosition = .userLocation(fallback: .automatic)
+    @State private var geocodeTask: Task<Void, Never>?
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
@@ -116,17 +116,44 @@ struct LogEntrySheet: View {
     /// Updates the location state with the coordinate and reverse-geocoded address from `item`.
     private func setItem(item: MKMapItem) -> Void {
         let coordinate: CLLocationCoordinate2D = item.location.coordinate
+        geocodeTask?.cancel()
+        mapPosition = .region(Self.region(around: coordinate))
 
-        latitude = coordinate.latitude
-        longitude = coordinate.longitude
-
-        let region = MKCoordinateRegion(
-            center: coordinate,
-            span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+        location = MomentLocation(
+            coordinate: coordinate,
+            address: item.addressRepresentations?.fullAddress(includingRegion: false, singleLine: true) ?? "Unknown"
         )
-        mapPosition = .region(region)
+    }
 
-        address = item.addressRepresentations?.fullAddress(includingRegion: false, singleLine: true) ?? "Unknown"
+    /// Sets the location to a coordinate the user tapped on the map.
+    /// The coordinate text stands in as address until reverse geocoding returns;
+    /// a newer tap cancels the lookup of an older one.
+    private func selectLocation(at coordinate: CLLocationCoordinate2D) {
+        let picked = MomentLocation(coordinate: coordinate)
+        location = MomentLocation(coordinate: coordinate, address: picked.formattedCoordinate)
+
+        geocodeTask?.cancel()
+        geocodeTask = Task {
+            guard let address = await locationManager.address(for: coordinate), !Task.isCancelled else { return }
+            location?.address = address
+        }
+    }
+
+    private func useCurrentLocation() {
+        locationManager.setItem = self.setItem
+        locationManager.requestLocation()
+    }
+
+    private func removeLocation() {
+        geocodeTask?.cancel()
+        location = nil
+    }
+
+    private static func region(around coordinate: CLLocationCoordinate2D) -> MKCoordinateRegion {
+        MKCoordinateRegion(
+            center: coordinate,
+            span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01) // ~1–2 km depending on latitude
+        )
     }
     
     private func save() {
@@ -135,6 +162,10 @@ struct LogEntrySheet: View {
             entry.score = score
             entry.tagsRaw = rawTags
             entry.timestamp = timestamp
+            // only touch the location fields if they changed, to avoid needless CloudKit writes
+            if entry.location != location {
+                entry.location = location
+            }
             context.saveOrLog("Failure while saving entry", logger: logger)
             HealthMoodLogger.save(entry)
         } else {
@@ -144,17 +175,87 @@ struct LogEntrySheet: View {
                 log: log,
                 score: score,
                 entry: day,
-                latitude: storeLocations ? latitude : nil,
-                longitude: storeLocations ? longitude : nil,
-                address: storeLocations ? address : nil,
                 tagsRaw: rawTags
             )
+            newEntry.location = storeLocations ? location : nil
             context.insert(newEntry)
             context.saveOrLog("Failure saving new entry", logger: logger)
             HealthMoodLogger.save(newEntry)
         }
     }
     
+    private var isLocationDenied: Bool {
+        locationManager.authorizationStatus == .denied || locationManager.authorizationStatus == .restricted
+    }
+
+    @ViewBuilder
+    private var locationDeniedHint: some View {
+        Text("Location services are disabled. Please open settings to enable location services.")
+
+        if let url = URL(string: UIApplication.openSettingsURLString) {
+            Button("Open Settings") {
+                UIApplication.shared.open(url)
+            }
+            .listRowSeparator(.hidden)
+        }
+    }
+
+    /// Location editor for an existing moment: tap the map to move the pin,
+    /// use the current location, or remove the location entirely.
+    @ViewBuilder
+    private var editableLocation: some View {
+        if let location {
+            Label(location.address ?? location.formattedCoordinate, systemImage: "location.circle.fill")
+                .labelStyle(.titleAndIcon)
+        }
+
+        MapReader { proxy in
+            Map(position: $mapPosition) {
+                if let location {
+                    Marker(location.address ?? location.formattedCoordinate, coordinate: location.coordinate)
+                }
+            }
+            .mapControls {
+                MapScaleView()
+            }
+            .onTapGesture { point in
+                if let coordinate = proxy.convert(point, from: .local) {
+                    selectLocation(at: coordinate)
+                }
+            }
+        }
+        .frame(height: 300)
+
+        Group {
+            if location == nil {
+                Text("Tap the map to set a location.")
+            } else {
+                Text("Tap the map to change the location.")
+            }
+        }
+        .font(.caption)
+        .foregroundStyle(.secondary)
+
+        if isLocationDenied {
+            locationDeniedHint
+        }
+
+        VStack(alignment: .leading, spacing: 12) {
+            Button("Use Current Location", systemImage: "location", action: useCurrentLocation)
+                .disabled(isLocationDenied)
+            if location != nil {
+                Button(role: .destructive, action: removeLocation) {
+                    // explicit red, otherwise the icon keeps the accent color (same as "Delete Moment")
+                    Label("Remove Location", systemImage: "location.slash")
+                        .foregroundStyle(.red)
+                }
+            }
+        }
+        // borderless keeps the two buttons separately tappable inside a Form row
+        .buttonStyle(.borderless)
+        .padding(.top, 12)
+    }
+
     var body: some View {
         Form {
             Section() {
@@ -241,18 +342,11 @@ struct LogEntrySheet: View {
                         }
                         
                         if storeLocations {
-                            if locationManager.authorizationStatus == .denied || locationManager.authorizationStatus == .restricted {
-                                Text("Location services are disabled. Please open settings to enable location services.")
-                                
-                                if let url = URL(string: UIApplication.openSettingsURLString) {
-                                    Button("Open Settings") {
-                                        UIApplication.shared.open(url)
-                                    }
-                                    .listRowSeparator(.hidden)
-                                }
+                            if isLocationDenied {
+                                locationDeniedHint
                             } else {
                                 if let item = locationManager.mapItems.first {
-                                    Text(address ?? "Unknown")
+                                    Text(location?.address ?? "Unknown")
                                     
                                     Map(position: $mapPosition) {
                                         Marker(item: item)
@@ -277,26 +371,20 @@ struct LogEntrySheet: View {
                             }
                         }
                         
+                    } else if isEntryEditable {
+                        editableLocation
                     } else {
-                        if let address {
+                        if let location, let address = location.address {
                             Label(address, systemImage: "location.circle.fill")
                                 .labelStyle(.titleAndIcon)
-                            
-                            if let latitude, let longitude {
-                                let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-                                let region = MKCoordinateRegion(
-                                    center: coordinate,
-                                    span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01) // ~1–2 km depending on latitude
-                                )
-                                
-                                Map(position: .constant(.region(region))) {
-                                    Marker(address, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
-                                }
-                                .mapControls {
-                                    MapScaleView()
-                                }
-                                .frame(height: 300)
+
+                            Map(position: .constant(.region(Self.region(around: location.coordinate)))) {
+                                Marker(address, coordinate: location.coordinate)
                             }
+                            .mapControls {
+                                MapScaleView()
+                            }
+                            .frame(height: 300)
                         } else {
                             Text("No location available")
                         }

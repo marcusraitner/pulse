@@ -81,6 +81,26 @@
         }
       }
     },
+    "Tap the map to change the location." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippe auf die Karte, um den Ort zu ändern."
+          }
+        }
+      }
+    },
+    "Tap the map to set a location." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippe auf die Karte, um einen Ort festzulegen."
+          }
+        }
+      }
+    },
     "Time spent in the reflection with the app open is saved as Mindful Minutes, from one minute up to 30 minutes per session. Only saved reflections count." : {
       "localizations" : {
         "de" : {
@@ -1823,6 +1843,16 @@
         }
       }
     },
+    "Remove Location" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ort entfernen"
+          }
+        }
+      }
+    },
     "Require Face ID to open Pulse" : {
       "localizations" : {
         "de" : {
@@ -2176,6 +2206,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Entsperre Pulse, um fortzufahren"
+          }
+        }
+      }
+    },
+    "Use Current Location" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuellen Ort verwenden"
           }
         }
       }
