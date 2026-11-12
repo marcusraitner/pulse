@@ -54,6 +54,19 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         }
     }
     
+    /// Reverse-geocodes `coordinate` into a single-line address, or `nil` if none is found.
+    func address(for coordinate: CLLocationCoordinate2D) async -> String? {
+        let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        guard let request = MKReverseGeocodingRequest(location: location) else { return nil }
+        do {
+            let items = try await request.mapItems
+            return items.first?.addressRepresentations?.fullAddress(includingRegion: false, singleLine: true)
+        } catch {
+            logger.error("Error reverse geocoding coordinate: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         self.authorizationStatus = manager.authorizationStatus
         switch locationManager.authorizationStatus {
