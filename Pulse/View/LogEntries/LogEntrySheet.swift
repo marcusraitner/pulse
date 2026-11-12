@@ -200,7 +200,7 @@ struct LogEntrySheet: View {
         }
     }
 
-    /// Location editor for an existing moment: tap the map to move the pin,
+    /// Location editor for new and existing moments: tap the map to move the pin,
     /// use the current location, or remove the location entirely.
     @ViewBuilder
     private var editableLocation: some View {
@@ -341,36 +341,10 @@ struct LogEntrySheet: View {
                             Text("Store location")
                         }
                         
+                        // same editor as for an existing moment, prefilled with the current location
                         if storeLocations {
-                            if isLocationDenied {
-                                locationDeniedHint
-                            } else {
-                                if let item = locationManager.mapItems.first {
-                                    Text(location?.address ?? "Unknown")
-                                    
-                                    Map(position: $mapPosition) {
-                                        Marker(item: item)
-                                    }
-                                    .frame(height: 300)
-                                    .mapStyle(.standard(elevation: .realistic))
-                                    .mapControls {
-                                        MapUserLocationButton()
-                                    }
-                                } else {
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color.gray.opacity(0.2))
-                                        .frame(height: 300)
-                                        .overlay {
-                                            VStack {
-                                                ProgressView()
-                                                Text("No location available")
-                                            }
-                                            .foregroundStyle(.primary)
-                                        }
-                                }
-                            }
+                            editableLocation
                         }
-                        
                     } else if isEntryEditable {
                         editableLocation
                     } else {
@@ -394,8 +368,7 @@ struct LogEntrySheet: View {
             .headerProminence(.standard)
             .onChange(of: storeLocations) {
                 if storeLocations {
-                    locationManager.setItem = self.setItem
-                    locationManager.requestLocation()
+                    useCurrentLocation()
                 }
             }
             
